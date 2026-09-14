@@ -1,0 +1,5 @@
+{
+  "agg_hours": 8,
+  "config": "nr=0.4,m=0.5,rb=720",
+  "freq": "1h vs 8h"
+}

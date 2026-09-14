@@ -25,8 +25,18 @@ import pandas as pd  # noqa: E402
 
 from src import config as cfgmod  # noqa: E402
 from src.data import store  # noqa: E402
+from src.eval import protocol  # noqa: E402
+from src.registry.runs import Run  # noqa: E402
 from src.sim.carry import CarryConfig, CarrySimulator  # noqa: E402
 from src.sim.funding import load_default  # noqa: E402
+
+HYPOTHESIS = {
+    "question": "carry 的收益分布在逐 bar 口径下退化到什么程度？"
+                "M10 报的 DSR=1.0000 是否因此不可信？",
+    "expected": "峰度极高（远超正态的 3）；聚合到 8h 会降低峰度但不消除",
+    "decision_rule": "若聚合后峰度仍远超正态（如 >20），则 Sharp/DSR 类指标"
+                     "不得作为判定证据，判定须以自助区间为主判据",
+}
 
 
 def load_frames(symbols, source="binance"):
@@ -58,13 +68,6 @@ def stats(r: np.ndarray, bars_per_year: float) -> dict:
     }
 
 
-def agg_to_clock(idx, r, freq):
-    s = pd.Series(np.asarray(r, dtype=float), index=pd.DatetimeIndex(idx))
-    out = s.groupby(s.index.floor(freq)).apply(
-        lambda x: float(np.expm1(np.log1p(x).sum())))
-    return out.to_numpy(), out.index
-
-
 def main() -> None:
     cfg = cfgmod.load("base")
     syms = cfg["universe"]["core"]
@@ -73,40 +76,56 @@ def main() -> None:
     perps = load_frames(syms, "binanceperp")
 
     print("检查：1h 逐 bar 序列 vs 8h 现金流频率序列的分布退化程度\n")
-    for s in syms:
-        c = CarryConfig(initial_capital=10_000.0, notional_ratio=0.4,
-                        initial_margin_ratio=0.5, rebalance_every=720, warmup=300)
-        res = CarrySimulator(spots[s], perps[s], ft, c, s).run()
-        eq = np.asarray(res.equity, dtype=float)
-        r = np.diff(eq) / eq[:-1]
-        idx = pd.DatetimeIndex(res.index)[-len(r):]
+    rows = []
+    with Run("m10_dist_check", {"agg_hours": 8, "config": "nr=0.4,m=0.5,rb=720",
+                                "freq": "1h vs 8h"}, HYPOTHESIS) as run:
+        for s in syms:
+            c = CarryConfig(initial_capital=10_000.0, notional_ratio=0.4,
+                            initial_margin_ratio=0.5, rebalance_every=720,
+                            warmup=300)
+            res = CarrySimulator(spots[s], perps[s], ft, c, s).run()
+            eq = np.asarray(res.equity, dtype=float)
+            r = np.diff(eq) / eq[:-1]
+            idx = pd.DatetimeIndex(res.index)[-len(r):]
+            r1 = stats(np.where(np.isfinite(r), r, 0.0), 24 * 365)
 
-        print(f"══ {s}")
-        for label, rr, bpy in [
-            ("1h 逐 bar", np.where(np.isfinite(r), r, 0.0), 24 * 365),
-        ]:
-            st = stats(rr, bpy)
-            print(f"  {label}（n={st['n']:,}）")
-            print(f"    年化收益 {st['年化收益']*100:>7.2f}%   年化波动 "
-                  f"{st['年化波动']*100:>6.2f}%   Sharpe {st['Sharpe']:>6.2f}")
-            print(f"    偏度 {st['偏度']:>8.2f}   峰度 {st['峰度']:>10.2f}   "
-                  f"零收益占比 {st['零收益占比']*100:>6.2f}%")
-            print(f"    单期极值 [{st['最小单期']*100:+.3f}%, "
-                  f"{st['最大单期']*100:+.3f}%]")
+            print(f"══ {s}")
+            print(f"  1h 逐 bar（n={r1['n']:,}）")
+            print(f"    年化收益 {r1['年化收益']*100:>7.2f}%   年化波动 "
+                  f"{r1['年化波动']*100:>6.2f}%   Sharpe {r1['Sharpe']:>6.2f}")
+            print(f"    偏度 {r1['偏度']:>8.2f}   峰度 {r1['峰度']:>10.2f}   "
+                  f"零收益占比 {r1['零收益占比']*100:>6.2f}%")
+            print(f"    单期极值 [{r1['最小单期']*100:+.3f}%, "
+                  f"{r1['最大单期']*100:+.3f}%]")
 
-        r8, _ = agg_to_clock(idx, r, "8h")
-        st8 = stats(r8, 24 * 365 / 8)
-        print(f"  8h 聚合（n={st8['n']:,}，≈ 结算次数）")
-        print(f"    年化收益 {st8['年化收益']*100:>7.2f}%   年化波动 "
-              f"{st8['年化波动']*100:>6.2f}%   Sharpe {st8['Sharpe']:>6.2f}")
-        print(f"    偏度 {st8['偏度']:>8.2f}   峰度 {st8['峰度']:>10.2f}   "
-              f"零收益占比 {st8['零收益占比']*100:>6.2f}%")
-        print(f"    单期极值 [{st8['最小单期']*100:+.3f}%, {st8['最大单期']*100:+.3f}%]")
+            # 用协议里的标准实现（脚本不再自带一份，避免两处实现分叉）
+            r8, _ = protocol.aggregate_to_clock(idx, r, "8h")
+            st8 = stats(r8, 24 * 365 / 8)
+            print(f"  8h 聚合（n={st8['n']:,}，≈ 结算次数）")
+            print(f"    年化收益 {st8['年化收益']*100:>7.2f}%   年化波动 "
+                  f"{st8['年化波动']*100:>6.2f}%   Sharpe {st8['Sharpe']:>6.2f}")
+            print(f"    偏度 {st8['偏度']:>8.2f}   峰度 {st8['峰度']:>10.2f}   "
+                  f"零收益占比 {st8['零收益占比']*100:>6.2f}%")
+            print(f"    单期极值 [{st8['最小单期']*100:+.3f}%, "
+                  f"{st8['最大单期']*100:+.3f}%]")
 
-        r1 = stats(np.where(np.isfinite(r), r, 0.0), 24 * 365)
-        print(f"  ⇒ 峰度 {r1['峰度']:.0f} → {st8['峰度']:.1f}（降 "
-              f"{r1['峰度']/max(st8['峰度'],1e-9):.0f} 倍）；"
-              f"Sharpe {r1['Sharpe']:.2f} → {st8['Sharpe']:.2f}\n")
+            ratio = r1["峰度"] / max(st8["峰度"], 1e-9)
+            rows.append({"symbol": s, "stats_1h": r1, "stats_8h": st8,
+                         "kurt_reduction": ratio})
+            print(f"  ⇒ 峰度 {r1['峰度']:.0f} → {st8['峰度']:.1f}（降 "
+                  f"{ratio:.0f} 倍）；Sharpe {r1['Sharpe']:.2f} → "
+                  f"{st8['Sharpe']:.2f}")
+            print(f"  ⇒ 8h 峰度 {st8['峰度']:.1f} 仍远超正态（3）⇒ "
+                  f"Sharpe/DSR 在此分布下不可作为判定证据\n")
+
+        run.log("dist_stats", rows)
+        run.record_metrics({r_["symbol"]: {
+            "kurt_1h": r_["stats_1h"]["峰度"], "kurt_8h": r_["stats_8h"]["峰度"],
+            "skew_1h": r_["stats_1h"]["偏度"], "skew_8h": r_["stats_8h"]["偏度"],
+            "sharpe_1h": r_["stats_1h"]["Sharpe"],
+            "sharpe_8h": r_["stats_8h"]["Sharpe"],
+            "vol_8h": r_["stats_8h"]["年化波动"]} for r_ in rows})
+        print(f"run 目录: {run.dir}")
 
 
 if __name__ == "__main__":

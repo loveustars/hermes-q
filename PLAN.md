@@ -714,7 +714,9 @@ beta ≈ 0、R² ≈ 0 证实了方向中性；alpha 全部来自 carry 而非�
 ### 14.4b **判定不能靠 DSR —— 收益分布是退化的**（2026-09-14 补）
 
 核对 run 产物时发现 `dsr` 区块里 **偏度 7.78、峰度 1902.97**（正态为 3）。
-追查后（`scripts/m10_dist_check.py`）：
+追查后（`scripts/m10_dist_check.py`，受追踪证据在
+**`runs/20260914T133013_m10_dist_check_47dbe4/`**——
+`metrics.json` 记峰度/偏度/Sharpe 的 1h 与 8h 两口径，`dist_stats.json` 记完整统计）：
 
 | 标的 | 口径 | 年化波动 | Sharpe | 偏度 | 峰度 |
 |---|---|---|---|---|---|
