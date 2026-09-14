@@ -1,0 +1,15 @@
+{
+  "run_id": "20260914T105633_m1_ingest_d1bd98",
+  "name": "m1_ingest",
+  "config_hash": "605f6f5a592d5491",
+  "git_head": "no-commit",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-14T10:56:33+00:00",
+  "data_manifest": {},
+  "hypothesis": {
+    "question": "三个数据源在同一时间点的价格是否一致？数据层是否足以支撑后续回测？",
+    "expected": "币安为基准，OKX 偏差中位数 < 5bp，Coinbase 因 USD 计价存在系统性基差但 < 30bp",
+    "decision_rule": "若任一源偏差中位数 > 50bp，则该源不用于校验，并记录原因"
+  }
+}

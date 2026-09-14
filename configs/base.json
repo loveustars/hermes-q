@@ -1,0 +1,51 @@
+{
+  "project": "hermes-q",
+  "config_version": "0.1.0",
+  "created": "2026-09-14",
+
+  "universe": {
+    "mode": "FROZEN",
+    "core": ["BTCUSDT", "ETHUSDT", "BNBUSDT"],
+    "reserve": ["TRXUSDT"],
+    "selection_rule": "全样本年化波动 <= 80% 且 2025-01-01 起日均成交额 >= 100M USDT",
+    "selection_window": "2021-01-01 ~ 2026-09-14",
+    "selection_date": "2026-09-14",
+    "note": "池子冻结。任何变更必须新建配置文件并登记，禁止就地修改，否则样本外评估失去可比性。"
+  },
+
+  "costs": {
+    "fee_taker": 0.001,
+    "fee_maker": 0.001,
+    "bnb_discount": 0.75,
+    "use_bnb_discount": true,
+    "impact_model": "sqrt_law",
+    "impact_k": 1.0,
+    "impact_k_sensitivity": [0.5, 1.0, 2.0],
+    "impact_gamma_perm": 0.2,
+    "latency_bars": 1,
+    "spread_source": "measured_orderbook",
+    "spread_bp": {}
+  },
+
+  "risk": {
+    "max_turnover_roundtrips_per_year": 100,
+    "max_gross_exposure": 1.0,
+    "max_drawdown_kill": 0.5
+  },
+
+  "eval": {
+    "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "holdout_fraction": 0.25,
+    "embargo_bars": 24,
+    "bootstrap_samples": 2000,
+    "min_observations": 500
+  },
+
+  "data": {
+    "primary_source": "binance",
+    "validation_sources": ["okx", "coinbase"],
+    "primary_interval": "1h",
+    "secondary_interval": "1d",
+    "history_start": "2017-08-17"
+  }
+}

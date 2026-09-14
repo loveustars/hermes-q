@@ -1,0 +1,174 @@
+{
+  "hourly": [
+    {
+      "rows": 79440,
+      "start": "2017-08-17 04:00:00+00:00",
+      "end": "2026-09-14 11:00:00+00:00",
+      "dup_index": 0,
+      "step": "0 days 01:00:00",
+      "gaps": 28,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "BTCUSDT",
+      "interval": "1h",
+      "new_rows": 1,
+      "resumed_from": 1789380000000,
+      "fetch_seconds": 1.6,
+      "path": "data/raw/binance_BTCUSDT_1h.csv"
+    },
+    {
+      "rows": 79440,
+      "start": "2017-08-17 04:00:00+00:00",
+      "end": "2026-09-14 11:00:00+00:00",
+      "dup_index": 0,
+      "step": "0 days 01:00:00",
+      "gaps": 28,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "ETHUSDT",
+      "interval": "1h",
+      "new_rows": 0,
+      "resumed_from": 1789383600000,
+      "fetch_seconds": 0.5,
+      "path": "data/raw/binance_ETHUSDT_1h.csv"
+    },
+    {
+      "rows": 77503,
+      "start": "2017-11-06 03:00:00+00:00",
+      "end": "2026-09-14 11:00:00+00:00",
+      "dup_index": 0,
+      "step": "0 days 01:00:00",
+      "gaps": 27,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "BNBUSDT",
+      "interval": "1h",
+      "new_rows": 0,
+      "resumed_from": 1789383600000,
+      "fetch_seconds": 0.5,
+      "path": "data/raw/binance_BNBUSDT_1h.csv"
+    }
+  ],
+  "daily": [
+    {
+      "rows": 3316,
+      "start": "2017-08-17 00:00:00+00:00",
+      "end": "2026-09-14 00:00:00+00:00",
+      "dup_index": 0,
+      "step": "1 days 00:00:00",
+      "gaps": 0,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "BTCUSDT",
+      "interval": "1d",
+      "new_rows": 3316,
+      "resumed_from": null,
+      "fetch_seconds": 1.5,
+      "path": "data/raw/binance_BTCUSDT_1d.csv"
+    },
+    {
+      "rows": 3316,
+      "start": "2017-08-17 00:00:00+00:00",
+      "end": "2026-09-14 00:00:00+00:00",
+      "dup_index": 0,
+      "step": "1 days 00:00:00",
+      "gaps": 0,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "ETHUSDT",
+      "interval": "1d",
+      "new_rows": 3316,
+      "resumed_from": null,
+      "fetch_seconds": 2.2,
+      "path": "data/raw/binance_ETHUSDT_1d.csv"
+    },
+    {
+      "rows": 3235,
+      "start": "2017-11-06 00:00:00+00:00",
+      "end": "2026-09-14 00:00:00+00:00",
+      "dup_index": 0,
+      "step": "1 days 00:00:00",
+      "gaps": 0,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "BNBUSDT",
+      "interval": "1d",
+      "new_rows": 3235,
+      "resumed_from": null,
+      "fetch_seconds": 2.1,
+      "path": "data/raw/binance_BNBUSDT_1d.csv"
+    },
+    {
+      "rows": 3018,
+      "start": "2018-06-11 00:00:00+00:00",
+      "end": "2026-09-14 00:00:00+00:00",
+      "dup_index": 0,
+      "step": "1 days 00:00:00",
+      "gaps": 0,
+      "nan": 0,
+      "nonpositive_close": 0,
+      "symbol": "TRXUSDT",
+      "interval": "1d",
+      "new_rows": 3018,
+      "resumed_from": null,
+      "fetch_seconds": 1.5,
+      "path": "data/raw/binance_TRXUSDT_1d.csv"
+    }
+  ],
+  "spread_bp": {
+    "BTCUSDT": 0.0006,
+    "ETHUSDT": 0.0199,
+    "BNBUSDT": 0.0692,
+    "TRXUSDT": 1.4704
+  },
+  "cross_validation": [
+    {
+      "symbol": "BTCUSDT",
+      "bars_compared": 168,
+      "okx": {
+        "n": 100,
+        "median_bp": 0.49,
+        "p99_bp": 1.778,
+        "max_bp": 3.238
+      },
+      "coinbase": {
+        "n": 168,
+        "median_bp": 2.917,
+        "p99_bp": 5.5,
+        "max_bp": 5.616
+      }
+    },
+    {
+      "symbol": "ETHUSDT",
+      "bars_compared": 168,
+      "okx": {
+        "n": 100,
+        "median_bp": 0.524,
+        "p99_bp": 3.416,
+        "max_bp": 8.006
+      },
+      "coinbase": {
+        "n": 168,
+        "median_bp": 2.687,
+        "p99_bp": 5.827,
+        "max_bp": 6.821
+      }
+    },
+    {
+      "symbol": "BNBUSDT",
+      "bars_compared": 168,
+      "okx": {
+        "n": 100,
+        "median_bp": 0.964,
+        "p99_bp": 4.315,
+        "max_bp": 9.834
+      },
+      "coinbase": {
+        "n": 168,
+        "median_bp": 3.01,
+        "p99_bp": 8.898,
+        "max_bp": 13.727
+      }
+    }
+  ]
+}

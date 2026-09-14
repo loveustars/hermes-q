@@ -1,0 +1,19 @@
+{
+  "run_id": "20260914T110339_m1_ingest_22ef95",
+  "name": "m1_ingest",
+  "config_hash": "605f6f5a592d5491",
+  "git_head": "no-commit",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-14T11:03:39+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "e18dbcf55acfc61c2dcca9869924b16f318d4c7252a8a4656b2742646b42709c",
+    "data/raw/binance_ETHUSDT_1h.csv": "c9e5570c6301f8821f94bee8aa7a6d00c8a4421abad59780413507ec8ba10ed5",
+    "data/raw/binance_BNBUSDT_1h.csv": "80276df2df58a5b2ecbbda336e4d178a641231f81ad84645c18bff700b07a958"
+  },
+  "hypothesis": {
+    "question": "三个数据源在同一时间点的价格是否一致？数据层是否足以支撑后续回测？",
+    "expected": "币安为基准，OKX 偏差中位数 < 5bp，Coinbase 因 USD 计价存在系统性基差但 < 30bp",
+    "decision_rule": "若任一源偏差中位数 > 50bp，则该源不用于校验，并记录原因"
+  }
+}

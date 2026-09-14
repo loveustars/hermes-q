@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+
+# 原始行情数据体积大（约 17MB），可通过 scripts/m1_ingest.py 重放获取
+# data/manifest.json 保留，用于校验重放结果是否一致
+data/raw/*.csv
+runs/*/curves/*.csv
+logs_*.txt

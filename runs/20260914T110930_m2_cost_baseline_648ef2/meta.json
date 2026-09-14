@@ -1,0 +1,25 @@
+{
+  "run_id": "20260914T110930_m2_cost_baseline_648ef2",
+  "name": "m2_cost_baseline",
+  "config_hash": "605f6f5a592d5491",
+  "git_head": "no-commit",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-14T11:09:30+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517"
+  },
+  "hypothesis": {
+    "question": "在核心池上，摩擦成本究竟吃掉多少收益？冲击占比是否如预期很小？",
+    "expected": "手续费为成本主项；冲击占比 < 25%；高换手策略被成本显著侵蚀",
+    "decision_rule": "若某基线策略换手后净收益相对毛收益损失超过 50%，则必须在强化信号中强制换手约束"
+  },
+  "ended_at": "2026-09-14T11:10:08+00:00",
+  "status": "ok"
+}

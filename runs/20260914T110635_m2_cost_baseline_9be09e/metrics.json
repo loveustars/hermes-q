@@ -1,0 +1,46 @@
+{
+  "impact_table": [
+    {
+      "fee_bp": 20.0,
+      "spread_bp": 0.0012,
+      "impact_bp": 3.3281272361652166,
+      "total_bp": 23.329327236165216,
+      "symbol": "BTCUSDT",
+      "sigma_pct": 0.7492,
+      "vol_median_M": 40.762,
+      "participation_pct": 0.0245,
+      "impact_share_pct": 14.3
+    },
+    {
+      "fee_bp": 20.0,
+      "spread_bp": 0.0398,
+      "impact_bp": 6.146760047359484,
+      "total_bp": 26.186560047359485,
+      "symbol": "ETHUSDT",
+      "sigma_pct": 0.9334,
+      "vol_median_M": 20.134,
+      "participation_pct": 0.0497,
+      "impact_share_pct": 23.5
+    },
+    {
+      "fee_bp": 20.0,
+      "spread_bp": 0.1384,
+      "impact_bp": 22.74252552368002,
+      "total_bp": 42.88092552368002,
+      "symbol": "BNBUSDT",
+      "sigma_pct": 1.0422,
+      "vol_median_M": 3.465,
+      "participation_pct": 0.2886,
+      "impact_share_pct": 53.0
+    }
+  ],
+  "agents": [
+    "cash",
+    "bh_BTCUSDT",
+    "buy_hold",
+    "mom_BTCUSDT_720_rb24",
+    "random_rb24_s0",
+    "random_rb1_s0"
+  ],
+  "worst_return_loss": 86.832377
+}

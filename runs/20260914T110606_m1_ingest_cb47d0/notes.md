@@ -1,0 +1,1 @@
+- 2026-09-14T11:06:26Z 点差写入 configs/spreads.json

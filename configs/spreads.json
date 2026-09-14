@@ -1,0 +1,11 @@
+{
+  "measured_at": "2026-09-14T11:06:26+00:00",
+  "unit": "bp_single_side",
+  "source": "binance_orderbook_top5",
+  "spread_bp": {
+    "BTCUSDT": 0.0006,
+    "ETHUSDT": 0.0199,
+    "BNBUSDT": 0.0692,
+    "TRXUSDT": 1.4704
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "hourly_rows": {
+    "BTCUSDT": 79440,
+    "ETHUSDT": 79440,
+    "BNBUSDT": 77503
+  },
+  "daily_rows": {
+    "BTCUSDT": 3316,
+    "ETHUSDT": 3316,
+    "BNBUSDT": 3235,
+    "TRXUSDT": 3018
+  },
+  "total_hourly_rows": 236383,
+  "manifest_integrity_ok": true,
+  "manifest_problems": []
+}
