@@ -1,0 +1,122 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "config": {
+      "symbol": "BTCUSDT",
+      "notional_ratio": 0.4,
+      "margin_ratio": 0.5,
+      "rebalance_every": 720,
+      "final_equity": 13633.42,
+      "annualized": 0.048381,
+      "total_return": 0.363342,
+      "liquidated": false,
+      "liquidated_at": null,
+      "topups": 9,
+      "topup_amount": 13590.27,
+      "funding_income": 3774.72,
+      "fees": 126.78,
+      "price_pnl": -141.31,
+      "bars": 57465
+    },
+    "alpha_test": {
+      "alpha_per_bar": 5.4e-06,
+      "alpha_annualized": 0.0485,
+      "beta": 0.0002,
+      "t_stat": 20.3929,
+      "p_value": 0.0,
+      "r_squared": 0.0002,
+      "n_obs": 57463
+    },
+    "dsr": {
+      "sharpe": 0.0426,
+      "n_obs": 57464,
+      "skew": 7.7816,
+      "kurtosis": 1902.9708,
+      "n_trials": 72,
+      "expected_max_sharpe_null": 0.0101,
+      "dsr": 1.0
+    },
+    "verdict": "有边际",
+    "dsr_value": 1.0
+  },
+  {
+    "symbol": "ETHUSDT",
+    "config": {
+      "symbol": "ETHUSDT",
+      "notional_ratio": 0.4,
+      "margin_ratio": 0.5,
+      "rebalance_every": 720,
+      "final_equity": 14785.25,
+      "annualized": 0.061424,
+      "total_return": 0.478525,
+      "liquidated": false,
+      "liquidated_at": null,
+      "topups": 13,
+      "topup_amount": 21399.0,
+      "funding_income": 4978.37,
+      "fees": 185.17,
+      "price_pnl": -193.12,
+      "bars": 57465
+    },
+    "alpha_test": {
+      "alpha_per_bar": 6.92e-06,
+      "alpha_annualized": 0.0625,
+      "beta": -0.0012,
+      "t_stat": 18.7256,
+      "p_value": 0.0,
+      "r_squared": 0.0031,
+      "n_obs": 57463
+    },
+    "dsr": {
+      "sharpe": 0.0436,
+      "n_obs": 57464,
+      "skew": 7.7155,
+      "kurtosis": 1025.0279,
+      "n_trials": 72,
+      "expected_max_sharpe_null": 0.0101,
+      "dsr": 1.0
+    },
+    "verdict": "有边际",
+    "dsr_value": 1.0
+  },
+  {
+    "symbol": "BNBUSDT",
+    "config": {
+      "symbol": "BNBUSDT",
+      "notional_ratio": 0.3,
+      "margin_ratio": 0.5,
+      "rebalance_every": 720,
+      "final_equity": 10377.78,
+      "annualized": 0.005669,
+      "total_return": 0.037778,
+      "liquidated": false,
+      "liquidated_at": null,
+      "topups": 17,
+      "topup_amount": 20496.72,
+      "funding_income": 474.87,
+      "fees": 102.66,
+      "price_pnl": -97.09,
+      "bars": 57465
+    },
+    "alpha_test": {
+      "alpha_per_bar": 7.2e-07,
+      "alpha_annualized": 0.0063,
+      "beta": -0.0004,
+      "t_stat": 1.4162,
+      "p_value": 0.078353,
+      "r_squared": 0.0001,
+      "n_obs": 57463
+    },
+    "dsr": {
+      "sharpe": 0.0028,
+      "n_obs": 57464,
+      "skew": 2.1075,
+      "kurtosis": 541.7647,
+      "n_trials": 72,
+      "expected_max_sharpe_null": 0.0101,
+      "dsr": 0.0405
+    },
+    "verdict": "无边际",
+    "dsr_value": 0.0405
+  }
+]

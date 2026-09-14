@@ -143,6 +143,62 @@ def test_pbo_low_when_one_strategy_is_genuinely_better():
     assert out["pbo"] < 0.25, f"存在真优势时 PBO 应偏低，实际 {out['pbo']}"
 
 
+def test_bootstrap_alpha_detects_real_alpha():
+    """有明显 alpha 时，截距的置信区间下界必须为正。"""
+    rng = np.random.default_rng(11)
+    n = 20_000
+    b = rng.normal(0.0001, 0.01, n)
+    r = 0.0006 + 0.9 * b + rng.normal(0.0, 0.002, n)
+    out = protocol.bootstrap_alpha(r, b, block=24, n_samples=600)
+    at = protocol.alpha_vs_benchmark(r, b, BPY)
+    assert out["ci_low"] > 0, f"真实 alpha 应被判为显著，实际 CI {out['ci_low']}~{out['ci_high']}"
+    # CI 必须包含点估计
+    assert out["ci_low"] <= at.alpha <= out["ci_high"], \
+        f"CI 未包含点估计：alpha={at.alpha}, CI=[{out['ci_low']}, {out['ci_high']}]"
+    assert out["p_value_alpha_positive"] < 0.05
+
+
+def test_bootstrap_alpha_no_false_alarm_on_zero_alpha():
+    rng = np.random.default_rng(12)
+    n = 20_000
+    b = rng.normal(0.0001, 0.01, n)
+    r = 0.9 * b + rng.normal(0.0, 0.002, n)        # 无 alpha
+    out = protocol.bootstrap_alpha(r, b, block=24, n_samples=600)
+    assert out["ci_low"] < 0 < out["ci_high"], "零 alpha 时 CI 应跨零"
+
+
+def test_evaluate_strategy_can_actually_pass():
+    """回归守卫：协议必须**有可能**判出「有边际」。
+
+    早期版本对 OLS 残差做 bootstrap 再检验均值 > 0 ——
+    残差均值按构造恒为 0，第三条判据在数学上永远不可能通过，
+    于是任何策略都只能得到「无边际」。这条测试确保那种失效不会回归。
+    """
+    rng = np.random.default_rng(13)
+    n = 20_000
+    idx = pd.date_range("2020-01-01", periods=n, freq="h", tz="UTC")
+    b = rng.normal(0.0001, 0.01, n)
+    r = 0.0008 + 0.2 * b + rng.normal(0.0, 0.0015, n)   # 强 alpha、低 beta
+    out = protocol.evaluate_strategy(r, b, n_trials=1, bars_per_year=BPY,
+                                     r_index=idx, b_index=idx)
+    assert out["verdict"] == "有边际", (
+        f"有明显 alpha 却判为无边际 —— 判定链条断了。"
+        f" alpha_test={out['alpha_test']}, dsr={out['dsr']['dsr']},"
+        f" boot_ci_low={out['alpha_bootstrap']['ci_low']}")
+    assert out["alpha_bootstrap"]["ci_low"] > 0
+
+
+def test_evaluate_strategy_rejects_pure_noise():
+    rng = np.random.default_rng(14)
+    n = 20_000
+    idx = pd.date_range("2020-01-01", periods=n, freq="h", tz="UTC")
+    b = rng.normal(0.0001, 0.01, n)
+    r = 0.8 * b + rng.normal(0.0, 0.002, n)
+    out = protocol.evaluate_strategy(r, b, n_trials=1, bars_per_year=BPY,
+                                     r_index=idx, b_index=idx)
+    assert out["verdict"] == "无边际", "纯噪声不该被判为有边际"
+
+
 # ==========================================================================
 # 6. 样本封存守卫
 # ==========================================================================

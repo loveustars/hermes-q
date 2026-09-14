@@ -133,6 +133,70 @@ def bootstrap_p_value(x: np.ndarray, block: int = 24, n_samples: int = 2000,
     }
 
 
+def bootstrap_alpha(r: np.ndarray, b: np.ndarray, block: int = 24,
+                    n_samples: int = 1000, seed: int = 0,
+                    bars_per_year: int = 24 * 365) -> dict:
+    """对**回归截距 alpha 本身**做块自助，而不是对残差做。
+
+    为什么必须这样：OLS 残差的均值按构造恒等于 0，
+    对它做 bootstrap 再检验「均值是否 > 0」，在数学上永远不可能通过。
+    早期版本正是这么写的，导致协议第三条判据（ci_low > 0）结构性失效——
+    任何策略都不可能被判为「有边际」。
+
+    做法：对 (r, b) 成对做循环块重采样，每个重采样重跑一遍回归取截距。
+    关键优化：重采样后的均值/协方差/方差都可以由**块级预聚合量**直接算出，
+    不必真的重建数组再回归，复杂度降到 O(n_samples × n_blocks)。
+    """
+    r = np.asarray(r, dtype=float)
+    b = np.asarray(b, dtype=float)
+    n = min(len(r), len(b))
+    r, b = r[:n], b[:n]
+    ok = np.isfinite(r) & np.isfinite(b)
+    r, b = r[ok], b[ok]
+    n = len(r)
+    if n < 3 * block:
+        return {"alpha_mean": 0.0, "ci_low": 0.0, "ci_high": 0.0,
+                "p_value_alpha_positive": 1.0, "n_samples": 0,
+                "annualized_ci_low": 0.0, "annualized_ci_high": 0.0}
+
+    block = max(1, min(block, n))
+    n_blocks = int(np.ceil(n / block))
+    need = n_blocks * block - n
+    rp = np.concatenate([r, r[:need]]) if need else r
+    bp = np.concatenate([b, b[:need]]) if need else b
+    R = rp.reshape(n_blocks, block)
+    B = bp.reshape(n_blocks, block)
+    s_r, s_b = R.sum(1), B.sum(1)
+    s_rr, s_bb, s_rb = (R * R).sum(1), (B * B).sum(1), (R * B).sum(1)
+
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, n_blocks, size=(n_samples, n_blocks))
+    N = float(n_blocks * block)
+    Sr = s_r[idx].sum(1) / N
+    Sb = s_b[idx].sum(1) / N
+    Srr = s_rr[idx].sum(1) / N
+    Sbb = s_bb[idx].sum(1) / N
+    Srb = s_rb[idx].sum(1) / N
+
+    var_b = Sbb - Sb * Sb
+    cov = Srb - Sr * Sb
+    beta = np.where(var_b > 1e-24, cov / np.where(var_b > 1e-24, var_b, 1.0), 0.0)
+    alpha = Sr - beta * Sb                     # 每个重采样的回归截距
+
+    return {
+        "alpha_mean": float(np.mean(alpha)),
+        "ci_low": float(np.quantile(alpha, 0.025)),
+        "ci_high": float(np.quantile(alpha, 0.975)),
+        "annualized_ci_low": float(np.expm1(np.quantile(alpha, 0.025) * bars_per_year))
+        if abs(np.quantile(alpha, 0.025) * bars_per_year) < 20 else -1.0,
+        "annualized_ci_high": float(np.expm1(np.quantile(alpha, 0.975) * bars_per_year))
+        if abs(np.quantile(alpha, 0.975) * bars_per_year) < 20 else 1e9,
+        "p_value_alpha_positive": float((alpha <= 0).mean()),
+        "n_samples": int(n_samples),
+        "block": int(block),
+    }
+
+
 # ==========================================================================
 # Sharpe 家族
 # ==========================================================================
@@ -363,18 +427,13 @@ def evaluate_strategy(returns: np.ndarray, bench: np.ndarray, n_trials: int,
                             r_index=r_index, b_index=b_index)
     dsr = deflated_sharpe(r, n_trials, sr_variance)
 
-    # 剥离 beta 后的残差序列，用于 bootstrap（同样必须先对齐）
+    # alpha 的置信区间必须对**截距本身**做自助，不能对残差做。
+    # 残差均值按构造恒为 0，对它做 bootstrap 再检验 >0 是永远不可能通过的。
     rr, bb = _align(r, np.asarray(bench, dtype=float), r_index, b_index)
-    ok = np.isfinite(rr) & np.isfinite(bb)
-    rr, bb = rr[ok], bb[ok]
-    if len(rr) > 10:
-        coef, *_ = np.linalg.lstsq(np.column_stack([np.ones(len(rr)), bb]), rr, rcond=None)
-        resid = rr - np.column_stack([np.ones(len(rr)), bb]) @ coef
-    else:
-        resid = rr
-    boot = bootstrap_p_value(resid, block=block, null=0.0)
+    boot = bootstrap_alpha(rr, bb, block=block, bars_per_year=bars_per_year)
 
-    passed = (at.p_value < 0.05) and (dsr["dsr"] > alpha_threshold) and (boot["ci_low"] > 0)
+    passed = (at.p_value < 0.05) and (dsr["dsr"] > alpha_threshold) \
+        and (boot["ci_low"] > 0)
     return {
         "alpha_test": at.as_dict(),
         "dsr": dsr,

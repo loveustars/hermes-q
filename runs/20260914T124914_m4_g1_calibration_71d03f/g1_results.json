@@ -1,0 +1,48 @@
+{
+  "n_trials": 100,
+  "window_bars": 77503,
+  "gross": {
+    "label": "毛口径·零成本",
+    "costs_enabled": false,
+    "n": 100,
+    "fp_rate_pct": {
+      "naive_no_beta_removal": 100.0,
+      "alpha_after_beta_removal": 0.0,
+      "dsr_only": 0.0,
+      "full_protocol": 0.0
+    },
+    "alpha_t": {
+      "median": -0.061,
+      "mean": -0.104,
+      "p95": 0.683,
+      "p05": -0.843
+    },
+    "pbo": 0.5448,
+    "pbo_combos": 12870,
+    "elapsed_s": 168.4
+  },
+  "net": {
+    "label": "净口径·含成本",
+    "costs_enabled": true,
+    "n": 100,
+    "fp_rate_pct": {
+      "naive_no_beta_removal": 79.0,
+      "alpha_after_beta_removal": 0.0,
+      "dsr_only": 0.0,
+      "full_protocol": 0.0
+    },
+    "alpha_t": {
+      "median": -0.901,
+      "mean": -2.114,
+      "p95": 0.46,
+      "p05": -9.635
+    },
+    "pbo": 0.1348,
+    "pbo_combos": 12870,
+    "elapsed_s": 169.3
+  },
+  "G1_basis": "毛口径（零技能假设成立）下剥离 beta 的假阳性率",
+  "G1_value_pct": 0.0,
+  "G1_threshold_pct": 5.0,
+  "G1_gate_pass": true
+}

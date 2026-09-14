@@ -1,0 +1,16 @@
+{
+  "n_configs": 72,
+  "n_alive": 68,
+  "n_liquidated": 4,
+  "alive_annualized_median": 0.025998,
+  "verdicts": {
+    "BTCUSDT": "无边际",
+    "ETHUSDT": "无边际",
+    "BNBUSDT": "无边际"
+  },
+  "betas": {
+    "BTCUSDT": 0.0002,
+    "ETHUSDT": -0.0012,
+    "BNBUSDT": -0.0004
+  }
+}
