@@ -175,7 +175,10 @@
 两份产物**除 `verdict` 外逐字节相同**（final_equity、funding_income、topup_amount、
 t_stat 全部一致）——可用来证明修复只动判据、未动仿真。**别看错那一份。**
 
-run 产物里的 `t_stat = 20.39` 是逐 bar 口径；13.36 是 8h 聚合修正值，证据在 `logs_hac.txt`。
+run 产物里的 `t_stat = 20.39` 是逐 bar 口径；13.36 是 8h 聚合修正值，
+受追踪证据在 `runs/20260914T132343_m10_hac_sensitivity_af9d97/`。
+（早期只指 `logs_hac.txt`，但它被 `.gitignore` 排除、不在仓库里 ⇒ 已落成 run 产物。
+顺带交叉验证：换成 `protocol.aggregate_to_clock` 后数字逐位一致 13.36/11.75、4.88%/6.25%。）
 
 ### 6.1b 判定不能靠 DSR（分布退化）
 
