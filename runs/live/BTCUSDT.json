@@ -13,11 +13,11 @@
  "opened_at_ms": 1789396852584,
  "spot_units": 0.05097889677589065,
  "perp_units": -0.051003440186339774,
- "margin_cash": 6000.0,
+ "margin_cash": 6000.169051862383,
  "reserve": 3991.2,
- "last_funding_ms": 1789394400000,
+ "last_funding_ms": 1789401600000,
  "last_rebalance_ms": 1789396852584,
- "funding_total": 0.0,
+ "funding_total": 0.1690518623823675,
  "fees_total": 8.8,
  "n_topups": 0,
  "topup_total": 0.0,
@@ -119,6 +119,30 @@
    "reserve": 3991.2,
    "funding_total": 0.0,
    "fees_total": 8.8
+  },
+  {
+   "at": "2026-09-14T16:00:20+00:00",
+   "at_ms": 1789401620744,
+   "equity": 9990.940196165633,
+   "spot_px": 78590.01,
+   "mark_px": 78560.6,
+   "basis_bp": -3.742205911411167,
+   "margin_equity": 1993.308188759418,
+   "reserve": 3991.2,
+   "funding_total": 0.1690518623823675,
+   "fees_total": 8.8
+  },
+  {
+   "at": "2026-09-14T16:04:13+00:00",
+   "at_ms": 1789401853593,
+   "equity": 9991.684870452675,
+   "spot_px": 78480.0,
+   "mark_px": 78436.04246627,
+   "basis_bp": -5.601112860601498,
+   "margin_equity": 1999.6610514807744,
+   "reserve": 3991.2,
+   "funding_total": 0.1690518623823675,
+   "fees_total": 8.8
   }
  ],
  "events": [
@@ -135,6 +159,18 @@
     "open_fee": 8.8,
     "spot_px": 78463.84,
     "mark_px": 78426.08234633
+   }
+  },
+  {
+   "at": "2026-09-14T16:00:00+00:00",
+   "at_ms": 1789401600000,
+   "kind": "funding",
+   "detail": {
+    "at": "2026-09-14T16:00:00+00:00",
+    "funding_time": 1789401600000,
+    "rate": 4.22e-05,
+    "mark_price": 78543.1,
+    "cash": 0.1690518623823675
    }
   }
  ]
