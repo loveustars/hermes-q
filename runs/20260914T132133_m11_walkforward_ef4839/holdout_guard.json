@@ -1,0 +1,25 @@
+{
+  "n": 57765,
+  "holdout_fraction": 0.25,
+  "sealed_from": 43323,
+  "sealed_count": 14442,
+  "allow": false,
+  "access_log": [],
+  "unseal": [
+    {
+      "at": "2026-09-14T13:21:58+00:00",
+      "kind": "holdout_slice",
+      "detail": null
+    },
+    {
+      "at": "2026-09-14T13:22:03+00:00",
+      "kind": "holdout_slice",
+      "detail": null
+    },
+    {
+      "at": "2026-09-14T13:22:07+00:00",
+      "kind": "holdout_slice",
+      "detail": null
+    }
+  ]
+}

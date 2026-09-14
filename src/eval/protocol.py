@@ -94,6 +94,60 @@ def purged_kfold(n: int, k: int, embargo: int = 0):
 
 
 # ==========================================================================
+# 现金流频率对齐（协议要求，见 PLAN §14.7）
+# ==========================================================================
+_FREQ_UNIT_NS = {"h": 3_600_000_000_000, "m": 60_000_000_000,
+                 "d": 86_400_000_000_000, "s": 1_000_000_000}
+
+
+def freq_to_ns(freq) -> int:
+    """把 '8h' / '30m' / '1d' 或整数纳秒转成纳秒。"""
+    if isinstance(freq, (int, np.integer)):
+        return int(freq)
+    s = str(freq).strip().lower()
+    if s.isdigit():
+        return int(s)
+    unit = s[-1]
+    if unit not in _FREQ_UNIT_NS:
+        raise ValueError(f"无法解析的时间频率：{freq!r}（支持 8h/30m/1d 或整数纳秒）")
+    return int(float(s[:-1]) * _FREQ_UNIT_NS[unit])
+
+
+def aggregate_to_clock(index, returns: np.ndarray, freq="8h"):
+    """按**绝对时间桶**把收益聚合到现金流频率。
+
+    为什么必须做：当策略的现金流按固定间隔到账（如资金费每 8 小时结算一次），
+    逐 bar 检验等于把同一笔现金流重复计了多次，有效样本量被虚增，
+    t 统计量与 Sharpe 都会被高估（本项实测 t 高估 1.2~1.6 倍）。
+    **这条要求不只适用于 t 统计量，也适用于 Sharpe/DSR/偏度/峰度。**
+
+    必须按**时钟分桶**、而不是"每 k 根取一个"：策略与基准的起点不同时，
+    按偏移量切分会让两边的网格整体错开，对齐后几乎无重叠
+    （实测曾导致回归退化成 t = 0.00）。
+
+    只依赖 numpy：时间戳走鸭子类型（DatetimeIndex 有 asi8），不 import pandas。
+    """
+    r = np.asarray(returns, dtype=float)
+    if len(r) == 0:
+        return r, np.asarray([], dtype=np.int64)
+    step = freq_to_ns(freq)
+    if hasattr(index, "asi8"):
+        t = np.asarray(index.asi8, dtype=np.int64)
+    else:
+        t = np.asarray(index, dtype=np.int64)
+    if len(t) != len(r):
+        raise ValueError(f"索引长度 {len(t)} 与收益长度 {len(r)} 不一致")
+    if not np.all(np.diff(t) >= 0):
+        raise ValueError("索引必须单调不减，否则分桶会错")
+    bucket = t // step
+    starts = np.unique(bucket, return_index=True)[1]
+    ends = np.append(starts[1:], len(r))
+    csum = np.concatenate([[0.0], np.cumsum(np.log1p(r))])   # 复利聚合
+    out = np.expm1(csum[ends] - csum[starts])
+    return out, (bucket[starts] * step)
+
+
+# ==========================================================================
 # Bootstrap
 # ==========================================================================
 def circular_block_bootstrap(x: np.ndarray, block: int, n_samples: int = 2000,

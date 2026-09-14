@@ -199,6 +199,73 @@ def test_evaluate_strategy_rejects_pure_noise():
     assert out["verdict"] == "无边际", "纯噪声不该被判为有边际"
 
 
+def test_freq_to_ns():
+    assert protocol.freq_to_ns("8h") == 8 * 3_600_000_000_000
+    assert protocol.freq_to_ns("30m") == 30 * 60_000_000_000
+    assert protocol.freq_to_ns("1d") == 86_400_000_000_000
+    assert protocol.freq_to_ns(12345) == 12345
+    try:
+        protocol.freq_to_ns("8w")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("无法解析的单位应抛 ValueError")
+
+
+def test_aggregate_to_clock_compounds_correctly():
+    """聚合必须是复利，且桶数正确。"""
+    import pandas as pd
+    idx = pd.date_range("2024-01-01", periods=8, freq="1h", tz="UTC")
+    r = np.full(8, 0.01)
+    out, ts = protocol.aggregate_to_clock(idx, r, "8h")
+    assert len(out) == 1, f"8 根 1h 应合成 1 个 8h 桶，得 {len(out)}"
+    assert abs(out[0] - (1.01 ** 8 - 1)) < 1e-12, "复利聚合不正确"
+    assert ts[0] == idx[0].value // (8 * 3_600_000_000_000) * (
+        8 * 3_600_000_000_000)
+
+
+def test_aggregate_to_clock_aligns_across_different_starts():
+    """**跨起点对齐**：两个系列起点不同，也必须落进同一批绝对时间桶。
+
+    这是实测踩过的坑：按"每 k 根取一个"切分时，两边网格整体错开，
+    对齐后几乎无重叠，回归退化成 t = 0.00。
+    """
+    import pandas as pd
+    base = pd.date_range("2024-01-01", periods=24, freq="1h", tz="UTC")
+    a_idx = base[:16]                     # 00:00 起
+    b_idx = base[3:19]                    # 03:00 起（错开 3 小时）
+    ra = np.full(len(a_idx), 0.001)
+    rb = np.full(len(b_idx), 0.002)
+    oa, ta = protocol.aggregate_to_clock(a_idx, ra, "8h")
+    ob, tb = protocol.aggregate_to_clock(b_idx, rb, "8h")
+    common = np.intersect1d(ta, tb)
+    assert len(common) >= 1, (
+        f"跨起点聚合后没有共同桶：ta={ta} tb={tb} —— 说明按了偏移量而不是时钟分桶")
+    # 共同桶里，A 应有 8 根、B 应有 5 根（b 起于 03:00，第一桶只含 03..07）
+    i = int(np.where(ta == common[0])[0][0])
+    j = int(np.where(tb == common[0])[0][0])
+    assert abs(oa[i] - (1.001 ** 8 - 1)) < 1e-9
+    assert abs(ob[j] - (1.002 ** 5 - 1)) < 1e-9
+
+
+def test_aggregate_to_clock_rejects_bad_input():
+    import pandas as pd
+    idx = pd.date_range("2024-01-01", periods=5, freq="1h", tz="UTC")
+    try:
+        protocol.aggregate_to_clock(idx, np.zeros(4), "8h")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("长度不一致应抛 ValueError")
+    rev = idx[::-1]
+    try:
+        protocol.aggregate_to_clock(rev, np.zeros(5), "8h")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("索引非单调应抛 ValueError")
+
+
 # ==========================================================================
 # 6. 样本封存守卫
 # ==========================================================================
