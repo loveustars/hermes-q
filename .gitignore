@@ -7,3 +7,7 @@ __pycache__/
 data/raw/*.csv
 runs/*/curves/*.csv
 logs_*.txt
+
+# 纸面交易的原始逐次日志：无界增长，不入 git。
+# 真正的事件审计轨迹在 runs/live/<SYM>.json 的 events 字段里，且有界（见 paper.Book._trim）。
+runs/live/ticks.jsonl

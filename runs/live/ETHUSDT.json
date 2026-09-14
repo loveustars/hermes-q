@@ -1,0 +1,93 @@
+{
+ "symbol": "ETHUSDT",
+ "cfg": {
+  "initial_capital": 10000.0,
+  "notional_ratio": 0.4,
+  "initial_margin_ratio": 0.5,
+  "rebalance_every_h": 720,
+  "maintenance_margin_ratio": 0.005,
+  "topup_trigger_ratio": 0.5,
+  "cost_rate": 0.0011
+ },
+ "created_at_ms": 1789396855443,
+ "opened_at_ms": 1789396855443,
+ "spot_units": 1.5998528135411543,
+ "perp_units": -1.6006943688086064,
+ "margin_cash": 6000.0,
+ "reserve": 3991.2,
+ "last_funding_ms": 1789394400000,
+ "last_rebalance_ms": 1789396855443,
+ "funding_total": 0.0,
+ "fees_total": 8.8,
+ "n_topups": 0,
+ "topup_total": 0.0,
+ "liquidated": false,
+ "liquidated_at_ms": null,
+ "snapshots": [
+  {
+   "at": "2026-09-14T14:40:55+00:00",
+   "at_ms": 1789396855443,
+   "equity": 9991.2,
+   "spot_px": 2500.23,
+   "mark_px": 2498.91551938,
+   "basis_bp": -5.257438795630565,
+   "margin_equity": 2000.0,
+   "reserve": 3991.2,
+   "funding_total": 0.0,
+   "fees_total": 8.8
+  },
+  {
+   "at": "2026-09-14T14:41:02+00:00",
+   "at_ms": 1789396862815,
+   "equity": 9990.987744532802,
+   "spot_px": 2499.37,
+   "mark_px": 2498.18857364,
+   "basis_bp": -4.726896617947007,
+   "margin_equity": 2001.1636179524476,
+   "reserve": 3991.2,
+   "funding_total": 0.0,
+   "fees_total": 8.8
+  },
+  {
+   "at": "2026-09-14T14:41:10+00:00",
+   "at_ms": 1789396870896,
+   "equity": 9990.839951398131,
+   "spot_px": 2501.09,
+   "mark_px": 2500.0,
+   "basis_bp": -4.35809986845781,
+   "margin_equity": 1998.2640779784842,
+   "reserve": 3991.2,
+   "funding_total": 0.0,
+   "fees_total": 8.8
+  },
+  {
+   "at": "2026-09-14T14:41:46+00:00",
+   "at_ms": 1789396906685,
+   "equity": 9991.353797797816,
+   "spot_px": 2499.16,
+   "mark_px": 2497.75,
+   "basis_bp": -5.641895676946618,
+   "margin_equity": 2001.8656403083032,
+   "reserve": 3991.2,
+   "funding_total": 0.0,
+   "fees_total": 8.8
+  }
+ ],
+ "events": [
+  {
+   "at": "2026-09-14T14:40:55+00:00",
+   "at_ms": 1789396855443,
+   "kind": "open",
+   "detail": {
+    "spot_units": 1.5998528135411543,
+    "perp_units": -1.6006943688086064,
+    "notional": 4000.0,
+    "margin": 2000.0,
+    "reserve": 3991.2,
+    "open_fee": 8.8,
+    "spot_px": 2500.23,
+    "mark_px": 2498.91551938
+   }
+  }
+ ]
+}

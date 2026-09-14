@@ -19,10 +19,13 @@ INTERVAL_MS = {"1h": 3_600_000, "1d": DAY_MS}
 
 # 合规白名单：只读行情端点。任何不在此列的网络请求都会被拒绝。
 ALLOWED_PATHS = {
-    "binance": ("/api/v3/klines", "/api/v3/depth", "/api/v3/ticker/24hr"),
+    "binance": ("/api/v3/klines", "/api/v3/depth", "/api/v3/ticker/24hr",
+                # 实时成交价（纸面交易推进用）。仍是公开只读行情，无账户上下文。
+                "/api/v3/ticker/price"),
     # 永续（U 本位）公开行情。仍然只有只读市场数据，不含任何账户/下单端点。
     "binance_futures": ("/fapi/v1/fundingRate", "/fapi/v1/premiumIndex",
-                        "/fapi/v1/klines", "/fapi/v1/ticker/24hr"),
+                        "/fapi/v1/klines", "/fapi/v1/ticker/24hr",
+                        "/fapi/v1/ticker/price"),
     "okx": ("/api/v5/market/candles", "/api/v5/market/history-candles", "/api/v5/market/books"),
     "coinbase": ("/products/",),
 }
