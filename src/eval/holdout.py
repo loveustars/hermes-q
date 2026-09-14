@@ -24,7 +24,14 @@ import os
 import subprocess
 from datetime import datetime, timezone
 
-DEFAULT_LEDGER = os.path.join("runs", "_holdout_ledger.json")
+DEFAULT_LEDGER = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "runs", "_holdout_ledger.json")
+"""开封账本路径 —— 同样锚定项目根。
+
+与 `src/live/paper.py::LIVE_DIR` 同一个教训：相对路径隐含假设 CWD 是项目根，
+换个目录跑就会把账本写到别处（或读不到历史记录），而**账本读不到 = 一次性约束失效**。
+"""
 
 
 class HoldoutViolation(RuntimeError):

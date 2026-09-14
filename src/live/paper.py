@@ -33,7 +33,16 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
-LIVE_DIR = os.path.join("runs", "live")
+LIVE_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "runs", "live")
+"""纸面交易状态目录 —— **锚定项目根，不用相对路径**。
+
+早期版本是 `os.path.join("runs", "live")`，隐含假设 CWD 就是项目根。
+包装脚本恰好 `cd` 了过去所以没暴露，但换个目录跑就 `FileNotFoundError`
+（实测 `cd / && python3 scripts/live_carry.py --tick` 会崩）。
+定时任务长年无人盯着，这种隐含假设必须消掉。
+"""
 
 
 def _utc(ms: int) -> str:

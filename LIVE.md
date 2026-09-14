@@ -46,6 +46,34 @@ Gateway 已装成 systemd 用户服务（`hermes gateway install --start-now --s
 所以 cron 重复触发、或进程重启后重跑，都不会把同一笔资金费算两遍
 （`tests/test_live_paper.py::test_funding_is_idempotent` 专门钉这条）。
 
+## 4b. **运维依赖：必须走本地代理**
+
+本机 **DNS 层屏蔽了 `binance.com`**：
+- 直连 `curl` 返回 `HTTP 000`、6 毫秒即失败
+- `getent hosts github.com` 正常，但 `getent hosts api.binance.com` **失败**
+- 必须经本地代理 `127.0.0.1:7897`（实测可用）
+
+而 Hermes gateway 以 systemd 用户服务运行，**它的环境里没有代理变量**。
+所以 `~/.hermes/scripts/quant_carry_tick.sh` 里显式导出了 `http_proxy/https_proxy/...`
+（默认 `http://127.0.0.1:7897/`，可用 `QUANT_PROXY` 覆盖）。
+
+**2026-09-14 23:00 那次 tick 就是这样失败的**：cron 正常触发、脚本正常找到持仓，
+但 `Name or service not known`，一笔行情都没取到。当时的处理是**安静地写了一条
+`{"books": []}`**，看起来像"这次没事发生"——这是错的。
+
+已修：现在**一笔行情都取不到就返回非零、并在 ticks.jsonl 里记显式 `error`**，
+让 cron 能把它当失败上报出来。数据源中断不该伪装成风平浪静。
+
+> 这个依赖也提示一件事：如果将来真要在境内做实际运营，
+> 除了 42 号文的合规问题，**连行情可达性本身都依赖代理**。
+
+## 4c. 路径锚定
+
+`LIVE_DIR` 与 `DEFAULT_LEDGER`（开封账本）都**锚定项目根**，不用相对路径。
+早期版本用 `os.path.join("runs", "live")`，隐含假设 CWD 是项目根——
+从别的目录跑就 `FileNotFoundError`（实测 `cd /tmp && python3 scripts/live_carry.py --tick` 会崩）。
+定时任务长年无人盯着，这类隐含假设必须消掉；而且账本读不到 = **一次性约束直接失效**。
+
 ## 5. 怎么看
 
 ```bash

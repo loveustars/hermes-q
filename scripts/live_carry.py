@@ -87,16 +87,19 @@ def init_books() -> int:
 def tick(verbose: bool = True) -> int:
     now_str = _now_utc()
     lines, recs = [], []
+    n_ok = n_books = 0
     for s in SYMBOLS:
         b = Book.load(s)
         if b is None:
             lines.append(f"  {s:<9} 无持仓状态（先跑 --init）")
             continue
+        n_books += 1
         try:
             q = fetch_live(s)
         except Exception as e:                       # 网络问题：跳过，不动状态
             lines.append(f"  {s:<9} 行情获取失败，本次跳过：{type(e).__name__}: {e}")
             continue
+        n_ok += 1
 
         if b.liquidated:
             snap = b.snapshot(q["now_ms"], q["spot_px"], q["mark_px"])
@@ -129,14 +132,23 @@ def tick(verbose: bool = True) -> int:
             f"  基差 {snap['basis_bp']:>+7.2f}bp"
             f"  累计资金费 {b.funding_total:>+9,.2f}{tag}")
 
+    failed = (n_books > 0 and n_ok == 0)
+    rec = {"tick_at": now_str, "books": recs}
+    if failed:
+        # 一笔行情都没取到 ⇒ 记成**显式失败**，并在日志与退出码上反映出来。
+        # 早期版本会安静地写一条 {"books": []}，看起来像"这次没事发生"，
+        # 实则是数据源断了 —— 2026-09-14 23:00 那次就是这样被掩盖的。
+        rec["error"] = "全部标的行情获取失败（数据源/代理不可达）"
     with open(LOG, "a", encoding="utf-8") as f:
-        f.write(json.dumps({"tick_at": now_str, "books": recs},
-                           ensure_ascii=False) + "\n")
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
     if verbose:
         print(f"carry 纸面交易  {now_str}")
         print("\n".join(lines) if lines else "  （无标的）")
-    return 0
+        if failed:
+            print(f"  ** 本次 tick 失败：{n_books} 个持仓全部取不到行情 **")
+            print("     检查代理是否可用（本机 DNS 屏蔽 binance.com，必须走代理）")
+    return 1 if failed else 0
 
 
 def status() -> int:
