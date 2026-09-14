@@ -1,0 +1,35 @@
+{
+  "funding_window_start": "2020-02-10",
+  "funding_window_bars": 57765,
+  "funding_window_years": 6.594,
+  "funding_annualized": {
+    "BTCUSDT": 0.115766,
+    "ETHUSDT": 0.138234,
+    "BNBUSDT": -0.00069
+  },
+  "buyhold_friction_usdt": 12.27,
+  "buyhold_funding_usdt": 32226.61,
+  "funding_over_friction_ratio": 2626.936,
+  "jitter_dispersion_pct": {
+    "等权持有三币": {
+      "0.5": 1.64,
+      "1.0": 1.64,
+      "2.0": 1.87
+    },
+    "动量（月换仓）": {
+      "0.5": 8.82,
+      "1.0": 19.03,
+      "2.0": 21.16
+    },
+    "随机（日换仓）": {
+      "0.5": 12.73,
+      "1.0": 17.4,
+      "2.0": 20.53
+    },
+    "随机（小时换仓）": {
+      "0.5": 24.97,
+      "1.0": 13.28,
+      "2.0": 24.42
+    }
+  }
+}

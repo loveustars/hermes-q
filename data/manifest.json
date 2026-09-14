@@ -61,5 +61,41 @@
     "sha256": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
     "bytes": 221478,
     "recorded_at": "2026-09-14T11:06:16+00:00"
+  },
+  "data/raw/binance_funding_BTCUSDT.csv": {
+    "symbol": "BTCUSDT",
+    "interval": "funding",
+    "source": "binance_futures",
+    "rows": 7684,
+    "sha256": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "bytes": 293499,
+    "recorded_at": "2026-09-14T12:12:13+00:00"
+  },
+  "data/raw/binance_funding_ETHUSDT.csv": {
+    "symbol": "ETHUSDT",
+    "interval": "funding",
+    "source": "binance_futures",
+    "rows": 7450,
+    "sha256": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "bytes": 283395,
+    "recorded_at": "2026-09-14T12:12:17+00:00"
+  },
+  "data/raw/binance_funding_BNBUSDT.csv": {
+    "symbol": "BNBUSDT",
+    "interval": "funding",
+    "source": "binance_futures",
+    "rows": 7225,
+    "sha256": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "bytes": 261443,
+    "recorded_at": "2026-09-14T12:12:21+00:00"
+  },
+  "data/raw/binance_funding_TRXUSDT.csv": {
+    "symbol": "TRXUSDT",
+    "interval": "funding",
+    "source": "binance_futures",
+    "rows": 7303,
+    "sha256": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
+    "bytes": 276130,
+    "recorded_at": "2026-09-14T12:12:25+00:00"
   }
 }

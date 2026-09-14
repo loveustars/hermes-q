@@ -1,0 +1,29 @@
+{
+  "run_id": "20260914T121746_m7_funding_latency_5293e4",
+  "name": "m7_funding_latency",
+  "config_hash": "605f6f5a592d5491",
+  "git_head": "d99f151",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-14T12:17:46+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
+    "data/raw/binance_funding_BTCUSDT.csv": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "data/raw/binance_funding_ETHUSDT.csv": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "data/raw/binance_funding_BNBUSDT.csv": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "data/raw/binance_funding_TRXUSDT.csv": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef"
+  },
+  "hypothesis": {
+    "question": "资金费相对手续费/冲击有多大？延迟抖动会不会改变结论？",
+    "expected": "资金费量级应显著超过手续费（年化 5%~15% vs 往返 0.2%）；抖动只影响高频策略",
+    "decision_rule": "若资金费在多头持有下的年化拖累 > 5%，则所有持仓型结论必须在永续口径下重算"
+  },
+  "ended_at": "2026-09-14T12:18:23+00:00",
+  "status": "ok"
+}

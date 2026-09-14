@@ -1,0 +1,42 @@
+[
+  {
+    "agent": "等权持有三币",
+    "spot_final": 167878.25,
+    "perp_final": 135651.64,
+    "terminal_impact_pct": -19.2,
+    "total_funding": 32226.61,
+    "effective_funding_rate": 0.055167,
+    "sharpe_spot": 0.9666,
+    "sharpe_perp": 0.8939
+  },
+  {
+    "agent": "单持 BTC",
+    "spot_final": 80447.74,
+    "perp_final": 43457.44,
+    "terminal_impact_pct": -45.98,
+    "total_funding": 36990.3,
+    "effective_funding_rate": 0.17575,
+    "sharpe_spot": 0.8261,
+    "sharpe_perp": 0.0166
+  },
+  {
+    "agent": "动量（月换仓）",
+    "spot_final": 248818.62,
+    "perp_final": 147357.06,
+    "terminal_impact_pct": -40.78,
+    "total_funding": 40016.33,
+    "effective_funding_rate": 0.072094,
+    "sharpe_spot": 1.3883,
+    "sharpe_perp": 1.1957
+  },
+  {
+    "agent": "随机（日换仓）",
+    "spot_final": 25814.93,
+    "perp_final": 17312.64,
+    "terminal_impact_pct": -32.94,
+    "total_funding": 22705.06,
+    "effective_funding_rate": 0.114385,
+    "sharpe_spot": 0.5536,
+    "sharpe_perp": 0.4638
+  }
+]

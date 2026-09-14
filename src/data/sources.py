@@ -20,6 +20,9 @@ INTERVAL_MS = {"1h": 3_600_000, "1d": DAY_MS}
 # 合规白名单：只读行情端点。任何不在此列的网络请求都会被拒绝。
 ALLOWED_PATHS = {
     "binance": ("/api/v3/klines", "/api/v3/depth", "/api/v3/ticker/24hr"),
+    # 永续（U 本位）公开行情。仍然只有只读市场数据，不含任何账户/下单端点。
+    "binance_futures": ("/fapi/v1/fundingRate", "/fapi/v1/premiumIndex",
+                        "/fapi/v1/klines", "/fapi/v1/ticker/24hr"),
     "okx": ("/api/v5/market/candles", "/api/v5/market/history-candles", "/api/v5/market/books"),
     "coinbase": ("/products/",),
 }
@@ -146,6 +149,74 @@ def measure_spread_bp(symbol: str, limit: int = 5) -> float:
     ask = float(d["asks"][0][0])
     mid = (bid + ask) / 2.0
     return (ask - bid) / mid / 2.0 * 1e4   # 单边成本 = 半价差
+
+
+# --------------------------------------------------------------------------
+# 币安永续（U 本位）—— 资金费与永续行情
+# --------------------------------------------------------------------------
+BINANCE_FUTURES_BASE = "https://fapi.binance.com"
+FUNDING_MS = 8 * 3_600_000          # 资金费每 8 小时结算一次
+
+
+def funding_rate_history(symbol: str, start_ms: int, end_ms: int | None = None,
+                         pause: float = 0.15, workers: int = 4) -> list[dict]:
+    """资金费历史（分页并行）。
+
+    币安 fapi/v1/fundingRate 单次上限 1000 条，一天 3 条，
+    9 年约 9,900 条 → 10 个分页。
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    if end_ms is None:
+        end_ms = int(time.time() * 1000)
+    span = 1000 * FUNDING_MS
+    starts = list(range(start_ms, end_ms, span))
+
+    def fetch_one(s: int) -> list[dict]:
+        out = _get("binance_futures", BINANCE_FUTURES_BASE, "/fapi/v1/fundingRate",
+                   {"symbol": symbol, "startTime": s, "endTime": min(s + span - 1, end_ms),
+                    "limit": 1000})
+        if pause:
+            time.sleep(pause)
+        return out if isinstance(out, list) else []
+
+    rows: list[dict] = []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for chunk in ex.map(fetch_one, starts):
+            rows.extend(chunk)
+
+    seen: dict[int, dict] = {}
+    for r in rows:
+        seen[int(r["fundingTime"])] = {
+            "funding_time": int(r["fundingTime"]),
+            "symbol": r["symbol"],
+            "funding_rate": float(r["fundingRate"]),
+            "mark_price": float(r.get("markPrice") or 0.0),
+            "rate_type": r.get("rateType", ""),
+        }
+    return [seen[k] for k in sorted(seen)]
+
+
+def perp_klines(symbol: str, interval: str = "1h", limit: int = 1000,
+                start_ms: int | None = None, end_ms: int | None = None) -> list[Bar]:
+    """永续 K 线（用于计算基差：永续价 vs 现货价）。"""
+    params = {"symbol": symbol, "interval": interval, "limit": limit}
+    if start_ms is not None:
+        params["startTime"] = start_ms
+    if end_ms is not None:
+        params["endTime"] = end_ms
+    batch = _get("binance_futures", BINANCE_FUTURES_BASE, "/fapi/v1/klines", params)
+    out = []
+    for k in batch:
+        out.append(Bar(int(k[0]), float(k[1]), float(k[2]), float(k[3]),
+                       float(k[4]), float(k[5]), float(k[7])))
+    return out
+
+
+def premium_index(symbol: str) -> dict:
+    """当前标记价、指数价与最近资金费。"""
+    return _get("binance_futures", BINANCE_FUTURES_BASE, "/fapi/v1/premiumIndex",
+                {"symbol": symbol})
 
 
 # --------------------------------------------------------------------------

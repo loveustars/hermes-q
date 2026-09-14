@@ -1,0 +1,15 @@
+{
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "TRXUSDT"
+  ],
+  "annualized_mean": {
+    "BTCUSDT": 0.115766,
+    "ETHUSDT": 0.138234,
+    "BNBUSDT": -0.00069,
+    "TRXUSDT": 0.032307
+  },
+  "min_coverage": 0
+}

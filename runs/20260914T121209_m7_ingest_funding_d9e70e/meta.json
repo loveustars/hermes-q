@@ -1,0 +1,25 @@
+{
+  "run_id": "20260914T121209_m7_ingest_funding_d9e70e",
+  "name": "m7_ingest_funding",
+  "config_hash": "605f6f5a592d5491",
+  "git_head": "d99f151",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-14T12:12:09+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517"
+  },
+  "hypothesis": {
+    "question": "永续资金费的年化量级有多大？覆盖率是否足以支撑回测？",
+    "expected": "核心池年化 5%~10% 的持仓成本；覆盖率应接近 100%",
+    "decision_rule": "若某标的覆盖率 < 90%，则该标的的资金费结论不可用，需要在报告中标注而非强行使用"
+  },
+  "ended_at": "2026-09-14T12:12:25+00:00",
+  "status": "ok"
+}

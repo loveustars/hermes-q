@@ -1,0 +1,29 @@
+{
+  "BTCUSDT": {
+    "n": 7684,
+    "mean_per_settlement": 0.00010572,
+    "annualized_mean": 0.115766,
+    "median_annualized": 0.105344,
+    "positive_share": 0.8576,
+    "max": 0.003,
+    "min": -0.003
+  },
+  "ETHUSDT": {
+    "n": 7450,
+    "mean_per_settlement": 0.00012624,
+    "annualized_mean": 0.138234,
+    "median_annualized": 0.1095,
+    "positive_share": 0.8632,
+    "max": 0.00375,
+    "min": -0.00356332
+  },
+  "BNBUSDT": {
+    "n": 7225,
+    "mean_per_settlement": -6.3e-07,
+    "annualized_mean": -0.00069,
+    "median_annualized": 0.0,
+    "positive_share": 0.262,
+    "max": 0.00441898,
+    "min": -0.00584369
+  }
+}

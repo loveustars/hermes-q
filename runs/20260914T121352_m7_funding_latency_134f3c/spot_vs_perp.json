@@ -1,0 +1,66 @@
+[
+  {
+    "agent": "等权持有三币",
+    "instrument": "spot",
+    "final_equity": 167878.25,
+    "total_funding": 0.0,
+    "annualized_funding_drag": 0.0,
+    "sharpe": 0.9666
+  },
+  {
+    "agent": "等权持有三币",
+    "instrument": "perp",
+    "final_equity": 135651.64,
+    "total_funding": 32226.61,
+    "annualized_funding_drag": 0.488713,
+    "sharpe": 0.8939
+  },
+  {
+    "agent": "单持 BTC",
+    "instrument": "spot",
+    "final_equity": 80447.74,
+    "total_funding": 0.0,
+    "annualized_funding_drag": 0.0,
+    "sharpe": 0.8261
+  },
+  {
+    "agent": "单持 BTC",
+    "instrument": "perp",
+    "final_equity": 43457.44,
+    "total_funding": 36990.3,
+    "annualized_funding_drag": 0.560954,
+    "sharpe": 0.0166
+  },
+  {
+    "agent": "动量（月换仓）",
+    "instrument": "spot",
+    "final_equity": 248818.62,
+    "total_funding": 0.0,
+    "annualized_funding_drag": 0.0,
+    "sharpe": 1.3883
+  },
+  {
+    "agent": "动量（月换仓）",
+    "instrument": "perp",
+    "final_equity": 147357.06,
+    "total_funding": 40016.33,
+    "annualized_funding_drag": 0.606843,
+    "sharpe": 1.1957
+  },
+  {
+    "agent": "随机（日换仓）",
+    "instrument": "spot",
+    "final_equity": 25814.93,
+    "total_funding": 0.0,
+    "annualized_funding_drag": 0.0,
+    "sharpe": 0.5536
+  },
+  {
+    "agent": "随机（日换仓）",
+    "instrument": "perp",
+    "final_equity": 17312.64,
+    "total_funding": 22705.06,
+    "annualized_funding_drag": 0.34432,
+    "sharpe": 0.4638
+  }
+]

@@ -1,0 +1,58 @@
+{
+  "BTCUSDT": {
+    "n": 7684,
+    "mean_per_settlement": 0.00010572,
+    "annualized_mean": 0.115766,
+    "median_annualized": 0.105344,
+    "positive_share": 0.8576,
+    "max": 0.003,
+    "min": -0.003,
+    "symbol": "BTCUSDT",
+    "n_records": 7684,
+    "first": "2019-09-10",
+    "last": "2026-09-14",
+    "coverage": 0.7726
+  },
+  "ETHUSDT": {
+    "n": 7450,
+    "mean_per_settlement": 0.00012624,
+    "annualized_mean": 0.138234,
+    "median_annualized": 0.1095,
+    "positive_share": 0.8632,
+    "max": 0.00375,
+    "min": -0.00356332,
+    "symbol": "ETHUSDT",
+    "n_records": 7450,
+    "first": "2019-11-27",
+    "last": "2026-09-14",
+    "coverage": 0.749
+  },
+  "BNBUSDT": {
+    "n": 7225,
+    "mean_per_settlement": -6.3e-07,
+    "annualized_mean": -0.00069,
+    "median_annualized": 0.0,
+    "positive_share": 0.262,
+    "max": 0.00441898,
+    "min": -0.00584369,
+    "symbol": "BNBUSDT",
+    "n_records": 7225,
+    "first": "2020-02-10",
+    "last": "2026-09-14",
+    "coverage": 0.7445
+  },
+  "TRXUSDT": {
+    "n": 7303,
+    "mean_per_settlement": 2.95e-05,
+    "annualized_mean": 0.032307,
+    "median_annualized": 0.099711,
+    "positive_share": 0.6469,
+    "max": 0.00378456,
+    "min": -0.004875,
+    "symbol": "TRXUSDT",
+    "n_records": 7303,
+    "first": "2020-01-15",
+    "last": "2026-09-14",
+    "coverage": null
+  }
+}

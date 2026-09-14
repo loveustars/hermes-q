@@ -6,8 +6,13 @@
 
 执行约定（防未来函数）：
   - 策略在第 t 根 bar 收盘后做决策，只能看到 0..t
-  - 成交发生在第 t+latency 根 bar 的**开盘价**
+  - 订单挂到 pending 队列，在第 t+latency 根 bar 的**开盘价**成交
+  - latency 支持抖动（泊松），模拟真实下单延迟的不确定性
   - 冲击模型用 t 时刻可见的 σ 与成交额，不用未来值
+  - 资金费在每个 8 小时结算点上按持仓名义额收取（仅净账本，单独计量）
+
+资金费只进净账本：毛账本的口径是"假如交易完全免费"，
+而资金费不是摩擦成本，是持仓的持有成本，必须单独可见。
 """
 from __future__ import annotations
 
@@ -18,6 +23,7 @@ import pandas as pd
 
 from ..env.market_view import MarketView, Precomputed
 from .costs import CostModel
+from .funding import FundingTable
 
 
 @dataclass
@@ -30,14 +36,26 @@ class SimConfig:
     sigma_window: int = 168          # 一周小时线，用于冲击模型
     vol_window: int = 168            # 冲击模型里的成交量窗口
     min_trade_notional: float = 1.0  # 小于此金额不下单（避免无穷小换手）
-    # 缺口处理。实测 BTC/ETH 各 28 处、最长 34 小时，三标的缺口位置一致（交易所停机）。
+    # 缺口处理。实测 BTC/ETH 各 27~28 处、最长 34 小时，三标的缺口位置一致（交易所停机）。
     #   "execute"（默认）：照常成交。交易所当时确实闭市，下一个可成交价就是复牌开盘价。
     #   "skip"：跨缺口那一根不交易，只做盯市。更保守，用于敏感性对照。
     gap_policy: str = "execute"
+    # 仪器类型：spot 无资金费；perp 计资金费（并允许做空）
+    instrument: str = "spot"
+    # 延迟抖动：实际成交延迟 = latency_bars + Poisson(jitter_mean)，上限 latency_max_bars
+    latency_jitter_mean: float = 0.0
+    latency_jitter_seed: int = 0
+    latency_max_bars: int = 5
 
     def __post_init__(self):
         if self.gap_policy not in ("execute", "skip"):
             raise ValueError(f"gap_policy 只能是 execute / skip，收到 {self.gap_policy!r}")
+        if self.instrument not in ("spot", "perp"):
+            raise ValueError(f"instrument 只能是 spot / perp，收到 {self.instrument!r}")
+        if self.instrument == "spot" and self.allow_short:
+            raise ValueError("现货模式不允许做空；做空请设 instrument='perp'")
+        if self.latency_jitter_mean < 0:
+            raise ValueError("latency_jitter_mean 不能为负")
 
 
 @dataclass
@@ -53,6 +71,9 @@ class SimResult:
     n_gap_bars: int = 0
     n_gap_trades: int = 0
     n_gap_skipped: int = 0
+    funding_paid: np.ndarray = field(default_factory=lambda: np.zeros(0))
+    n_funding_events: int = 0
+    latency_histogram: dict = field(default_factory=dict)
     symbols: list[str] = field(default_factory=list)
 
     @property
@@ -77,15 +98,20 @@ class SimResult:
         """全周期成本占**初始本金**的比例（基点）—— 不能用 e[0] 做基数。"""
         return float(self.cost_paid.sum() / self.initial_cash * 1e4)
 
+    def total_funding(self) -> float:
+        return float(self.funding_paid.sum()) if len(self.funding_paid) else 0.0
+
 
 class SimExchange:
     def __init__(self, frames: dict[str, pd.DataFrame], gross_costs: CostModel,
-                 net_costs: CostModel, cfg: SimConfig):
+                 net_costs: CostModel, cfg: SimConfig,
+                 funding: FundingTable | None = None):
         self.frames = frames
         self.symbols = list(frames)
         self.gross_costs = gross_costs     # enabled=False
         self.net_costs = net_costs         # enabled=True
         self.cfg = cfg
+        self.funding = funding
         lens = {len(f) for f in frames.values()}
         if len(lens) != 1:
             raise ValueError(f"各标的 bar 数不一致: {lens}，请先对齐")
@@ -112,101 +138,120 @@ class SimExchange:
             out = {s: v * k for s, v in out.items()}
         return out
 
+    # ------------------------------------------------------------------
     def run(self, agent) -> SimResult:
         cfg = self.cfg
         start = cfg.warmup
         if start >= self.T - cfg.latency_bars - 1:
             raise ValueError("warmup 过长，剩余 bar 不足")
 
-        # 两个账本各自的现金与持仓
+        jitter_rng = np.random.default_rng(cfg.latency_jitter_seed)
+        use_funding = (cfg.instrument == "perp" and self.funding is not None
+                       and len(self.funding.rates_by_hour) > 0)
+
         cash_n = cash_g = cfg.initial_cash
         units_n = {s: 0.0 for s in self.symbols}
         units_g = {s: 0.0 for s in self.symbols}
 
         idx_out, net_eq, gross_eq = [], [], []
-        cost_paid, turnover = [], []
+        cost_paid, turnover, funding_paid = [], [], []
         n_trades = 0
+        n_funding_events = 0
         insolvent_at: int | None = None
         n_gap_trades = 0
         n_gap_skipped = 0
+        latency_hist: dict[int, int] = {}
         gap_mask = self.pre.gaps if self.pre is not None else None
         n_gap_bars = int(gap_mask.sum()) if gap_mask is not None else 0
 
-        for t in range(start, self.T - cfg.latency_bars):
-            view = MarketView(self.frames, t, self.pre)
-            target = agent.decide(view)
-            ex = t + cfg.latency_bars
-            at_gap = bool(gap_mask[ex]) if gap_mask is not None else False
+        first_record = start + cfg.latency_bars
+        pending: dict[int, tuple[dict[str, float], int]] = {}
+        idx = self.frames[self.symbols[0]].index
 
-            def _mark():
-                nonlocal insolvent_at
+        for t in range(start, self.T):
+            ex = t
+            at_gap = bool(gap_mask[ex]) if gap_mask is not None else False
+            bar_cost = 0.0
+            bar_turnover = 0.0
+            bar_funding = 0.0
+
+            # ---------- 1) 执行到期订单（成交价 = 本根 open）----------
+            due = pending.pop(ex, None)
+            if due is not None:
+                target_w, decision_step = due
+                if at_gap and cfg.gap_policy == "skip":
+                    n_gap_skipped += 1
+                else:
+                    if at_gap:
+                        n_gap_trades += 1
+                    # 冲击模型的 σ 与成交额用**决策时刻**可见的值（因果），
+                    # 不用执行时刻的，避免延迟抖动带来隐性未来信息。
+                    dview = MarketView(self.frames, decision_step, self.pre)
+                    px = {s: float(self.frames[s]["open"].iloc[ex]) for s in self.symbols}
+                    eq_n = cash_n + sum(units_n[s] * px[s] for s in self.symbols)
+                    eq_g = cash_g + sum(units_g[s] * px[s] for s in self.symbols)
+                    for s in self.symbols:
+                        sigma = dview.sigma(s, cfg.sigma_window)
+                        pn = dview.period_notional(s, cfg.vol_window)
+
+                        want_n = target_w[s] * eq_n / px[s]
+                        d_n = want_n - units_n[s]
+                        notional_n = abs(d_n) * px[s]
+                        if notional_n >= cfg.min_trade_notional:
+                            c = self.net_costs.trade_cost(s, notional_n, sigma, pn)
+                            cash_n -= c
+                            cash_n -= d_n * px[s]
+                            units_n[s] = want_n
+                            bar_cost += c
+                            n_trades += 1
+
+                        want_g = target_w[s] * eq_g / px[s]
+                        d_g = want_g - units_g[s]
+                        notional_g = abs(d_g) * px[s]
+                        if notional_g >= cfg.min_trade_notional:
+                            cash_g -= d_g * px[s]
+                            units_g[s] = want_g
+                            bar_turnover += notional_g
+
+            # ---------- 2) 资金费结算（按收盘价近似结算价）----------
+            if use_funding:
+                ts_ms = int(idx[ex].timestamp() * 1000)
+                for s in self.symbols:
+                    rate = self.funding.rate_or_none(s, ts_ms)
+                    if rate is None or units_n[s] == 0.0:
+                        continue
+                    price = float(self.frames[s]["close"].iloc[ex])
+                    pay = units_n[s] * price * rate
+                    cash_n -= pay
+                    bar_funding += pay
+                    n_funding_events += 1
+
+            # ---------- 3) 盯市 ----------
+            if ex >= first_record:
                 pxc = {s: float(self.frames[s]["close"].iloc[ex]) for s in self.symbols}
-                idx_out.append(self.frames[self.symbols[0]].index[ex])
+                idx_out.append(idx[ex])
                 net_eq.append(cash_n + sum(units_n[s] * pxc[s] for s in self.symbols))
                 gross_eq.append(cash_g + sum(units_g[s] * pxc[s] for s in self.symbols))
-                cost_paid.append(0.0)
-                turnover.append(0.0)
+                cost_paid.append(bar_cost)
+                turnover.append(bar_turnover)
+                funding_paid.append(bar_funding)
                 if insolvent_at is None and net_eq[-1] < 0.01 * cfg.initial_cash:
                     insolvent_at = len(net_eq) - 1
 
-            # 契约：decide 返回完整目标权重 dict；返回 None 表示"维持现状"
-            # 没有这个语义，买入持有会被翻译成每根 bar 精确再平衡，换手虚高。
-            if target is None:
-                _mark()
+            # ---------- 4) 决策（只能在看到 t 及之前的数据后做）----------
+            if ex >= self.T - 1:
                 continue
-
-            # 跨缺口的成交：实际间隔不是 1 根 bar，latency_bars 假设在此失效。
-            # 默认照常成交（交易所复牌，下一个可成交价就是复牌开盘价），
-            # gap_policy="skip" 时不成交，只盯市。
-            if at_gap:
-                if cfg.gap_policy == "skip":
-                    n_gap_skipped += 1
-                    _mark()
-                    continue
-                n_gap_trades += 1
-
-            target = self._sanitize(target, view)
-            px = {s: float(self.frames[s]["open"].iloc[ex]) for s in self.symbols}
-
-            eq_n = cash_n + sum(units_n[s] * px[s] for s in self.symbols)
-            eq_g = cash_g + sum(units_g[s] * px[s] for s in self.symbols)
-
-            bar_cost = 0.0
-            bar_turnover = 0.0
-
-            for s in self.symbols:
-                sigma = view.sigma(s, cfg.sigma_window)
-                period_notional = view.period_notional(s, cfg.vol_window)
-
-                # --- 净账本：真实成交，计成本 ---
-                want_n = target[s] * eq_n / px[s]
-                d_n = want_n - units_n[s]
-                notional_n = abs(d_n) * px[s]
-                if notional_n >= cfg.min_trade_notional:
-                    c = self.net_costs.trade_cost(s, notional_n, sigma, period_notional)
-                    cash_n -= c
-                    cash_n -= d_n * px[s]
-                    units_n[s] = want_n
-                    bar_cost += c
-                    n_trades += 1
-
-                # --- 毛账本：同一决策、同一目标权重，零成本 ---
-                # 换手按毛账本统计：净账本一旦接近归零就停止交易，
-                # 会让换手/成本统计被截断，从而低估策略真实的交易强度。
-                want_g = target[s] * eq_g / px[s]
-                d_g = want_g - units_g[s]
-                notional_g = abs(d_g) * px[s]
-                if notional_g >= cfg.min_trade_notional:
-                    cash_g -= d_g * px[s]
-                    units_g[s] = want_g
-                    bar_turnover += notional_g
-
-            px_close = {s: float(self.frames[s]["close"].iloc[ex]) for s in self.symbols}
-            idx_out.append(self.frames[self.symbols[0]].index[ex])
-            net_eq.append(cash_n + sum(units_n[s] * px_close[s] for s in self.symbols))
-            gross_eq.append(cash_g + sum(units_g[s] * px_close[s] for s in self.symbols))
-            cost_paid.append(bar_cost)
-            turnover.append(bar_turnover)
+            view = MarketView(self.frames, ex, self.pre)
+            target = agent.decide(view)
+            if target is None:
+                continue
+            lat = cfg.latency_bars
+            if cfg.latency_jitter_mean > 0:
+                lat += int(jitter_rng.poisson(cfg.latency_jitter_mean))
+            lat = int(max(1, min(lat, cfg.latency_max_bars)))
+            latency_hist[lat] = latency_hist.get(lat, 0) + 1
+            exec_at = min(ex + lat, self.T - 1)
+            pending[exec_at] = (self._sanitize(target, view), ex)
 
         return SimResult(
             index=pd.DatetimeIndex(idx_out),
@@ -220,5 +265,8 @@ class SimExchange:
             n_gap_bars=n_gap_bars,
             n_gap_trades=n_gap_trades,
             n_gap_skipped=n_gap_skipped,
+            funding_paid=np.asarray(funding_paid, dtype=float),
+            n_funding_events=n_funding_events,
+            latency_histogram=latency_hist,
             symbols=self.symbols,
         )
