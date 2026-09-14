@@ -1,0 +1,30 @@
+[
+  {
+    "roundtrips_per_year": 10,
+    "cost_drag_pct_per_year": 2.0
+  },
+  {
+    "roundtrips_per_year": 25,
+    "cost_drag_pct_per_year": 5.0
+  },
+  {
+    "roundtrips_per_year": 50,
+    "cost_drag_pct_per_year": 10.0
+  },
+  {
+    "roundtrips_per_year": 100,
+    "cost_drag_pct_per_year": 20.0
+  },
+  {
+    "roundtrips_per_year": 200,
+    "cost_drag_pct_per_year": 40.0
+  },
+  {
+    "roundtrips_per_year": 500,
+    "cost_drag_pct_per_year": 100.0
+  },
+  {
+    "roundtrips_per_year": 1000,
+    "cost_drag_pct_per_year": 200.0
+  }
+]

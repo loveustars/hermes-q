@@ -1,0 +1,74 @@
+[
+  {
+    "agent": "bh_BTCUSDT",
+    "execute_final": 101251.2482389912,
+    "skip_final": 101251.2482389912,
+    "deviation_pp_of_principal": 0.0,
+    "gap_trades": 0,
+    "gap_skipped": 0,
+    "insolvent": false,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  },
+  {
+    "agent": "buy_hold",
+    "execute_final": 1580663.3985241996,
+    "skip_final": 1580663.3985241996,
+    "deviation_pp_of_principal": 0.0,
+    "gap_trades": 0,
+    "gap_skipped": 0,
+    "insolvent": false,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  },
+  {
+    "agent": "mom_BTCUSDT_720_rb24",
+    "execute_final": 145007.74794669356,
+    "skip_final": 145007.74794669356,
+    "deviation_pp_of_principal": 0.0,
+    "gap_trades": 2,
+    "gap_skipped": 2,
+    "insolvent": false,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  },
+  {
+    "agent": "random_rb24_s11",
+    "execute_final": 33798.48195394415,
+    "skip_final": 33488.95695955984,
+    "deviation_pp_of_principal": -3.0952,
+    "gap_trades": 2,
+    "gap_skipped": 2,
+    "insolvent": false,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  },
+  {
+    "agent": "random_rb1_s11",
+    "execute_final": 0.9630208679962344,
+    "skip_final": 0.9201527564925704,
+    "deviation_pp_of_principal": -0.0004,
+    "gap_trades": 27,
+    "gap_skipped": 27,
+    "insolvent": true,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  },
+  {
+    "agent": "hedge_K11_eta0.0200_band0.02",
+    "execute_final": 146416.34587188959,
+    "skip_final": 146311.8050509641,
+    "deviation_pp_of_principal": -1.0454,
+    "gap_trades": 2,
+    "gap_skipped": 2,
+    "insolvent": false,
+    "verdict_execute": "无边际",
+    "verdict_skip": "无边际",
+    "flip": false
+  }
+]

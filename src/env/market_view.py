@@ -25,7 +25,8 @@ class Precomputed:
     """
 
     def __init__(self, frames: dict[str, pd.DataFrame],
-                 sigma_windows: set[int], vol_windows: set[int]):
+                 sigma_windows: set[int], vol_windows: set[int],
+                 with_gaps: bool = True):
         self.sigma: dict[tuple[str, int], np.ndarray] = {}
         self.vmed: dict[tuple[str, int], np.ndarray] = {}
         for s, f in frames.items():
@@ -35,6 +36,11 @@ class Precomputed:
                 self.sigma[(s, n)] = logret.rolling(n).std(ddof=0).to_numpy()
             for n in vol_windows:
                 self.vmed[(s, n)] = qv.rolling(n).median().to_numpy()
+        # 缺口标记：任一标的在该 bar 之前有缺口即为 True（成交是全组合同时发生的）
+        self.gaps: np.ndarray | None = None
+        if with_gaps:
+            from ..data.quality import union_gap_flags
+            self.gaps = union_gap_flags(frames)
 
 
 class MarketView:
@@ -114,6 +120,18 @@ class MarketView:
 
     def available_history(self) -> int:
         return self._t + 1
+
+    def is_gap(self, i: int | None = None) -> bool:
+        """该 bar 之前是否存在数据缺口（交易所停机）。
+
+        用途：跨缺口的成交，实际间隔不是 1 根 bar（实测最长 34 小时），
+        所以"延迟 1 根 bar 成交"的假设在那些 bar 上不成立。
+        策略与统计口径都可以据此排除或区别处理。
+        """
+        idx = self._t if i is None else self._check(i)
+        if self._pre is None or self._pre.gaps is None or idx >= len(self._pre.gaps):
+            return False
+        return bool(self._pre.gaps[idx])
 
     def __repr__(self) -> str:
         return f"<MarketView t={self._t} symbols={self.symbols()}>"

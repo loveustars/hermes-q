@@ -30,6 +30,14 @@ class SimConfig:
     sigma_window: int = 168          # 一周小时线，用于冲击模型
     vol_window: int = 168            # 冲击模型里的成交量窗口
     min_trade_notional: float = 1.0  # 小于此金额不下单（避免无穷小换手）
+    # 缺口处理。实测 BTC/ETH 各 28 处、最长 34 小时，三标的缺口位置一致（交易所停机）。
+    #   "execute"（默认）：照常成交。交易所当时确实闭市，下一个可成交价就是复牌开盘价。
+    #   "skip"：跨缺口那一根不交易，只做盯市。更保守，用于敏感性对照。
+    gap_policy: str = "execute"
+
+    def __post_init__(self):
+        if self.gap_policy not in ("execute", "skip"):
+            raise ValueError(f"gap_policy 只能是 execute / skip，收到 {self.gap_policy!r}")
 
 
 @dataclass
@@ -42,6 +50,9 @@ class SimResult:
     n_trades: int
     initial_cash: float = 10_000.0
     insolvent_at: int | None = None
+    n_gap_bars: int = 0
+    n_gap_trades: int = 0
+    n_gap_skipped: int = 0
     symbols: list[str] = field(default_factory=list)
 
     @property
@@ -116,25 +127,43 @@ class SimExchange:
         cost_paid, turnover = [], []
         n_trades = 0
         insolvent_at: int | None = None
+        n_gap_trades = 0
+        n_gap_skipped = 0
+        gap_mask = self.pre.gaps if self.pre is not None else None
+        n_gap_bars = int(gap_mask.sum()) if gap_mask is not None else 0
 
         for t in range(start, self.T - cfg.latency_bars):
             view = MarketView(self.frames, t, self.pre)
             target = agent.decide(view)
             ex = t + cfg.latency_bars
+            at_gap = bool(gap_mask[ex]) if gap_mask is not None else False
 
-            # 契约：decide 返回完整目标权重 dict；返回 None 表示"维持现状"
-            # 没有这个语义，买入持有会被翻译成每根 bar 精确再平衡，换手虚高。
-            if target is None:
-                px_close = {s: float(self.frames[s]["close"].iloc[ex])
-                            for s in self.symbols}
+            def _mark():
+                nonlocal insolvent_at
+                pxc = {s: float(self.frames[s]["close"].iloc[ex]) for s in self.symbols}
                 idx_out.append(self.frames[self.symbols[0]].index[ex])
-                net_eq.append(cash_n + sum(units_n[s] * px_close[s] for s in self.symbols))
-                gross_eq.append(cash_g + sum(units_g[s] * px_close[s] for s in self.symbols))
+                net_eq.append(cash_n + sum(units_n[s] * pxc[s] for s in self.symbols))
+                gross_eq.append(cash_g + sum(units_g[s] * pxc[s] for s in self.symbols))
                 cost_paid.append(0.0)
                 turnover.append(0.0)
                 if insolvent_at is None and net_eq[-1] < 0.01 * cfg.initial_cash:
                     insolvent_at = len(net_eq) - 1
+
+            # 契约：decide 返回完整目标权重 dict；返回 None 表示"维持现状"
+            # 没有这个语义，买入持有会被翻译成每根 bar 精确再平衡，换手虚高。
+            if target is None:
+                _mark()
                 continue
+
+            # 跨缺口的成交：实际间隔不是 1 根 bar，latency_bars 假设在此失效。
+            # 默认照常成交（交易所复牌，下一个可成交价就是复牌开盘价），
+            # gap_policy="skip" 时不成交，只盯市。
+            if at_gap:
+                if cfg.gap_policy == "skip":
+                    n_gap_skipped += 1
+                    _mark()
+                    continue
+                n_gap_trades += 1
 
             target = self._sanitize(target, view)
             px = {s: float(self.frames[s]["open"].iloc[ex]) for s in self.symbols}
@@ -188,5 +217,8 @@ class SimExchange:
             n_trades=n_trades,
             initial_cash=cfg.initial_cash,
             insolvent_at=insolvent_at,
+            n_gap_bars=n_gap_bars,
+            n_gap_trades=n_gap_trades,
+            n_gap_skipped=n_gap_skipped,
             symbols=self.symbols,
         )

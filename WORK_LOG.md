@@ -24,6 +24,7 @@
 | M3 因果环境 | ✅ | 10/10 测试通过，含未来函数注入与 next-bar-open 成交验证 |
 | M4 评估协议 + G1 | ✅ | 首次不通过（100% 假阳性），修掉两个结论级错误后通过（0.0%） |
 | M5 在线自学习体 | ✅ | **无边际**：alpha 年化 −13.96%，t=−1.00，p=0.84，DSR 0.70 |
+| M6 缺口处理（工程债） | ✅ | 实测 27 处/最长 34 小时；口径敏感性最多 3.1 个本金百分点，零判定翻转 |
 
 ---
 
@@ -41,7 +42,27 @@
 
 ---
 
-## 四、踩过的坑（务必先看，全部是"结论级"错误）
+## 四、M6 缺口处理（工程债已清）
+
+**实测**（对齐后三标的完全一致）：27 处缺口、缺 122 根（0.1574%）、**最长一处 34 小时**
+（2018-01-04 起）。BTC 与 ETH 的缺口位置连时间点都相同 ⇒ 交易所级别停机，不是单标的数据问题。
+
+**做法**：标记而非删除（删除会破坏时间轴连续性）。新增 `src/data/quality.py`，
+`MarketView.is_gap(t)` 暴露给策略，`SimConfig.gap_policy` 支持 `execute`（默认，贴近现实）与
+`skip`（保守对照）。
+
+**敏感性结论**：差异最多 3.1 个本金百分点（只影响高频调仓策略；买入持有与动量 0.000pp），
+**零判定翻转** ⇒ 默认 `execute` 保持不变。
+
+**顺带修掉一个错误指标**：第一版用"相对终值"算差异，而小时换仓策略终值 0.98（已归零），
+算出 4.45% 的"显著差异"——纯除零噪声。已改为以初始本金的百分点计。
+
+**回归验证**：改动后重跑 `m2_baseline.py`，全部数字与改动前逐项一致
+（`bh_BTCUSDT` 101,252 / `buy_hold` 1,580,664 / 动量 148,774 / 冲击表逐项相同）。
+
+---
+
+## 五、踩过的坑（务必先看，全部是"结论级"错误）
 
 1. **收益基数错误**：成本在第一根 bar 扣除，用 `equity[0]` 做收益基数会让净值基数变小，
    净收益百分比反而**高于**毛收益（BNB 毛 45,586% / 净 55,849%）。修复：一律以固定初始本金为基数。
@@ -64,7 +85,7 @@
 
 ---
 
-## 五、怎么跑
+## 六、怎么跑
 
 ```bash
 cd /home/nick/workspace/quant
@@ -72,6 +93,7 @@ cd /home/nick/workspace/quant
 # 测试
 python3 tests/test_causality.py        # 10/10  因果封印与撮合正确性
 python3 tests/test_protocol.py         # 13/13  评估协议自洽性
+python3 tests/test_data_quality.py     # 11/11  缺口识别与缺口口径
 
 # 数据（可重复执行，只补增量）
 python3 scripts/m1_ingest.py
@@ -83,6 +105,10 @@ python3 checks_window_sensitivity.py   # 冲击占比的口径敏感性
 # 优化正确性对拍（改 MarketView 后必跑）
 python3 scripts/verify_precompute.py
 
+# 数据质量诊断
+python3 scripts/diag_gaps.py           # 缺口位置与分布
+python3 scripts/m6_gap_sensitivity.py  # 缺口口径敏感性（execute vs skip）
+
 # 评估器校准（G1 闸门，约 6 分钟）
 python3 scripts/m4_calibrate.py
 
@@ -93,7 +119,7 @@ python3 scripts/m5_online.py           # 完整评测
 
 ---
 
-## 六、关键文件位置
+## 七、关键文件位置
 
 ```
 quant/
@@ -103,7 +129,8 @@ quant/
 ├── configs/spreads.json          # 实测点差（m1_ingest 生成）
 ├── src/data/sources.py           # 三源只读适配器 + 合规白名单
 ├── src/data/store.py             # CSV 落盘 + sha256 manifest
-├── src/env/market_view.py        # 因果封印 + 滚动统计预计算
+├── src/data/quality.py           # 缺口识别/标记/时间权重
+├── src/env/market_view.py        # 因果封印 + 滚动统计预计算 + is_gap
 ├── src/sim/costs.py              # 手续费 / 点差 / 平方根冲击
 ├── src/sim/exchange.py           # 双账本撮合仿真
 ├── src/eval/metrics.py           # 指标（固定本金基数）
@@ -114,12 +141,13 @@ quant/
 ├── src/agents/online.py          # M5 在线学习体（11 专家 + Hedge）
 ├── tests/test_causality.py       # 10/10
 ├── tests/test_protocol.py        # 13/13
-└── runs/                         # 实验登记（含 G1/M5 结果与学习曲线）
+├── tests/test_data_quality.py    # 11/11
+└── runs/                         # 实验登记（含 G1/M5/缺口敏感性结果）
 ```
 
 ---
 
-## 七、下一步
+## 八、下一步
 
 **按淘汰门 G2：无显著边际 → 禁止在现有信号上继续调参**（那是过拟合螺旋的入口），
 转信号源研究。候选：
@@ -136,7 +164,7 @@ quant/
 
 ---
 
-## 八、合规
+## 九、合规
 
 - 只读公开行情，**不接账号、不存 key、不碰下单接口**（代码级白名单强制，
   非白名单请求抛 `ComplianceError`）

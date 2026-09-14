@@ -1,0 +1,8 @@
+{
+  "gap_bars": 27,
+  "gap_pct": 0.0348,
+  "max_deviation_pp_of_principal": 3.0952,
+  "verdict_flips": 0,
+  "default_policy": "execute",
+  "note": "差异以初始本金百分点计；相对终值计算在归零情形下是除零噪声"
+}
