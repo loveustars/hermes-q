@@ -39,7 +39,19 @@ N_TRIALS = 100
 REBALANCE_CHOICES = [1, 6, 24, 72, 168, 720]
 
 
-def load_frames(symbols: list[str]) -> dict[str, pd.DataFrame]:
+def load_frames(symbols: list[str], train_only: bool = False,
+                holdout_fraction: float = 0.25) -> dict[str, pd.DataFrame]:
+    """加载核心池的 1h 现货数据，取公共时间轴。
+
+    `train_only=True` 时只保留前 (1 - holdout_fraction) 段，
+    **把封存段排除在协议校准之外**。
+
+    为什么要这个开关：G1 用的是**真实行情上的随机权重策略**，
+    所以它的校准窗口默认会覆盖封存段（2023-09-15 ~ 2026-09-14 与封存段
+    2025-01-20 ~ 2026-09-14 重叠）。严格说，用封存段来标定协议阈值是
+    一种（很轻微的）泄漏。加上这个开关后可以跑"仅训练段"的对照，
+    消除这个疑问。默认仍为全窗口，以便与改判据前的数字直接对比。
+    """
     frames = {}
     for s in symbols:
         frames[s] = store.load_bars(s, "1h")[
@@ -47,6 +59,8 @@ def load_frames(symbols: list[str]) -> dict[str, pd.DataFrame]:
     idx = None
     for f in frames.values():
         idx = f.index if idx is None else idx.intersection(f.index)
+    if train_only:
+        idx = idx[:int(len(idx) * (1.0 - holdout_fraction))]
     return {s: f.loc[idx] for s, f in frames.items()}
 
 
@@ -62,6 +76,8 @@ def run_calibration(cfg, frames, bench, bench_index, label: str, enabled: bool) 
     simcfg = SimConfig(initial_cash=10_000.0, warmup=300, latency_bars=1)
 
     naive_flags = alpha_flags = dsr_flags = full_flags = 0
+    ci_flags = degenerate_flags = 0
+    binding_sets: dict[tuple, int] = {}
     results, tstats, rets_for_pbo = [], [], []
     t0 = time.time()
     for i in range(N_TRIALS):
@@ -78,10 +94,16 @@ def run_calibration(cfg, frames, bench, bench_index, label: str, enabled: bool) 
                                           r_index=r_idx, b_index=bench_index)
         a_only = full["alpha_test"]["p_value"] < 0.05
         d_only = full["dsr"]["dsr"] > 0.95
+        c_only = full["alpha_bootstrap"]["ci_low"] > 0
+        degen = bool(full["distribution"]["degenerate"])
+        bs = tuple(full["binding_criteria"])
 
         naive_flags += int(naive)
         alpha_flags += int(a_only)
         dsr_flags += int(d_only)
+        ci_flags += int(c_only)
+        degenerate_flags += int(degen)
+        binding_sets[bs] = binding_sets.get(bs, 0) + 1
         full_flags += int(full["passed"])
         tstats.append(full["alpha_test"]["t_stat"])
         rets_for_pbo.append(r)
@@ -98,8 +120,14 @@ def run_calibration(cfg, frames, bench, bench_index, label: str, enabled: bool) 
             "alpha_p": full["alpha_test"]["p_value"],
             "beta": full["alpha_test"]["beta"],
             "dsr": full["dsr"]["dsr"],
+            "alpha_ci_low": full["alpha_bootstrap"]["ci_low"],
+            "kurtosis": full["distribution"]["kurtosis"],
+            "degenerate": degen,
+            "binding_criteria": list(bs),
+            "waived_criteria": full["waived_criteria"],
             "alpha_only_flagged": bool(a_only),
             "dsr_flagged": bool(d_only),
+            "alpha_ci_flagged": bool(c_only),
             "verdict": full["verdict"],
         })
         if (i + 1) % 25 == 0:
@@ -119,8 +147,12 @@ def run_calibration(cfg, frames, bench, bench_index, label: str, enabled: bool) 
             "naive_no_beta_removal": pct(naive_flags),
             "alpha_after_beta_removal": pct(alpha_flags),
             "dsr_only": pct(dsr_flags),
+            "alpha_ci_only": pct(ci_flags),
             "full_protocol": pct(full_flags),
         },
+        "degenerate_pct": pct(degenerate_flags),
+        "binding_sets": {"+".join(k): v for k, v in
+                         sorted(binding_sets.items(), key=lambda kv: -kv[1])},
         "alpha_t": {"median": round(float(np.median(ts)), 3),
                     "mean": round(float(ts.mean()), 3),
                     "p95": round(float(np.quantile(ts, 0.95)), 3),
@@ -139,35 +171,47 @@ def print_block(r: dict) -> None:
     print(f"    ② 剥离 beta 的 alpha (p<0.05)            : {fp['alpha_after_beta_removal']:>5}%"
           f"   ← 门槛 5%")
     print(f"    ③ DSR > 0.95（按 {N_TRIALS} 次试验惩罚）      : {fp['dsr_only']:>5}%")
-    print(f"    ④ 三者同时满足（协议最终判定）            : {fp['full_protocol']:>5}%")
+    print(f"    ③b 仅自助区间下界 > 0（不依赖分布假设）     : {fp['alpha_ci_only']:>5}%")
+    print(f"    ④ 协议最终判定（分布感知，见下）           : {fp['full_protocol']:>5}%"
+          f"   ← 门槛 5%")
+    print(f"    分布退化（峰度 > {protocol.KURT_MAX_WELL_BEHAVED:.0f}）的比例："
+          f"{r['degenerate_pct']}%")
+    for k, v in r.get("binding_sets", {}).items():
+        print(f"      生效判据 {k:<32} : {v:>4} 次")
     t = r["alpha_t"]
     print(f"    alpha t 分布：中位数 {t['median']:>7}  均值 {t['mean']:>7}  "
           f"p05 {t['p05']:>7}  p95 {t['p95']:>7}")
     print(f"    PBO = {r['pbo']}  (组合数 {r['pbo_combos']})")
 
 
-def main() -> None:
+def main(train_only: bool = False) -> None:
     cfg = cfgmod.load("base")
     cfgmod.guard_frozen(cfg)
     syms = cfg["universe"]["core"]
 
-    frames = load_frames(syms)
+    frames = load_frames(syms, train_only=train_only)
     n_bars = len(frames[syms[0]])
     bm = equal_weight_buyhold(frames, cfg)
     bench, bench_index = bm.returns, bm.index
-    print(f"校准窗口 {n_bars:,} 根小时线  "
+    tag = "仅训练段（封存段已排除）" if train_only else "全窗口"
+    print(f"校准窗口 [{tag}] {n_bars:,} 根小时线  "
           f"{frames[syms[0]].index[0]:%Y-%m-%d} ~ {frames[syms[0]].index[-1]:%Y-%m-%d}")
     print(f"基准（等权买入持有，同一撮合器零成本）累计收益 "
           f"{bm.cumulative_return() * 100:,.1f}%")
 
     hypothesis = {
-        "question": "评估器会不会把没有预测力的策略判成'有边际'？",
+        "question": "评估器会不会把没有预测力的策略判成'有边际'？"
+                    "（口径改为分布感知后必须重验，确认假阳性率没被放松）",
         "expected": "毛口径：朴素判定约 100%（牛市陷阱），剥离 beta 约 5%，DSR 惩罚后约 0%；"
                     "净口径：全部接近 0（成本把 alpha 推向负值）",
-        "decision_rule": "毛口径下剥离 beta 的假阳性率 > 10% 就地停住修评估器，禁止进入 M5",
+        "decision_rule": "毛口径下剥离 beta 的假阳性率 > 10% 就地停住修评估器；"
+                         "本次改判据后门槛仍为 5%（PLAN §15.9 第 1 项）",
+        "window": tag,
+        "train_only": bool(train_only),
     }
 
-    with Run("m4_g1_calibration", cfg, hypothesis) as run:
+    name = "m4_g1_calibration_trainonly" if train_only else "m4_g1_calibration"
+    with Run(name, cfg, hypothesis) as run:
         print(f"\n=== 校准开始（真实撮合器，{N_TRIALS} 个纯噪声策略）===")
         gross = run_calibration(cfg, frames, bench, bench_index, "毛口径·零成本",
                                 enabled=False)
@@ -195,10 +239,16 @@ def main() -> None:
         run.record_metrics(out)
 
         print("\n--- G1 闸门 ---")
-        print(f"  判据：毛口径下剥离 beta 的假阳性率 {fp_gross}%  门槛 5%")
-        print(f"  结果：{'通过，可以进入 M5' if gate_pass else '不通过，先修评估器，禁止进入 M5'}")
+        print(f"  判据：毛口径下剥离 beta 的假阳性率 {fp_gross}%  门槛 5%"
+              f"  （口径：{tag}）")
+        print(f"  结果：{'通过 —— 协议可用' if gate_pass else '不通过 —— 先修评估器'}")
         print(f"  run 目录: {os.path.relpath(run.dir, store.project_root())}")
 
 
 if __name__ == "__main__":
-    main()
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--train-only", action="store_true",
+                    help="只用训练段（排除封存段）做协议校准")
+    main(train_only=ap.parse_args().train_only)

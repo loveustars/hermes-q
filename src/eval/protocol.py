@@ -464,34 +464,127 @@ def alpha_vs_benchmark(returns: np.ndarray, bench: np.ndarray,
 # ==========================================================================
 # 综合报告
 # ==========================================================================
+# 分布退化阈值：峰度超过此值即认为正态近似不可用，Sharpe 家族判据不再作数。
+# 正态的峰度为 3；本项目 carry 在 8h 现金流频率上仍有 44~105（见 PLAN §14.4b）。
+KURT_MAX_WELL_BEHAVED = 10.0
+
+_SECONDS_PER_YEAR = 365.0 * 24 * 3600
+
+
+def bars_per_year_for(freq) -> float:
+    """给定时间频率（如 '8h'），返回每年多少个观测。"""
+    return _SECONDS_PER_YEAR * 1e9 / freq_to_ns(freq)
+
+
+def _criteria_report(at, dsr, boot, kurt: float, dsr_min: float,
+                     max_kurt_for_sharpe: float) -> dict:
+    """把三条判据整理成「哪条生效、哪条被豁免、为什么」。
+
+    设计动机（PLAN §14.4b）：判定如果不写清楚依据，就会出现
+    「三项判据里两项通过却判无边际」这种自相矛盾的结果无人能解释。
+    """
+    degenerate = kurt > max_kurt_for_sharpe
+    why = (f"峰度 {kurt:.1f} > {max_kurt_for_sharpe:.0f}：正态近似不可用"
+           f"⇒ 该判据仅报告、不作为判据")
+    ok = "分布未退化，正常作为判据"
+    return {
+        "alpha_ci": {
+            "value": boot["ci_low"], "threshold": 0.0,
+            "passed": boot["ci_low"] > 0.0, "binding": True,
+            "note": "对回归截距的块自助百分位区间，不依赖分布假设 ⇒ 始终为判据",
+        },
+        "alpha_p": {
+            "value": at.p_value, "threshold": 0.05,
+            "passed": at.p_value < 0.05, "binding": not degenerate,
+            "note": ok if not degenerate else why,
+        },
+        "dsr": {
+            "value": dsr["dsr"], "threshold": dsr_min,
+            "passed": dsr["dsr"] > dsr_min, "binding": not degenerate,
+            "note": ok if not degenerate else why,
+        },
+    }
+
+
 def evaluate_strategy(returns: np.ndarray, bench: np.ndarray, n_trials: int,
                       bars_per_year: int = 24 * 365, block: int = 24,
                       sr_variance: float | None = None,
-                      alpha_threshold: float = 0.95,
-                      r_index=None, b_index=None) -> dict:
+                      dsr_min: float = 0.95,
+                      r_index=None, b_index=None,
+                      cashflow_freq=None,
+                      max_kurt_for_sharpe: float = KURT_MAX_WELL_BEHAVED,
+                      alpha_threshold: float | None = None) -> dict:
     """一条策略的完整判定。
 
-    判定规则（全部必须满足才算"有边际"）：
-      1. 剥离 beta 后的 alpha，单边 p < 0.05
-      2. DSR > 0.95（已按试验次数惩罚）
-      3. Block bootstrap 的 alpha 置信区间下界 > 0
+    **判定规则（分布感知，且每条都写明是否生效）**：
+      1. `alpha_ci`：对回归截距的块自助区间下界 > 0 —— **始终为判据**
+         （不依赖分布假设，是唯一在高峰度下仍然可靠的一条）
+      2. `alpha_p` ：剥离 beta 后的 alpha 单边 p < 0.05 —— 分布未退化时生效
+      3. `dsr`     ：DSR > 0.95（按试验次数惩罚）      —— 分布未退化时生效
+
+    峰度 > `max_kurt_for_sharpe` 时，第 2、3 条**仅报告、不参与判定**，
+    理由与阈值一并写进返回值的 `criteria` / `waived_criteria` / `verdict_basis`，
+    避免出现「通过了却判无边际」这种无法解释的结果（PLAN §14.6 的教训）。
+
+    `cashflow_freq`（如 "8h"）：若给出，则先按**绝对时间桶**把收益与基准
+    聚合到该频率，并自动换算 bars_per_year。
+    这是协议要求（PLAN §14.7）：现金流按固定间隔到账时，逐 bar 检验会把
+    同一笔现金流重复计数，使 t 与 Sharpe 被高估。**能自动就自动，别靠人记得。**
     """
+    if alpha_threshold is not None:      # 兼容旧参数名
+        dsr_min = alpha_threshold
     r = np.asarray(returns, dtype=float)
-    at = alpha_vs_benchmark(r, bench, bars_per_year,
+    b = np.asarray(bench, dtype=float)
+
+    note = "未做现金流频率聚合（调用方自负其责）"
+    if cashflow_freq is not None:
+        if r_index is None or b_index is None:
+            raise ValueError("cashflow_freq 需要同时给出 r_index 与 b_index "
+                             "才能按时钟分桶")
+        r, r_index = aggregate_to_clock(r_index, r, cashflow_freq)
+        b, b_index = aggregate_to_clock(b_index, b, cashflow_freq)
+        bars_per_year = bars_per_year_for(cashflow_freq)
+        note = f"已按绝对时间桶聚合到 {cashflow_freq} 后检验"
+
+    at = alpha_vs_benchmark(r, b, bars_per_year,
                             r_index=r_index, b_index=b_index)
     dsr = deflated_sharpe(r, n_trials, sr_variance)
 
     # alpha 的置信区间必须对**截距本身**做自助，不能对残差做。
     # 残差均值按构造恒为 0，对它做 bootstrap 再检验 >0 是永远不可能通过的。
-    rr, bb = _align(r, np.asarray(bench, dtype=float), r_index, b_index)
+    rr, bb = _align(r, b, r_index, b_index)
     boot = bootstrap_alpha(rr, bb, block=block, bars_per_year=bars_per_year)
 
-    passed = (at.p_value < 0.05) and (dsr["dsr"] > alpha_threshold) \
-        and (boot["ci_low"] > 0)
+    _, skew, kurt, n = _moments(r)
+    crit = _criteria_report(at, dsr, boot, kurt, dsr_min, max_kurt_for_sharpe)
+    binding = [k for k, v in crit.items() if v["binding"]]
+    waived = [k for k, v in crit.items() if not v["binding"]]
+    passed = all(crit[k]["passed"] for k in binding)
+    failed = [k for k in binding if not crit[k]["passed"]]
+
+    if waived:
+        basis = (f"生效判据：{'、'.join(binding)}；"
+                 f"豁免：{'、'.join(waived)}（峰度 {kurt:.1f} > "
+                 f"{max_kurt_for_sharpe:.0f}）")
+    else:
+        basis = f"全部判据均生效：{'、'.join(binding)}"
     return {
         "alpha_test": at.as_dict(),
         "dsr": dsr,
         "alpha_bootstrap": boot,
+        "criteria": crit,
+        "binding_criteria": binding,
+        "waived_criteria": waived,
+        "failed_criteria": failed,
+        "distribution": {"n": n, "skew": round(skew, 4),
+                         "kurtosis": round(kurt, 4),
+                         "degenerate": bool(kurt > max_kurt_for_sharpe),
+                         "kurt_max_for_sharpe": max_kurt_for_sharpe},
+        "n_periods": int(len(rr)),
+        "bars_per_year": float(bars_per_year),
+        "cashflow_freq": cashflow_freq,
+        "evaluation_note": note,
+        "verdict_basis": basis,
         "verdict": "有边际" if passed else "无边际",
         "passed": bool(passed),
     }

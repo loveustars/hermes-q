@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 
@@ -17,7 +18,8 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from src.eval import protocol  # noqa: E402
-from src.eval.holdout import HoldoutGuard, HoldoutViolation  # noqa: E402
+from src.eval.holdout import (HoldoutAlreadyUnsealed,  # noqa: E402
+                              HoldoutGuard, HoldoutViolation)
 
 BPY = 24 * 365
 
@@ -292,6 +294,187 @@ def test_holdout_guard_allows_when_explicit():
     g = HoldoutGuard(n=1000, fraction=0.25, allow=True)
     assert g.holdout_slice() == slice(750, 1000)
     g.assert_clean([999])
+
+
+# --------------------------------------------------------------------------
+# 6b. 开封一次性 —— 机制约束（账本）
+# --------------------------------------------------------------------------
+def _tmp_ledger() -> str:
+    import tempfile
+    d = tempfile.mkdtemp(prefix="seal_ledger_")
+    return os.path.join(d, "ledger.jsonl")
+
+
+def test_unseal_records_ledger_and_repeats_within_one_guard():
+    """同一守卫实例内可重复读（同一次评估事件），但账本只记一次开封。"""
+    lp = _tmp_ledger()
+    g = HoldoutGuard(n=1000, fraction=0.25, ledger_path=lp)
+    assert g.unseal("G3 最终评定") == slice(750, 1000)
+    assert g.unseal("G3 最终评定") == slice(750, 1000)   # 同实例可重复
+    with open(lp, encoding="utf-8") as f:
+        lines = [ln for ln in f if ln.strip()]
+    assert len(lines) == 1, f"账本应只记 1 条开封，实际 {len(lines)} 条"
+
+
+def test_second_unseal_of_same_seal_is_blocked():
+    """**核心约束**：换一个守卫实例/进程再开封同一个封存段，必须被拦。"""
+    lp = _tmp_ledger()
+    g1 = HoldoutGuard(n=1000, fraction=0.25, ledger_path=lp)
+    g1.unseal("第一次评定")
+    g2 = HoldoutGuard(n=1000, fraction=0.25, ledger_path=lp)
+    try:
+        g2.unseal("又想来一次")
+    except HoldoutAlreadyUnsealed as e:
+        assert "第一次评定" in str(e), "报错信息应指出上一次的开封用途"
+    else:
+        raise AssertionError("第二次开封没有被拦住 —— 一次性约束失效")
+
+
+def test_second_unseal_allowed_with_override_reason():
+    """确需二次开封时可以过，但必须给理由，且理由进账本。"""
+    lp = _tmp_ledger()
+    HoldoutGuard(n=1000, fraction=0.25, ledger_path=lp).unseal("第一次")
+    g2 = HoldoutGuard(n=1000, fraction=0.25, ledger_path=lp)
+    assert g2.unseal("第二次", override_reason="协议修正后必须复核") \
+        == slice(750, 1000)
+    with open(lp, encoding="utf-8") as f:
+        entries = [json.loads(ln) for ln in f if ln.strip()]
+    assert len(entries) == 2
+    assert entries[1]["override"] is True
+    assert entries[1]["override_reason"] == "协议修正后必须复核"
+    assert entries[1]["prior_unseals"] == 1
+
+
+def test_unseal_requires_nonempty_purpose():
+    g = HoldoutGuard(n=1000, fraction=0.25, ledger_path=_tmp_ledger())
+    for bad in ("", "   ", None):
+        try:
+            g.unseal(bad)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(f"purpose={bad!r} 应被拒绝")
+
+
+def test_production_scripts_do_not_bypass_unseal():
+    """源码级检查：正式脚本不得直接调 `holdout_slice()`。
+
+    否则「开封一次性」就只是口头约定 —— 绕过受约束的 `unseal()` 即可。
+    测试/调试脚本（tests/ 与 *_smoke.py）不受此限。
+    """
+    import glob
+    import re
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    offenders = []
+    for p in sorted(glob.glob(os.path.join(root, "scripts", "*.py"))):
+        if p.endswith("_smoke.py"):
+            continue
+        with open(p, encoding="utf-8") as f:
+            src = f.read()
+        for m in re.finditer(r"\.holdout_slice\s*\(", src):
+            line_no = src[:m.start()].count("\n") + 1
+            offenders.append(f"{os.path.basename(p)}:{line_no}")
+    assert not offenders, (
+        f"这些脚本直接调了 holdout_slice()，应改用受约束的 unseal()：{offenders}")
+
+
+# ==========================================================================
+# 7. 判定口径：分布感知 + 可解释
+# ==========================================================================
+def _spiky_series(n: int, alpha: float, seed: int):
+    """构造一个峰度极高（分布退化）的收益序列：稀疏尖峰 + 小噪声。"""
+    rng = np.random.default_rng(seed)
+    b = rng.normal(0.0, 0.01, n)
+    spike = rng.random(n) < 0.01
+    noise = np.where(spike, rng.normal(0.0, 0.06, n), rng.normal(0.0, 0.004, n))
+    return alpha + 0.5 * b + noise, b
+
+
+def test_degenerate_distribution_waives_sharpe_family():
+    """高峰度 ⇒ 只保留不依赖分布假设的那条判据，且必须说明豁免原因。"""
+    r, b = _spiky_series(15_000, 0.0015, seed=3)
+    out = protocol.evaluate_strategy(r, b, n_trials=24, bars_per_year=BPY)
+    kurt = out["distribution"]["kurtosis"]
+    assert kurt > protocol.KURT_MAX_WELL_BEHAVED, f"构造的序列峰度只有 {kurt}"
+    assert out["distribution"]["degenerate"] is True
+    assert out["binding_criteria"] == ["alpha_ci"], \
+        f"退化分布下应只有 alpha_ci 生效，实得 {out['binding_criteria']}"
+    assert set(out["waived_criteria"]) == {"alpha_p", "dsr"}
+    assert "豁免" in out["verdict_basis"] and "alpha_ci" in out["verdict_basis"]
+    assert out["verdict"] == "有边际", (
+        f"真 alpha 明显为正却判无边际：ci={out['alpha_bootstrap']['ci_low']}")
+
+
+def test_degenerate_distribution_does_not_let_noise_pass():
+    """**假阳性守卫**：退化分布下，纯噪声仍不得被判为有边际。
+
+    这条测试存在的意义：口径改动放宽了任何东西，这里必须炸。
+    """
+    for seed in (1, 2, 3):
+        r, b = _spiky_series(15_000, 0.0, seed=seed)      # alpha = 0
+        out = protocol.evaluate_strategy(r, b, n_trials=24, bars_per_year=BPY)
+        assert out["distribution"]["degenerate"] is True
+        assert out["verdict"] == "无边际", (
+            f"seed={seed} 纯噪声被判有边际：ci_low={out['alpha_bootstrap']['ci_low']}")
+
+
+def test_well_behaved_distribution_keeps_all_criteria_binding():
+    """分布未退化时，三条判据都应生效（不豁免）。"""
+    rng = np.random.default_rng(7)
+    n = 6000
+    b = rng.normal(0.0, 0.01, n)
+    r = 0.0004 + 0.8 * b + rng.normal(0.0, 0.01, n)
+    out = protocol.evaluate_strategy(r, b, n_trials=24, bars_per_year=BPY)
+    assert out["distribution"]["degenerate"] is False
+    assert set(out["binding_criteria"]) == {"alpha_ci", "alpha_p", "dsr"}
+    assert out["waived_criteria"] == []
+    assert out["verdict_basis"].startswith("全部判据均生效")
+
+
+def test_verdict_reports_failed_criteria():
+    """判无边际时要能指出是被哪条判据挡下的，而不是只给一个结论。"""
+    rng = np.random.default_rng(9)
+    n = 4000
+    idx = pd.date_range("2023-01-01", periods=n, freq="h", tz="UTC")
+    b = rng.normal(0.0, 0.01, n)
+    r = -0.0005 + 0.5 * b + rng.normal(0.0, 0.01, n)      # 负 alpha
+    out = protocol.evaluate_strategy(r, b, n_trials=24, bars_per_year=BPY,
+                                     r_index=idx, b_index=idx)
+    assert out["verdict"] == "无边际"
+    assert out["failed_criteria"], "应报告是哪条判据没通过"
+
+
+def test_cashflow_freq_aggregates_and_updates_bars_per_year():
+    """给出 cashflow_freq 时应自动聚合，并换算 bars_per_year（防遗忘）。"""
+    n = 24 * 40
+    idx = pd.date_range("2024-01-01", periods=n, freq="h", tz="UTC")
+    rng = np.random.default_rng(5)
+    b = rng.normal(0.0, 0.004, n)
+    r = 0.0002 + 0.6 * b + rng.normal(0.0, 0.004, n)
+
+    raw = protocol.evaluate_strategy(r, b, n_trials=4, bars_per_year=BPY,
+                                     r_index=idx, b_index=idx)
+    agg = protocol.evaluate_strategy(r, b, n_trials=4, bars_per_year=BPY,
+                                     r_index=idx, b_index=idx,
+                                     cashflow_freq="8h")
+    assert raw["cashflow_freq"] is None
+    assert "未做现金流频率聚合" in raw["evaluation_note"]
+    assert agg["cashflow_freq"] == "8h"
+    assert "聚合到 8h" in agg["evaluation_note"]
+    assert abs(agg["bars_per_year"] - protocol.bars_per_year_for("8h")) < 1e-6
+    assert agg["n_periods"] < raw["n_periods"], "聚合后观测数应变少"
+    assert abs(protocol.bars_per_year_for("8h") - 24 * 365 / 8) < 1e-6
+
+
+def test_cashflow_freq_requires_indices():
+    rng = np.random.default_rng(1)
+    r = rng.normal(0, 0.01, 500)
+    try:
+        protocol.evaluate_strategy(r, r, n_trials=1, cashflow_freq="8h")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("缺索引时应抛 ValueError，而不是静默按原频率算")
 
 
 # ==========================================================================

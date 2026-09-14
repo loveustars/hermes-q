@@ -1,0 +1,2702 @@
+[
+  {
+    "trial": 0,
+    "rebalance_every": 1,
+    "final_equity": 458889.07,
+    "total_return_pct": 4488.89,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.3335,
+    "alpha_p": 0.630632,
+    "beta": 0.7978,
+    "dsr": 0.6132,
+    "alpha_ci_low": -2.669466391153202e-05,
+    "kurtosis": 32.842,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 1,
+    "rebalance_every": 6,
+    "final_equity": 420541.12,
+    "total_return_pct": 4105.41,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4443,
+    "alpha_p": 0.671572,
+    "beta": 0.8003,
+    "dsr": 0.5986,
+    "alpha_ci_low": -2.789847323167869e-05,
+    "kurtosis": 33.0978,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 2,
+    "rebalance_every": 24,
+    "final_equity": 706124.64,
+    "total_return_pct": 6961.25,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1518,
+    "alpha_p": 0.43966,
+    "beta": 0.7965,
+    "dsr": 0.6825,
+    "alpha_ci_low": -2.14817471166759e-05,
+    "kurtosis": 33.0717,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 3,
+    "rebalance_every": 72,
+    "final_equity": 331995.58,
+    "total_return_pct": 3219.96,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.7505,
+    "alpha_p": 0.773521,
+    "beta": 0.8124,
+    "dsr": 0.5564,
+    "alpha_ci_low": -3.274442481160797e-05,
+    "kurtosis": 35.8735,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 4,
+    "rebalance_every": 168,
+    "final_equity": 531244.22,
+    "total_return_pct": 5212.44,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.228,
+    "alpha_p": 0.590166,
+    "beta": 0.8057,
+    "dsr": 0.6362,
+    "alpha_ci_low": -2.4790851245591422e-05,
+    "kurtosis": 35.1643,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 5,
+    "rebalance_every": 720,
+    "final_equity": 472465.01,
+    "total_return_pct": 4624.65,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5143,
+    "alpha_p": 0.696468,
+    "beta": 0.8429,
+    "dsr": 0.6108,
+    "alpha_ci_low": -2.5716460180766952e-05,
+    "kurtosis": 37.8673,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 6,
+    "rebalance_every": 2,
+    "final_equity": 630862.32,
+    "total_return_pct": 6208.62,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0089,
+    "alpha_p": 0.503544,
+    "beta": 0.8014,
+    "dsr": 0.6645,
+    "alpha_ci_low": -2.2823596009115733e-05,
+    "kurtosis": 32.8012,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 7,
+    "rebalance_every": 12,
+    "final_equity": 894079.07,
+    "total_return_pct": 8840.79,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3809,
+    "alpha_p": 0.351637,
+    "beta": 0.8008,
+    "dsr": 0.7176,
+    "alpha_ci_low": -1.7305701893136383e-05,
+    "kurtosis": 31.89,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 8,
+    "rebalance_every": 48,
+    "final_equity": 475723.38,
+    "total_return_pct": 4657.23,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.327,
+    "alpha_p": 0.628168,
+    "beta": 0.8038,
+    "dsr": 0.618,
+    "alpha_ci_low": -2.596477166088183e-05,
+    "kurtosis": 34.3194,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 9,
+    "rebalance_every": 144,
+    "final_equity": 1088437.58,
+    "total_return_pct": 10784.38,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.636,
+    "alpha_p": 0.262389,
+    "beta": 0.7959,
+    "dsr": 0.7453,
+    "alpha_ci_low": -1.4644337716463853e-05,
+    "kurtosis": 30.5904,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 10,
+    "rebalance_every": 336,
+    "final_equity": 568332.88,
+    "total_return_pct": 5583.33,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.2183,
+    "alpha_p": 0.586402,
+    "beta": 0.8123,
+    "dsr": 0.6468,
+    "alpha_ci_low": -2.2732362642397853e-05,
+    "kurtosis": 34.7822,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 11,
+    "rebalance_every": 1440,
+    "final_equity": 1124357.44,
+    "total_return_pct": 11143.57,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.4552,
+    "alpha_p": 0.324468,
+    "beta": 0.8438,
+    "dsr": 0.7417,
+    "alpha_ci_low": -1.5455778917004156e-05,
+    "kurtosis": 40.2719,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 12,
+    "rebalance_every": 3,
+    "final_equity": 630105.52,
+    "total_return_pct": 6201.06,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0051,
+    "alpha_p": 0.502031,
+    "beta": 0.801,
+    "dsr": 0.6642,
+    "alpha_ci_low": -2.3290197306848962e-05,
+    "kurtosis": 34.2006,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 13,
+    "rebalance_every": 18,
+    "final_equity": 688435.37,
+    "total_return_pct": 6784.35,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0342,
+    "alpha_p": 0.486376,
+    "beta": 0.8126,
+    "dsr": 0.6758,
+    "alpha_ci_low": -2.116848165518219e-05,
+    "kurtosis": 36.9244,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 14,
+    "rebalance_every": 72,
+    "final_equity": 379733.18,
+    "total_return_pct": 3697.33,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5406,
+    "alpha_p": 0.705617,
+    "beta": 0.7931,
+    "dsr": 0.5822,
+    "alpha_ci_low": -2.8941015007079292e-05,
+    "kurtosis": 33.0908,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 15,
+    "rebalance_every": 216,
+    "final_equity": 677950.7,
+    "total_return_pct": 6679.51,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0914,
+    "alpha_p": 0.463595,
+    "beta": 0.7925,
+    "dsr": 0.6786,
+    "alpha_ci_low": -2.1546020921950584e-05,
+    "kurtosis": 31.5883,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 16,
+    "rebalance_every": 504,
+    "final_equity": 961619.46,
+    "total_return_pct": 9516.19,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3631,
+    "alpha_p": 0.358277,
+    "beta": 0.8219,
+    "dsr": 0.7246,
+    "alpha_ci_low": -1.629894615369654e-05,
+    "kurtosis": 33.8505,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 17,
+    "rebalance_every": 2160,
+    "final_equity": 1129703.38,
+    "total_return_pct": 11197.03,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3751,
+    "alpha_p": 0.353789,
+    "beta": 0.8638,
+    "dsr": 0.7381,
+    "alpha_ci_low": -1.4716071424034067e-05,
+    "kurtosis": 38.5323,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 18,
+    "rebalance_every": 4,
+    "final_equity": 579714.34,
+    "total_return_pct": 5697.14,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.1648,
+    "alpha_p": 0.565468,
+    "beta": 0.8108,
+    "dsr": 0.6496,
+    "alpha_ci_low": -2.3750931619806074e-05,
+    "kurtosis": 36.4253,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 19,
+    "rebalance_every": 24,
+    "final_equity": 403739.46,
+    "total_return_pct": 3937.39,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5485,
+    "alpha_p": 0.708312,
+    "beta": 0.8091,
+    "dsr": 0.5902,
+    "alpha_ci_low": -2.7818538660274605e-05,
+    "kurtosis": 36.6034,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 20,
+    "rebalance_every": 96,
+    "final_equity": 422172.19,
+    "total_return_pct": 4121.72,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4269,
+    "alpha_p": 0.665275,
+    "beta": 0.7989,
+    "dsr": 0.5993,
+    "alpha_ci_low": -2.866726729082112e-05,
+    "kurtosis": 33.5596,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 21,
+    "rebalance_every": 288,
+    "final_equity": 750428.9,
+    "total_return_pct": 7404.29,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1067,
+    "alpha_p": 0.457507,
+    "beta": 0.8154,
+    "dsr": 0.6892,
+    "alpha_ci_low": -2.0488176235890096e-05,
+    "kurtosis": 31.9789,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 22,
+    "rebalance_every": 672,
+    "final_equity": 1091579.92,
+    "total_return_pct": 10815.8,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.5028,
+    "alpha_p": 0.307559,
+    "beta": 0.8288,
+    "dsr": 0.7399,
+    "alpha_ci_low": -1.4815610724531532e-05,
+    "kurtosis": 32.3201,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 23,
+    "rebalance_every": 2880,
+    "final_equity": 733064.65,
+    "total_return_pct": 7230.65,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.2275,
+    "alpha_p": 0.589988,
+    "beta": 0.878,
+    "dsr": 0.674,
+    "alpha_ci_low": -2.141970276916956e-05,
+    "kurtosis": 43.0778,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 24,
+    "rebalance_every": 5,
+    "final_equity": 549533.47,
+    "total_return_pct": 5395.33,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.1803,
+    "alpha_p": 0.571524,
+    "beta": 0.8062,
+    "dsr": 0.6409,
+    "alpha_ci_low": -2.5859849963091782e-05,
+    "kurtosis": 39.7917,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 25,
+    "rebalance_every": 30,
+    "final_equity": 1068373.56,
+    "total_return_pct": 10583.74,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.5678,
+    "alpha_p": 0.285087,
+    "beta": 0.8059,
+    "dsr": 0.7409,
+    "alpha_ci_low": -1.591246905635628e-05,
+    "kurtosis": 34.8916,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 26,
+    "rebalance_every": 120,
+    "final_equity": 723914.01,
+    "total_return_pct": 7139.14,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0708,
+    "alpha_p": 0.471781,
+    "beta": 0.8135,
+    "dsr": 0.6843,
+    "alpha_ci_low": -2.0426352824868172e-05,
+    "kurtosis": 31.3328,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 27,
+    "rebalance_every": 360,
+    "final_equity": 984101.97,
+    "total_return_pct": 9741.02,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3665,
+    "alpha_p": 0.356985,
+    "beta": 0.8259,
+    "dsr": 0.7269,
+    "alpha_ci_low": -1.7011458137702485e-05,
+    "kurtosis": 35.0237,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 28,
+    "rebalance_every": 840,
+    "final_equity": 542975.43,
+    "total_return_pct": 5329.75,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4,
+    "alpha_p": 0.655419,
+    "beta": 0.837,
+    "dsr": 0.6358,
+    "alpha_ci_low": -2.4560641346029394e-05,
+    "kurtosis": 35.5303,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 29,
+    "rebalance_every": 3600,
+    "final_equity": 293878.28,
+    "total_return_pct": 2838.78,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.7912,
+    "alpha_p": 0.785584,
+    "beta": 0.7994,
+    "dsr": 0.5375,
+    "alpha_ci_low": -3.294575500667106e-05,
+    "kurtosis": 30.8024,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 30,
+    "rebalance_every": 6,
+    "final_equity": 1183429.15,
+    "total_return_pct": 11734.29,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.6773,
+    "alpha_p": 0.249093,
+    "beta": 0.8092,
+    "dsr": 0.7548,
+    "alpha_ci_low": -1.412107548403988e-05,
+    "kurtosis": 35.3442,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 31,
+    "rebalance_every": 36,
+    "final_equity": 881521.65,
+    "total_return_pct": 8715.22,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3071,
+    "alpha_p": 0.379393,
+    "beta": 0.8157,
+    "dsr": 0.7114,
+    "alpha_ci_low": -1.8242395415073486e-05,
+    "kurtosis": 44.0674,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 32,
+    "rebalance_every": 144,
+    "final_equity": 469332.14,
+    "total_return_pct": 4593.32,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4231,
+    "alpha_p": 0.663898,
+    "beta": 0.8216,
+    "dsr": 0.6127,
+    "alpha_ci_low": -2.7221593736721005e-05,
+    "kurtosis": 37.4531,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 33,
+    "rebalance_every": 432,
+    "final_equity": 271372.34,
+    "total_return_pct": 2613.72,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -1.0506,
+    "alpha_p": 0.85328,
+    "beta": 0.8145,
+    "dsr": 0.5229,
+    "alpha_ci_low": -3.2882334155879705e-05,
+    "kurtosis": 34.3,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 34,
+    "rebalance_every": 1008,
+    "final_equity": 304528.73,
+    "total_return_pct": 2945.29,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6701,
+    "alpha_p": 0.748613,
+    "beta": 0.7772,
+    "dsr": 0.5463,
+    "alpha_ci_low": -3.2438166024277046e-05,
+    "kurtosis": 35.1933,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 35,
+    "rebalance_every": 4320,
+    "final_equity": 1406557.54,
+    "total_return_pct": 13965.58,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.6489,
+    "alpha_p": 0.2582,
+    "beta": 0.8742,
+    "dsr": 0.7616,
+    "alpha_ci_low": -1.338593292509626e-05,
+    "kurtosis": 46.9125,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 36,
+    "rebalance_every": 7,
+    "final_equity": 677360.36,
+    "total_return_pct": 6673.6,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0769,
+    "alpha_p": 0.469334,
+    "beta": 0.7993,
+    "dsr": 0.6761,
+    "alpha_ci_low": -2.2450157831621806e-05,
+    "kurtosis": 32.942,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 37,
+    "rebalance_every": 42,
+    "final_equity": 749838.67,
+    "total_return_pct": 7398.39,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1439,
+    "alpha_p": 0.442801,
+    "beta": 0.8132,
+    "dsr": 0.6881,
+    "alpha_ci_low": -2.119676696368558e-05,
+    "kurtosis": 35.6731,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 38,
+    "rebalance_every": 168,
+    "final_equity": 360486.65,
+    "total_return_pct": 3504.87,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6667,
+    "alpha_p": 0.747518,
+    "beta": 0.8135,
+    "dsr": 0.57,
+    "alpha_ci_low": -3.081741075455967e-05,
+    "kurtosis": 41.9751,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 39,
+    "rebalance_every": 504,
+    "final_equity": 528354.6,
+    "total_return_pct": 5183.55,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.3352,
+    "alpha_p": 0.631259,
+    "beta": 0.8154,
+    "dsr": 0.6353,
+    "alpha_ci_low": -2.489602019137974e-05,
+    "kurtosis": 34.8458,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 40,
+    "rebalance_every": 1176,
+    "final_equity": 436279.34,
+    "total_return_pct": 4262.79,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5367,
+    "alpha_p": 0.70425,
+    "beta": 0.8276,
+    "dsr": 0.6007,
+    "alpha_ci_low": -2.760840770693811e-05,
+    "kurtosis": 34.2475,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 41,
+    "rebalance_every": 5040,
+    "final_equity": 1008240.91,
+    "total_return_pct": 9982.41,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.2939,
+    "alpha_p": 0.384411,
+    "beta": 0.8601,
+    "dsr": 0.7206,
+    "alpha_ci_low": -1.7431685043855104e-05,
+    "kurtosis": 41.7198,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 42,
+    "rebalance_every": 8,
+    "final_equity": 397210.44,
+    "total_return_pct": 3872.1,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4566,
+    "alpha_p": 0.676035,
+    "beta": 0.794,
+    "dsr": 0.5897,
+    "alpha_ci_low": -2.9681716918492622e-05,
+    "kurtosis": 34.6524,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 43,
+    "rebalance_every": 48,
+    "final_equity": 429665.95,
+    "total_return_pct": 4196.66,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4657,
+    "alpha_p": 0.679294,
+    "beta": 0.8111,
+    "dsr": 0.6002,
+    "alpha_ci_low": -2.7214784112867413e-05,
+    "kurtosis": 33.4693,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 44,
+    "rebalance_every": 192,
+    "final_equity": 362060.48,
+    "total_return_pct": 3520.6,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.7674,
+    "alpha_p": 0.778592,
+    "beta": 0.8179,
+    "dsr": 0.5711,
+    "alpha_ci_low": -2.9846881680198745e-05,
+    "kurtosis": 38.057,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 45,
+    "rebalance_every": 576,
+    "final_equity": 660482.91,
+    "total_return_pct": 6504.83,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0238,
+    "alpha_p": 0.509481,
+    "beta": 0.8116,
+    "dsr": 0.6707,
+    "alpha_ci_low": -2.2677123421605645e-05,
+    "kurtosis": 31.961,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 46,
+    "rebalance_every": 1344,
+    "final_equity": 1096888.56,
+    "total_return_pct": 10868.89,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.4177,
+    "alpha_p": 0.338075,
+    "beta": 0.8409,
+    "dsr": 0.7394,
+    "alpha_ci_low": -1.655581164840899e-05,
+    "kurtosis": 34.0544,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 47,
+    "rebalance_every": 5760,
+    "final_equity": 342562.2,
+    "total_return_pct": 3325.62,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.8188,
+    "alpha_p": 0.793538,
+    "beta": 0.8311,
+    "dsr": 0.5596,
+    "alpha_ci_low": -3.29368169478303e-05,
+    "kurtosis": 36.5248,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 48,
+    "rebalance_every": 9,
+    "final_equity": 884855.03,
+    "total_return_pct": 8748.55,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.324,
+    "alpha_p": 0.372975,
+    "beta": 0.8106,
+    "dsr": 0.7138,
+    "alpha_ci_low": -1.6552037319271022e-05,
+    "kurtosis": 39.291,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 49,
+    "rebalance_every": 54,
+    "final_equity": 858880.54,
+    "total_return_pct": 8488.81,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.3847,
+    "alpha_p": 0.35022,
+    "beta": 0.7923,
+    "dsr": 0.7128,
+    "alpha_ci_low": -1.7142854028140788e-05,
+    "kurtosis": 33.5884,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 50,
+    "rebalance_every": 216,
+    "final_equity": 261759.69,
+    "total_return_pct": 2517.6,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.8415,
+    "alpha_p": 0.799965,
+    "beta": 0.7923,
+    "dsr": 0.5173,
+    "alpha_ci_low": -3.508851935607404e-05,
+    "kurtosis": 33.5678,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 51,
+    "rebalance_every": 648,
+    "final_equity": 370484.56,
+    "total_return_pct": 3604.85,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.4962,
+    "alpha_p": 0.690122,
+    "beta": 0.8053,
+    "dsr": 0.5743,
+    "alpha_ci_low": -3.0568053157937554e-05,
+    "kurtosis": 34.0743,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 52,
+    "rebalance_every": 1512,
+    "final_equity": 643968.57,
+    "total_return_pct": 6339.69,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.1321,
+    "alpha_p": 0.552528,
+    "beta": 0.8274,
+    "dsr": 0.663,
+    "alpha_ci_low": -2.201350981323984e-05,
+    "kurtosis": 40.2656,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 53,
+    "rebalance_every": 6480,
+    "final_equity": 883615.87,
+    "total_return_pct": 8736.16,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0888,
+    "alpha_p": 0.535368,
+    "beta": 0.9079,
+    "dsr": 0.6955,
+    "alpha_ci_low": -2.008674604691631e-05,
+    "kurtosis": 40.1338,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 54,
+    "rebalance_every": 10,
+    "final_equity": 860452.9,
+    "total_return_pct": 8504.53,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.2998,
+    "alpha_p": 0.382158,
+    "beta": 0.8122,
+    "dsr": 0.7085,
+    "alpha_ci_low": -1.8586045832036162e-05,
+    "kurtosis": 44.2179,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 55,
+    "rebalance_every": 60,
+    "final_equity": 611418.6,
+    "total_return_pct": 6014.19,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0578,
+    "alpha_p": 0.523033,
+    "beta": 0.8028,
+    "dsr": 0.6595,
+    "alpha_ci_low": -2.2297427622665275e-05,
+    "kurtosis": 33.5957,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 56,
+    "rebalance_every": 240,
+    "final_equity": 483431.69,
+    "total_return_pct": 4734.32,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.375,
+    "alpha_p": 0.646157,
+    "beta": 0.8222,
+    "dsr": 0.6176,
+    "alpha_ci_low": -2.625037070637172e-05,
+    "kurtosis": 37.2228,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 57,
+    "rebalance_every": 720,
+    "final_equity": 460290.22,
+    "total_return_pct": 4502.9,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5035,
+    "alpha_p": 0.692696,
+    "beta": 0.8337,
+    "dsr": 0.6076,
+    "alpha_ci_low": -2.7219582572528953e-05,
+    "kurtosis": 42.2492,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 58,
+    "rebalance_every": 1680,
+    "final_equity": 1445544.19,
+    "total_return_pct": 14355.44,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.7815,
+    "alpha_p": 0.217259,
+    "beta": 0.8516,
+    "dsr": 0.7658,
+    "alpha_ci_low": -1.2072342008405495e-05,
+    "kurtosis": 45.9589,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 59,
+    "rebalance_every": 7200,
+    "final_equity": 1249838.18,
+    "total_return_pct": 12398.38,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.4805,
+    "alpha_p": 0.315441,
+    "beta": 0.8763,
+    "dsr": 0.7469,
+    "alpha_ci_low": -1.5190337281617044e-05,
+    "kurtosis": 38.1338,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 60,
+    "rebalance_every": 11,
+    "final_equity": 291202.83,
+    "total_return_pct": 2812.03,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.8708,
+    "alpha_p": 0.80806,
+    "beta": 0.8012,
+    "dsr": 0.5356,
+    "alpha_ci_low": -3.232604331645835e-05,
+    "kurtosis": 36.4627,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 61,
+    "rebalance_every": 66,
+    "final_equity": 1487960.37,
+    "total_return_pct": 14779.6,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.8749,
+    "alpha_p": 0.190825,
+    "beta": 0.8183,
+    "dsr": 0.7832,
+    "alpha_ci_low": -1.3389202866553366e-05,
+    "kurtosis": 34.8033,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 62,
+    "rebalance_every": 264,
+    "final_equity": 392576.0,
+    "total_return_pct": 3825.76,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.7586,
+    "alpha_p": 0.775961,
+    "beta": 0.8306,
+    "dsr": 0.5834,
+    "alpha_ci_low": -2.9349749520602965e-05,
+    "kurtosis": 36.0197,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 63,
+    "rebalance_every": 792,
+    "final_equity": 652817.85,
+    "total_return_pct": 6428.18,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0486,
+    "alpha_p": 0.519397,
+    "beta": 0.8103,
+    "dsr": 0.6693,
+    "alpha_ci_low": -2.1467284240878226e-05,
+    "kurtosis": 36.238,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 64,
+    "rebalance_every": 1848,
+    "final_equity": 887853.58,
+    "total_return_pct": 8778.54,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1427,
+    "alpha_p": 0.44327,
+    "beta": 0.8521,
+    "dsr": 0.7066,
+    "alpha_ci_low": -1.927290351486708e-05,
+    "kurtosis": 36.0247,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 65,
+    "rebalance_every": 7920,
+    "final_equity": 851064.13,
+    "total_return_pct": 8410.64,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.2183,
+    "alpha_p": 0.413591,
+    "beta": 0.8493,
+    "dsr": 0.6957,
+    "alpha_ci_low": -2.1816507885683463e-05,
+    "kurtosis": 43.562,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 66,
+    "rebalance_every": 12,
+    "final_equity": 392099.49,
+    "total_return_pct": 3820.99,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.481,
+    "alpha_p": 0.684733,
+    "beta": 0.7934,
+    "dsr": 0.5875,
+    "alpha_ci_low": -2.9076320472410664e-05,
+    "kurtosis": 32.9111,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 67,
+    "rebalance_every": 72,
+    "final_equity": 788810.64,
+    "total_return_pct": 7788.11,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1856,
+    "alpha_p": 0.426394,
+    "beta": 0.8169,
+    "dsr": 0.695,
+    "alpha_ci_low": -2.069637516945406e-05,
+    "kurtosis": 43.2332,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 68,
+    "rebalance_every": 288,
+    "final_equity": 594567.6,
+    "total_return_pct": 5845.68,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0147,
+    "alpha_p": 0.505849,
+    "beta": 0.7922,
+    "dsr": 0.6565,
+    "alpha_ci_low": -2.386478755168679e-05,
+    "kurtosis": 31.7682,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 69,
+    "rebalance_every": 864,
+    "final_equity": 1375111.16,
+    "total_return_pct": 13651.11,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.6188,
+    "alpha_p": 0.268013,
+    "beta": 0.8634,
+    "dsr": 0.7657,
+    "alpha_ci_low": -1.153117234956684e-05,
+    "kurtosis": 35.6437,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 70,
+    "rebalance_every": 2016,
+    "final_equity": 293630.63,
+    "total_return_pct": 2836.31,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.8825,
+    "alpha_p": 0.811237,
+    "beta": 0.8159,
+    "dsr": 0.5357,
+    "alpha_ci_low": -3.3909420038234145e-05,
+    "kurtosis": 33.6118,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 71,
+    "rebalance_every": 8640,
+    "final_equity": 638870.61,
+    "total_return_pct": 6288.71,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5568,
+    "alpha_p": 0.711151,
+    "beta": 0.8787,
+    "dsr": 0.6568,
+    "alpha_ci_low": -2.3542841298377337e-05,
+    "kurtosis": 33.3249,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 72,
+    "rebalance_every": 13,
+    "final_equity": 367384.83,
+    "total_return_pct": 3573.85,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6528,
+    "alpha_p": 0.743062,
+    "beta": 0.807,
+    "dsr": 0.575,
+    "alpha_ci_low": -3.0799216939624496e-05,
+    "kurtosis": 36.4614,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 73,
+    "rebalance_every": 78,
+    "final_equity": 428717.26,
+    "total_return_pct": 4187.17,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.5743,
+    "alpha_p": 0.717114,
+    "beta": 0.8182,
+    "dsr": 0.5996,
+    "alpha_ci_low": -2.7569916754650905e-05,
+    "kurtosis": 33.1731,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 74,
+    "rebalance_every": 312,
+    "final_equity": 496503.46,
+    "total_return_pct": 4865.03,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.3419,
+    "alpha_p": 0.633773,
+    "beta": 0.8124,
+    "dsr": 0.6242,
+    "alpha_ci_low": -2.5327510157383558e-05,
+    "kurtosis": 34.9756,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 75,
+    "rebalance_every": 936,
+    "final_equity": 375247.29,
+    "total_return_pct": 3652.47,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6143,
+    "alpha_p": 0.730478,
+    "beta": 0.8076,
+    "dsr": 0.5782,
+    "alpha_ci_low": -2.9156726063336434e-05,
+    "kurtosis": 36.1096,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 76,
+    "rebalance_every": 2184,
+    "final_equity": 686744.74,
+    "total_return_pct": 6767.45,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0677,
+    "alpha_p": 0.527003,
+    "beta": 0.8546,
+    "dsr": 0.6645,
+    "alpha_ci_low": -2.2779947028534826e-05,
+    "kurtosis": 44.7208,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 77,
+    "rebalance_every": 9360,
+    "final_equity": 346677.68,
+    "total_return_pct": 3366.78,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.9422,
+    "alpha_p": 0.826953,
+    "beta": 0.8318,
+    "dsr": 0.5635,
+    "alpha_ci_low": -2.9644392153163826e-05,
+    "kurtosis": 34.9308,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 78,
+    "rebalance_every": 14,
+    "final_equity": 707189.15,
+    "total_return_pct": 6971.89,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.064,
+    "alpha_p": 0.474479,
+    "beta": 0.8131,
+    "dsr": 0.6804,
+    "alpha_ci_low": -2.0984246524463655e-05,
+    "kurtosis": 34.4534,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 79,
+    "rebalance_every": 84,
+    "final_equity": 805571.82,
+    "total_return_pct": 7955.72,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.2685,
+    "alpha_p": 0.394154,
+    "beta": 0.8026,
+    "dsr": 0.7008,
+    "alpha_ci_low": -2.100341430394198e-05,
+    "kurtosis": 35.328,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 80,
+    "rebalance_every": 336,
+    "final_equity": 536696.48,
+    "total_return_pct": 5266.96,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.1157,
+    "alpha_p": 0.546049,
+    "beta": 0.7871,
+    "dsr": 0.6416,
+    "alpha_ci_low": -2.4217961049049765e-05,
+    "kurtosis": 31.5807,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 81,
+    "rebalance_every": 1008,
+    "final_equity": 818976.09,
+    "total_return_pct": 8089.76,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.2909,
+    "alpha_p": 0.385559,
+    "beta": 0.8072,
+    "dsr": 0.701,
+    "alpha_ci_low": -1.9133534556546127e-05,
+    "kurtosis": 33.9382,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 82,
+    "rebalance_every": 2352,
+    "final_equity": 453147.84,
+    "total_return_pct": 4431.48,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6458,
+    "alpha_p": 0.740803,
+    "beta": 0.8369,
+    "dsr": 0.6066,
+    "alpha_ci_low": -2.7019418178856587e-05,
+    "kurtosis": 36.8829,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 83,
+    "rebalance_every": 10080,
+    "final_equity": 159138.82,
+    "total_return_pct": 1491.39,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -1.1663,
+    "alpha_p": 0.878249,
+    "beta": 0.7734,
+    "dsr": 0.4319,
+    "alpha_ci_low": -4.073790570775602e-05,
+    "kurtosis": 31.8325,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 84,
+    "rebalance_every": 15,
+    "final_equity": 482047.21,
+    "total_return_pct": 4720.47,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.3234,
+    "alpha_p": 0.626792,
+    "beta": 0.8044,
+    "dsr": 0.6201,
+    "alpha_ci_low": -2.4769344862039048e-05,
+    "kurtosis": 37.1645,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 85,
+    "rebalance_every": 90,
+    "final_equity": 703441.94,
+    "total_return_pct": 6934.42,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0205,
+    "alpha_p": 0.491831,
+    "beta": 0.8162,
+    "dsr": 0.6795,
+    "alpha_ci_low": -2.2198044017728566e-05,
+    "kurtosis": 37.3523,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 86,
+    "rebalance_every": 360,
+    "final_equity": 371001.22,
+    "total_return_pct": 3610.01,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.6134,
+    "alpha_p": 0.730191,
+    "beta": 0.8061,
+    "dsr": 0.5762,
+    "alpha_ci_low": -3.166792184081433e-05,
+    "kurtosis": 35.295,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 87,
+    "rebalance_every": 1080,
+    "final_equity": 1608113.34,
+    "total_return_pct": 15981.13,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.8032,
+    "alpha_p": 0.210938,
+    "beta": 0.8709,
+    "dsr": 0.7803,
+    "alpha_ci_low": -1.2222961391874057e-05,
+    "kurtosis": 40.5968,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 88,
+    "rebalance_every": 2520,
+    "final_equity": 704655.4,
+    "total_return_pct": 6946.55,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0595,
+    "alpha_p": 0.523729,
+    "beta": 0.8668,
+    "dsr": 0.6658,
+    "alpha_ci_low": -2.3174322933231587e-05,
+    "kurtosis": 43.7808,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 89,
+    "rebalance_every": 10800,
+    "final_equity": 1708506.59,
+    "total_return_pct": 16985.07,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.7865,
+    "alpha_p": 0.215787,
+    "beta": 0.9012,
+    "dsr": 0.7834,
+    "alpha_ci_low": -1.0953216643649485e-05,
+    "kurtosis": 39.2505,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 90,
+    "rebalance_every": 16,
+    "final_equity": 321043.71,
+    "total_return_pct": 3110.44,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.7568,
+    "alpha_p": 0.775416,
+    "beta": 0.8063,
+    "dsr": 0.5521,
+    "alpha_ci_low": -3.289669486166865e-05,
+    "kurtosis": 34.7049,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 91,
+    "rebalance_every": 96,
+    "final_equity": 685290.23,
+    "total_return_pct": 6752.9,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.076,
+    "alpha_p": 0.469718,
+    "beta": 0.8096,
+    "dsr": 0.6746,
+    "alpha_ci_low": -2.227719105899554e-05,
+    "kurtosis": 34.116,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 92,
+    "rebalance_every": 384,
+    "final_equity": 558071.6,
+    "total_return_pct": 5480.72,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.0618,
+    "alpha_p": 0.524625,
+    "beta": 0.7905,
+    "dsr": 0.6459,
+    "alpha_ci_low": -2.3241310015589134e-05,
+    "kurtosis": 32.3217,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 93,
+    "rebalance_every": 1152,
+    "final_equity": 2004258.43,
+    "total_return_pct": 19942.58,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 1.1118,
+    "alpha_p": 0.133117,
+    "beta": 0.8591,
+    "dsr": 0.8098,
+    "alpha_ci_low": -7.874669286797444e-06,
+    "kurtosis": 35.8786,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 94,
+    "rebalance_every": 2688,
+    "final_equity": 800729.61,
+    "total_return_pct": 7907.3,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0161,
+    "alpha_p": 0.493569,
+    "beta": 0.8494,
+    "dsr": 0.6929,
+    "alpha_ci_low": -2.0976927793178833e-05,
+    "kurtosis": 34.7116,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 95,
+    "rebalance_every": 11520,
+    "final_equity": 927208.85,
+    "total_return_pct": 9172.09,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.093,
+    "alpha_p": 0.462949,
+    "beta": 0.869,
+    "dsr": 0.7107,
+    "alpha_ci_low": -1.8192305506881286e-05,
+    "kurtosis": 37.234,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 96,
+    "rebalance_every": 17,
+    "final_equity": 482600.35,
+    "total_return_pct": 4726.0,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": -0.3211,
+    "alpha_p": 0.625949,
+    "beta": 0.8058,
+    "dsr": 0.6203,
+    "alpha_ci_low": -2.508079709473595e-05,
+    "kurtosis": 34.331,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 97,
+    "rebalance_every": 102,
+    "final_equity": 695710.95,
+    "total_return_pct": 6857.11,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.0584,
+    "alpha_p": 0.476708,
+    "beta": 0.8098,
+    "dsr": 0.6784,
+    "alpha_ci_low": -2.0721860715264066e-05,
+    "kurtosis": 31.524,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 98,
+    "rebalance_every": 408,
+    "final_equity": 1038506.13,
+    "total_return_pct": 10285.06,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.5016,
+    "alpha_p": 0.307974,
+    "beta": 0.8173,
+    "dsr": 0.7342,
+    "alpha_ci_low": -1.63730828898146e-05,
+    "kurtosis": 32.1045,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  },
+  {
+    "trial": 99,
+    "rebalance_every": 1224,
+    "final_equity": 784402.58,
+    "total_return_pct": 7744.03,
+    "cost_as_pct_of_initial": 0.0,
+    "insolvent_at": null,
+    "naive_flagged": true,
+    "alpha_t": 0.1874,
+    "alpha_p": 0.425679,
+    "beta": 0.8154,
+    "dsr": 0.6943,
+    "alpha_ci_low": -1.944709429073696e-05,
+    "kurtosis": 34.1939,
+    "degenerate": true,
+    "binding_criteria": [
+      "alpha_ci"
+    ],
+    "waived_criteria": [
+      "alpha_p",
+      "dsr"
+    ],
+    "alpha_only_flagged": false,
+    "dsr_flagged": false,
+    "alpha_ci_flagged": false,
+    "verdict": "无边际"
+  }
+]

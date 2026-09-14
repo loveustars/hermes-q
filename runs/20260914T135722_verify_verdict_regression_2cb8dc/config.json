@@ -1,0 +1,8 @@
+{
+  "rule_kurt_max": 10.0,
+  "sources": {
+    "M5 全样本": "runs/20260914T114151_m5_online_learning_3801ab/best_config.json",
+    "M10 全样本(8h)": "runs/20260914T132343_m10_hac_sensitivity_af9d97/hac_sensitivity.json",
+    "G3 封存段": "runs/20260914T132133_m11_walkforward_ef4839/holdout.json"
+  }
+}

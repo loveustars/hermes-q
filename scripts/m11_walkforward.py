@@ -113,7 +113,8 @@ def main() -> None:
 
     idx = spots[syms[0]].index
     n = len(idx)
-    g = HoldoutGuard(n=n, fraction=0.25, allow=False,
+    # allow 默认 False：整段 A（滚动样本外）都不许碰封存段，越界即抛。
+    g = HoldoutGuard(n=n, fraction=0.25,
                      log_path=os.path.join("runs", "_holdout_access.log"))
     print(f"公共时间轴 {idx[0]:%Y-%m-%d} ~ {idx[-1]:%Y-%m-%d}  共 {n:,} 根")
     print(f"训练段 [0, {g.cut:,})   封存段 [{g.cut:,}, {n:,})  "
@@ -197,24 +198,30 @@ def main() -> None:
         print("\n" + "=" * 76)
         print("B. 封存样本（一次性开封）：前 75% 选配置 → 后 25% 评一次")
         print("=" * 76)
-        # 开封必须是**显式**的：另起一个 allow=True 的守卫，且访问会写进日志。
-        # 上面的 g（allow=False）在整段 A 里都禁止触碰封存段。
-        g_open = HoldoutGuard(n=n, fraction=0.25, allow=True,
+        # 开封必须是**显式且一次性**的：走 unseal()，它查账本并写账本。
+        # 拆成"每个标的开一次"是之前犯的错（实测开了 3 次而无人拦）——
+        # 一次评估事件只开一次，同一 guard 内读完三个标的。
+        g_open = HoldoutGuard(n=n, fraction=0.25,
                               log_path=os.path.join("runs",
                                                     "_holdout_access.log"))
+        hs = g_open.unseal("G3 封存段最终评定：carry 三标的各评一次")
         for s in syms:
             best = select_best(spots[s], perps[s], ft, s, 0, g.cut)
             if best is None:
                 print(f"\n  {s}: 训练段无存活配置")
                 continue
             (nr, m, rb), ins_ann, _ = best
-            hs = g_open.holdout_slice()               # ← 显式开封
             r_h = CarrySimulator(spots[s].iloc[hs], perps[s].iloc[hs], ft,
                                  make_cfg(nr, m, rb), s).run()
-            h8, h8i = rets8(r_h.equity, r_h.index)
-            ev = protocol.evaluate_strategy(h8, bm8, n_trials=len(GRID),
-                                            bars_per_year=BARS_PER_8H,
-                                            r_index=h8i, b_index=bm8_idx)
+            # 用协议里的 cashflow_freq：聚合由 evaluate_strategy 自己做，
+            # 免得脚本各写一份、也免得忘了聚合（PLAN §14.7 的要求）
+            h_r = np.diff(np.asarray(r_h.equity, dtype=float)) \
+                / np.asarray(r_h.equity, dtype=float)[:-1]
+            h_r = np.where(np.isfinite(h_r), h_r, 0.0)
+            h_idx = pd.DatetimeIndex(r_h.index)[-len(h_r):]
+            ev = protocol.evaluate_strategy(h_r, bm_r, n_trials=len(GRID),
+                                            r_index=h_idx, b_index=bm_idx,
+                                            cashflow_freq=AGG)
             at = ev["alpha_test"]
             ci_lo = ev["alpha_bootstrap"]["annualized_ci_low"]
             ci_hi = ev["alpha_bootstrap"]["annualized_ci_high"]
@@ -238,8 +245,14 @@ def main() -> None:
                   f"beta {at['beta']:+.4f}   t {at['t_stat']:.2f}   "
                   f"p {at['p_value']:.6f}   DSR {ev['dsr']['dsr']:.4f}")
             print(f"    自助 95% 区间 [{ci_lo*100:+.2f}%, {ci_hi*100:+.2f}%] 年化")
-            print(f"    判定（以自助区间为主判据）：{ev['verdict']}"
-                  f"（区间下界{'为正' if ci_lo > 0 else '未过零线'}）")
+            print(f"    分布：峰度 {ev['distribution']['kurtosis']:.2f}"
+                  f"（{'退化' if ev['distribution']['degenerate'] else '未退化'}）"
+                  f"   {ev['evaluation_note']}")
+            print(f"    判定：{ev['verdict']}   —— {ev['verdict_basis']}")
+            if ci_lo > 0:
+                print("    （区间下界为正）")
+            else:
+                print("    （区间下界未过零线）")
 
         print(f"\n开封记录：{g_open.accesses}")
         run.log("walkforward", wf_all)
