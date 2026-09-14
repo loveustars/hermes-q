@@ -1,0 +1,29 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "raw_on_notional": -0.8211,
+    "switches": 964,
+    "cost_on_notional": 2.1208,
+    "net_on_notional": -2.9419,
+    "net_annualized_2x": -0.223,
+    "improvement_vs_always": -2.1871
+  },
+  {
+    "symbol": "ETHUSDT",
+    "raw_on_notional": -0.9709,
+    "switches": 998,
+    "cost_on_notional": 2.1956,
+    "net_on_notional": -3.1665,
+    "net_annualized_2x": -0.24,
+    "improvement_vs_always": -2.2689
+  },
+  {
+    "symbol": "BNBUSDT",
+    "raw_on_notional": -0.6212,
+    "switches": 829,
+    "cost_on_notional": 1.8238,
+    "net_on_notional": -2.445,
+    "net_annualized_2x": -0.1853,
+    "improvement_vs_always": -2.4496
+  }
+]

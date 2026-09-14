@@ -1,0 +1,16 @@
+{
+  "window_years": 6.598,
+  "best_symbol": "ETHUSDT",
+  "best_annualized_on_notional": 0.1361,
+  "best_annualized_at_2x_capital": 0.068,
+  "positive_years": {
+    "BTCUSDT": "7/7",
+    "ETHUSDT": "7/7",
+    "BNBUSDT": "3/7"
+  },
+  "timed_net_annualized_2x": {
+    "BTCUSDT": -0.0985,
+    "ETHUSDT": -0.0928,
+    "BNBUSDT": -0.0911
+  }
+}

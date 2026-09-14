@@ -1,0 +1,29 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "years": 6.598,
+    "cumulative_on_notional": -0.7548,
+    "annualized_on_notional": -0.1144,
+    "annualized_cost_2x": -0.0572,
+    "annualized_cost_1_5x": -0.0763,
+    "negative_share": 0.1421
+  },
+  {
+    "symbol": "ETHUSDT",
+    "years": 6.598,
+    "cumulative_on_notional": -0.8976,
+    "annualized_on_notional": -0.1361,
+    "annualized_cost_2x": -0.068,
+    "annualized_cost_1_5x": -0.0907,
+    "negative_share": 0.1402
+  },
+  {
+    "symbol": "BNBUSDT",
+    "years": 6.598,
+    "cumulative_on_notional": 0.0046,
+    "annualized_on_notional": 0.0007,
+    "annualized_cost_2x": 0.0003,
+    "annualized_cost_1_5x": 0.0005,
+    "negative_share": 0.2406
+  }
+]
