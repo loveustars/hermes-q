@@ -1,0 +1,35 @@
+[
+  {
+    "symbol": "BTCUSDT",
+    "n_bars": 79440,
+    "n_gap_segments": 28,
+    "n_missing_bars": 128,
+    "missing_pct": 0.16112789526686808,
+    "longest_span_h": 34.0,
+    "n_missing_longest": 33,
+    "longest_gap_from": "2018-02-08 01:00",
+    "longest_gap_to": "2018-02-09 09:00"
+  },
+  {
+    "symbol": "ETHUSDT",
+    "n_bars": 79440,
+    "n_gap_segments": 28,
+    "n_missing_bars": 128,
+    "missing_pct": 0.16112789526686808,
+    "longest_span_h": 34.0,
+    "n_missing_longest": 33,
+    "longest_gap_from": "2018-02-08 01:00",
+    "longest_gap_to": "2018-02-09 09:00"
+  },
+  {
+    "symbol": "BNBUSDT",
+    "n_bars": 77503,
+    "n_gap_segments": 27,
+    "n_missing_bars": 122,
+    "missing_pct": 0.1574132614221385,
+    "longest_span_h": 34.0,
+    "n_missing_longest": 33,
+    "longest_gap_from": "2018-02-08 01:00",
+    "longest_gap_to": "2018-02-09 09:00"
+  }
+]

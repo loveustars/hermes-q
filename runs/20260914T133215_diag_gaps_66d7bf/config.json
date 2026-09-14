@@ -1,0 +1,10 @@
+{
+  "interval": "1h",
+  "source": "binance",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "TRXUSDT"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "per_symbol": {
+    "BTCUSDT": {
+      "n_bars": 79440,
+      "n_gap_segments": 28,
+      "n_missing_bars": 128,
+      "missing_pct": 0.16112789526686808,
+      "longest_span_h": 34.0
+    },
+    "ETHUSDT": {
+      "n_bars": 79440,
+      "n_gap_segments": 28,
+      "n_missing_bars": 128,
+      "missing_pct": 0.16112789526686808,
+      "longest_span_h": 34.0
+    },
+    "BNBUSDT": {
+      "n_bars": 77503,
+      "n_gap_segments": 27,
+      "n_missing_bars": 122,
+      "missing_pct": 0.1574132614221385,
+      "longest_span_h": 34.0
+    }
+  },
+  "core_total": {
+    "n_gap_segments": 83,
+    "n_missing_bars": 378
+  }
+}
