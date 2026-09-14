@@ -213,6 +213,37 @@ def perp_klines(symbol: str, interval: str = "1h", limit: int = 1000,
     return out
 
 
+def perp_klines_parallel(symbol: str, interval: str = "1h",
+                         start_ms: int | None = None, end_ms: int | None = None,
+                         workers: int = 6, pause: float = 0.05) -> list[Bar]:
+    """分块并行拉取永续全量历史（与 binance_klines_parallel 同一套做法）。"""
+    from concurrent.futures import ThreadPoolExecutor
+
+    step = INTERVAL_MS[interval]
+    if end_ms is None:
+        end_ms = int(time.time() * 1000)
+    if start_ms is None:
+        start_ms = end_ms - step * 1000
+    starts = list(range(start_ms, end_ms, step * 1000))
+
+    def fetch_one(s: int) -> list[Bar]:
+        batch = _get("binance_futures", BINANCE_FUTURES_BASE, "/fapi/v1/klines",
+                     {"symbol": symbol, "interval": interval,
+                      "startTime": s, "endTime": min(s + step * 1000 - 1, end_ms),
+                      "limit": 1000})
+        if pause:
+            time.sleep(pause)
+        return [Bar(int(k[0]), float(k[1]), float(k[2]), float(k[3]),
+                    float(k[4]), float(k[5]), float(k[7])) for k in batch]
+
+    out: list[Bar] = []
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        for chunk in ex.map(fetch_one, starts):
+            out.extend(chunk)
+    seen: dict[int, Bar] = {b.open_time: b for b in out}
+    return [seen[k] for k in sorted(seen)]
+
+
 def premium_index(symbol: str) -> dict:
     """当前标记价、指数价与最近资金费。"""
     return _get("binance_futures", BINANCE_FUTURES_BASE, "/fapi/v1/premiumIndex",

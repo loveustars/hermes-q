@@ -97,5 +97,32 @@
     "sha256": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
     "bytes": 276130,
     "recorded_at": "2026-09-14T12:12:25+00:00"
+  },
+  "data/raw/binanceperp_BTCUSDT_1h.csv": {
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "source": "binanceperp",
+    "rows": 61508,
+    "sha256": "ef36cdbedfe77ff4c3cc606f7dc0eb53c88a03c51a299b8dbdc191e126cfe352",
+    "bytes": 4458467,
+    "recorded_at": "2026-09-14T12:39:44+00:00"
+  },
+  "data/raw/binanceperp_ETHUSDT_1h.csv": {
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "source": "binanceperp",
+    "rows": 59598,
+    "sha256": "26d1b3a1060289da5b93f53c2664e22ec8f6f66fdaccf9423831ae3854622a69",
+    "bytes": 4265168,
+    "recorded_at": "2026-09-14T12:40:00+00:00"
+  },
+  "data/raw/binanceperp_BNBUSDT_1h.csv": {
+    "symbol": "BNBUSDT",
+    "interval": "1h",
+    "source": "binanceperp",
+    "rows": 57797,
+    "sha256": "5a2616a8f3e0093009876da0d4842a5dace446ebe99b0b2e81433bd6bdbb12a6",
+    "bytes": 3781082,
+    "recorded_at": "2026-09-14T12:40:16+00:00"
   }
 }

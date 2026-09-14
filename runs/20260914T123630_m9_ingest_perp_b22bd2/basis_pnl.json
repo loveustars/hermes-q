@@ -1,0 +1,23 @@
+{
+  "BTCUSDT": {
+    "years": 6.59,
+    "basis_pnl": 336.79,
+    "annualized": 0.005107,
+    "funding_income": 7548.32,
+    "ratio_abs_pnl_over_funding": 0.0446
+  },
+  "ETHUSDT": {
+    "years": 6.59,
+    "basis_pnl": 1395.43,
+    "annualized": 0.021162,
+    "funding_income": 8976.24,
+    "ratio_abs_pnl_over_funding": 0.1555
+  },
+  "BNBUSDT": {
+    "years": 6.59,
+    "basis_pnl": 635.4,
+    "annualized": 0.009636,
+    "funding_income": -45.56,
+    "ratio_abs_pnl_over_funding": -13.9475
+  }
+}

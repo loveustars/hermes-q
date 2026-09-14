@@ -1,0 +1,112 @@
+{
+  "basis_stats": {
+    "BTCUSDT": {
+      "bars": 57765,
+      "median_bp": -3.768,
+      "mean_bp": -1.425,
+      "std_bp": 6.1,
+      "p1_bp": -8.293,
+      "p99_bp": 16.659,
+      "max_bp": 210.123,
+      "min_bp": -257.306,
+      "contango_share": 0.2599
+    },
+    "ETHUSDT": {
+      "bars": 57765,
+      "median_bp": -3.666,
+      "mean_bp": -0.828,
+      "std_bp": 6.884,
+      "p1_bp": -8.421,
+      "p99_bp": 21.138,
+      "max_bp": 139.384,
+      "min_bp": -252.246,
+      "contango_share": 0.2968
+    },
+    "BNBUSDT": {
+      "bars": 57765,
+      "median_bp": 0.483,
+      "mean_bp": 0.242,
+      "std_bp": 9.618,
+      "p1_bp": -24.576,
+      "p99_bp": 24.848,
+      "max_bp": 177.363,
+      "min_bp": -238.013,
+      "contango_share": 0.5148
+    }
+  },
+  "basis_pnl": {
+    "BTCUSDT": {
+      "years": 6.59,
+      "basis_pnl": 336.79,
+      "annualized": 0.005107,
+      "funding_income": 7548.32,
+      "ratio_abs_pnl_over_funding": 0.0446
+    },
+    "ETHUSDT": {
+      "years": 6.59,
+      "basis_pnl": 1395.43,
+      "annualized": 0.021162,
+      "funding_income": 8976.24,
+      "ratio_abs_pnl_over_funding": 0.1555
+    },
+    "BNBUSDT": {
+      "years": 6.59,
+      "basis_pnl": 635.4,
+      "annualized": 0.009636,
+      "funding_income": -45.56,
+      "ratio_abs_pnl_over_funding": -13.9475
+    }
+  },
+  "short_squeeze": {
+    "BTCUSDT": {
+      "max_up_all": 30.009,
+      "7d": 0.5509,
+      "30d": 1.3552,
+      "90d": 2.6954
+    },
+    "ETHUSDT": {
+      "max_up_all": 50.5287,
+      "7d": 0.7695,
+      "30d": 1.5001,
+      "90d": 3.2157
+    },
+    "BNBUSDT": {
+      "max_up_all": 176.198,
+      "7d": 1.9269,
+      "30d": 7.9612,
+      "90d": 15.391
+    }
+  },
+  "margin_requirement": {
+    "BTCUSDT": {
+      "annualized_on_notional": 0.114469,
+      "return_at_m_1_0": 0.057235,
+      "return_at_m_1_35": 0.04871,
+      "return_at_m_2_7": 0.030938,
+      "required_m_for_30d": 1.3552,
+      "required_m_for_90d": 2.6954,
+      "return_at_required_m_30d": 0.048603,
+      "return_at_required_m_90d": 0.030976
+    },
+    "ETHUSDT": {
+      "annualized_on_notional": 0.136124,
+      "return_at_m_1_0": 0.068062,
+      "return_at_m_1_35": 0.057925,
+      "return_at_m_2_7": 0.03679,
+      "required_m_for_30d": 1.5001,
+      "required_m_for_90d": 3.2157,
+      "return_at_required_m_30d": 0.054447,
+      "return_at_required_m_90d": 0.03229
+    },
+    "BNBUSDT": {
+      "annualized_on_notional": -0.000691,
+      "return_at_m_1_0": -0.000345,
+      "return_at_m_1_35": -0.000294,
+      "return_at_m_2_7": -0.000187,
+      "required_m_for_30d": 7.9612,
+      "required_m_for_90d": 15.391,
+      "return_at_required_m_30d": -7.7e-05,
+      "return_at_required_m_90d": -4.2e-05
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "BTCUSDT": {
+    "rows": 61508,
+    "start": "2019-09-08 17:00:00+00:00",
+    "end": "2026-09-14 12:00:00+00:00",
+    "dup_index": 0,
+    "step": "0 days 01:00:00",
+    "gaps": 0,
+    "nan": 0,
+    "nonpositive_close": 0,
+    "symbol": "BTCUSDT",
+    "interval": "1h",
+    "path": "data/raw/binanceperp_BTCUSDT_1h.csv"
+  },
+  "ETHUSDT": {
+    "rows": 59598,
+    "start": "2019-11-27 07:00:00+00:00",
+    "end": "2026-09-14 12:00:00+00:00",
+    "dup_index": 0,
+    "step": "0 days 01:00:00",
+    "gaps": 0,
+    "nan": 0,
+    "nonpositive_close": 0,
+    "symbol": "ETHUSDT",
+    "interval": "1h",
+    "path": "data/raw/binanceperp_ETHUSDT_1h.csv"
+  },
+  "BNBUSDT": {
+    "rows": 57797,
+    "start": "2020-02-10 08:00:00+00:00",
+    "end": "2026-09-14 12:00:00+00:00",
+    "dup_index": 0,
+    "step": "0 days 01:00:00",
+    "gaps": 0,
+    "nan": 0,
+    "nonpositive_close": 0,
+    "symbol": "BNBUSDT",
+    "interval": "1h",
+    "path": "data/raw/binanceperp_BNBUSDT_1h.csv"
+  }
+}

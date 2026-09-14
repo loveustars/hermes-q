@@ -1,0 +1,35 @@
+{
+  "BTCUSDT": {
+    "bars": 57765,
+    "median_bp": -3.768,
+    "mean_bp": -1.425,
+    "std_bp": 6.1,
+    "p1_bp": -8.293,
+    "p99_bp": 16.659,
+    "max_bp": 210.123,
+    "min_bp": -257.306,
+    "contango_share": 0.2599
+  },
+  "ETHUSDT": {
+    "bars": 57765,
+    "median_bp": -3.666,
+    "mean_bp": -0.828,
+    "std_bp": 6.884,
+    "p1_bp": -8.421,
+    "p99_bp": 21.138,
+    "max_bp": 139.384,
+    "min_bp": -252.246,
+    "contango_share": 0.2968
+  },
+  "BNBUSDT": {
+    "bars": 57765,
+    "median_bp": 0.483,
+    "mean_bp": 0.242,
+    "std_bp": 9.618,
+    "p1_bp": -24.576,
+    "p99_bp": 24.848,
+    "max_bp": 177.363,
+    "min_bp": -238.013,
+    "contango_share": 0.5148
+  }
+}

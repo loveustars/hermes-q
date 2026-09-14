@@ -1,0 +1,32 @@
+{
+  "BTCUSDT": {
+    "annualized_on_notional": 0.114469,
+    "return_at_m_1_0": 0.057235,
+    "return_at_m_1_35": 0.04871,
+    "return_at_m_2_7": 0.030938,
+    "required_m_for_30d": 1.3552,
+    "required_m_for_90d": 2.6954,
+    "return_at_required_m_30d": 0.048603,
+    "return_at_required_m_90d": 0.030976
+  },
+  "ETHUSDT": {
+    "annualized_on_notional": 0.136124,
+    "return_at_m_1_0": 0.068062,
+    "return_at_m_1_35": 0.057925,
+    "return_at_m_2_7": 0.03679,
+    "required_m_for_30d": 1.5001,
+    "required_m_for_90d": 3.2157,
+    "return_at_required_m_30d": 0.054447,
+    "return_at_required_m_90d": 0.03229
+  },
+  "BNBUSDT": {
+    "annualized_on_notional": -0.000691,
+    "return_at_m_1_0": -0.000345,
+    "return_at_m_1_35": -0.000294,
+    "return_at_m_2_7": -0.000187,
+    "required_m_for_30d": 7.9612,
+    "required_m_for_90d": 15.391,
+    "return_at_required_m_30d": -7.7e-05,
+    "return_at_required_m_90d": -4.2e-05
+  }
+}
