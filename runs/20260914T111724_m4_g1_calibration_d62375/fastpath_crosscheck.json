@@ -1,0 +1,20 @@
+[
+  {
+    "rebalance_every": 6,
+    "slow_total_return": -0.7916,
+    "fast_total_return": -0.9095,
+    "deviation_pp": -11.79
+  },
+  {
+    "rebalance_every": 24,
+    "slow_total_return": 0.1982,
+    "fast_total_return": -0.3082,
+    "deviation_pp": -50.63
+  },
+  {
+    "rebalance_every": 168,
+    "slow_total_return": 1.4904,
+    "fast_total_return": 0.1447,
+    "deviation_pp": -134.57
+  }
+]

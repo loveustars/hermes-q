@@ -1,0 +1,112 @@
+{
+  "rec": {
+    "eta": 0.02,
+    "band": 0.02,
+    "name": "hedge_K11_eta0.0200_band0.02",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 125640.38,
+      "total_return": 11.564038,
+      "ann_return": 0.467256,
+      "ann_vol": 0.806819,
+      "sharpe": 0.8814,
+      "sortino": 1.0478,
+      "max_drawdown": -0.92045,
+      "calmar": 0.5076,
+      "turnover_roundtrips_per_year": 7.43,
+      "turnover_notional": 980641.4,
+      "total_cost": 1100.5,
+      "cost_drag_bp_of_initial": 1100.5,
+      "cost_as_pct_of_initial": 11.01
+    },
+    "insolvent": false,
+    "mean_entropy": 0.57,
+    "n_experts": 11,
+    "final_expert_weights": {
+      "flat": 0.0,
+      "long_all": 0.9579,
+      "inv_vol": 0.0419,
+      "mom_24": 0.0,
+      "mom_72": 0.0,
+      "mom_168": 0.0,
+      "mom_720": 0.0,
+      "rev_24": 0.0,
+      "rev_168": 0.0,
+      "only_BTCUSDT": 0.0002,
+      "only_ETHUSDT": 0.0
+    }
+  },
+  "split": {
+    "first_half": {
+      "bars": 28913,
+      "total_return_pct": 652.36,
+      "sharpe": 1.1250805099287453,
+      "max_drawdown_pct": -92.04
+    },
+    "second_half": {
+      "bars": 28914,
+      "total_return_pct": 68.25,
+      "sharpe": 0.5712367133156119,
+      "max_drawdown_pct": -75.16
+    }
+  },
+  "evaluation": {
+    "alpha_test": {
+      "alpha_per_bar": -1.716e-05,
+      "alpha_annualized": -0.1396,
+      "beta": 0.714,
+      "t_stat": -0.9966,
+      "p_value": 0.840523,
+      "r_squared": 0.7404,
+      "n_obs": 57825
+    },
+    "dsr": {
+      "sharpe": 0.0094,
+      "n_obs": 57825,
+      "skew": -0.3949,
+      "kurtosis": 30.725,
+      "n_trials": 14,
+      "expected_max_sharpe_null": 0.0072,
+      "dsr": 0.7002
+    },
+    "alpha_bootstrap": {
+      "mean": 1.2302811889288174e-19,
+      "p_value": 0.5055,
+      "ci_low": -3.504889220183238e-05,
+      "ci_high": 3.4914372039380475e-05,
+      "null": 0.0
+    },
+    "verdict": "无边际",
+    "passed": false
+  },
+  "evaluation_total_trials": {
+    "alpha_test": {
+      "alpha_per_bar": -1.716e-05,
+      "alpha_annualized": -0.1396,
+      "beta": 0.714,
+      "t_stat": -0.9966,
+      "p_value": 0.840523,
+      "r_squared": 0.7404,
+      "n_obs": 57825
+    },
+    "dsr": {
+      "sharpe": 0.0094,
+      "n_obs": 57825,
+      "skew": -0.3949,
+      "kurtosis": 30.725,
+      "n_trials": 24,
+      "expected_max_sharpe_null": 0.0082,
+      "dsr": 0.6118
+    },
+    "alpha_bootstrap": {
+      "mean": 1.2302811889288174e-19,
+      "p_value": 0.5055,
+      "ci_low": -3.504889220183238e-05,
+      "ci_high": 3.4914372039380475e-05,
+      "null": 0.0
+    },
+    "verdict": "无边际",
+    "passed": false
+  }
+}

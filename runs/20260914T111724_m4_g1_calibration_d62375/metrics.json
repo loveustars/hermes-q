@@ -1,0 +1,14 @@
+{
+  "n_trials": 100,
+  "window_bars": 26280,
+  "false_positive_rate_pct": {
+    "naive_no_beta_removal": 0.0,
+    "alpha_after_beta_removal": 1.0,
+    "dsr_only": 0.0,
+    "full_protocol": 0.0
+  },
+  "alpha_t_median": -0.905,
+  "pbo_noise": 0.3524,
+  "G1_gate_pass": true,
+  "G1_threshold_pct": 5.0
+}

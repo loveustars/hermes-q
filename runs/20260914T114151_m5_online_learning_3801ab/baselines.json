@@ -1,0 +1,102 @@
+[
+  {
+    "agent": "bh_BTCUSDT",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 79096.2,
+      "total_return": 6.90962,
+      "ann_return": 0.36792,
+      "ann_vol": 0.761569,
+      "sharpe": 0.7949,
+      "sortino": 0.9563,
+      "max_drawdown": -0.840824,
+      "calmar": 0.4376,
+      "turnover_roundtrips_per_year": 0.08,
+      "turnover_notional": 10000.0,
+      "total_cost": 53.86,
+      "cost_drag_bp_of_initial": 53.86,
+      "cost_as_pct_of_initial": 0.54
+    }
+  },
+  {
+    "agent": "buy_hold",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 1259094.63,
+      "total_return": 124.909463,
+      "ann_return": 1.080346,
+      "ann_vol": 0.977182,
+      "sharpe": 1.2434,
+      "sortino": 1.5261,
+      "max_drawdown": -0.847783,
+      "calmar": 1.2743,
+      "turnover_roundtrips_per_year": 0.08,
+      "turnover_notional": 10000.0,
+      "total_cost": 248.86,
+      "cost_drag_bp_of_initial": 248.86,
+      "cost_as_pct_of_initial": 2.49
+    }
+  },
+  {
+    "agent": "mom_BTCUSDT_720_rb24",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 127165.76,
+      "total_return": 11.716576,
+      "ann_return": 0.469941,
+      "ann_vol": 0.526934,
+      "sharpe": 0.995,
+      "sortino": 0.8799,
+      "max_drawdown": -0.75028,
+      "calmar": 0.6264,
+      "turnover_roundtrips_per_year": 59.05,
+      "turnover_notional": 7796603.62,
+      "total_cost": 8226.16,
+      "cost_drag_bp_of_initial": 8226.16,
+      "cost_as_pct_of_initial": 82.26
+    }
+  },
+  {
+    "agent": "random_rb24_s7",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 46082.96,
+      "total_return": 3.608296,
+      "ann_return": 0.260431,
+      "ann_vol": 0.853807,
+      "sharpe": 0.7042,
+      "sortino": 0.8433,
+      "max_drawdown": -0.915819,
+      "calmar": 0.2844,
+      "turnover_roundtrips_per_year": 2054.38,
+      "turnover_notional": 271224809.02,
+      "total_cost": 69181.27,
+      "cost_drag_bp_of_initial": 69181.27,
+      "cost_as_pct_of_initial": 691.81
+    }
+  },
+  {
+    "agent": "cash",
+    "net": {
+      "bars": 57826,
+      "initial": 10000.0,
+      "final_equity": 10000.0,
+      "total_return": 0.0,
+      "ann_return": 0.0,
+      "ann_vol": 0.0,
+      "sharpe": 0.0,
+      "sortino": 0.0,
+      "max_drawdown": 0.0,
+      "calmar": 0.0,
+      "turnover_roundtrips_per_year": 0.0,
+      "turnover_notional": 0.0,
+      "total_cost": 0.0,
+      "cost_drag_bp_of_initial": 0.0,
+      "cost_as_pct_of_initial": 0.0
+    }
+  }
+]

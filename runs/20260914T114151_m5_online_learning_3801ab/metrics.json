@@ -1,0 +1,26 @@
+{
+  "train_bars": 58127,
+  "sealed_bars": 19376,
+  "n_configs_searched": 9,
+  "n_trials_this_run": 14,
+  "n_trials_project_total": 24,
+  "best_verdict": "无边际",
+  "best_verdict_total_trials": "无边际",
+  "best_dsr": 0.7002,
+  "best_alpha_annualized": -0.1396,
+  "best_alpha_t": -0.9966,
+  "split": {
+    "first_half": {
+      "bars": 28913,
+      "total_return_pct": 652.36,
+      "sharpe": 1.1250805099287453,
+      "max_drawdown_pct": -92.04
+    },
+    "second_half": {
+      "bars": 28914,
+      "total_return_pct": 68.25,
+      "sharpe": 0.5712367133156119,
+      "max_drawdown_pct": -75.16
+    }
+  }
+}

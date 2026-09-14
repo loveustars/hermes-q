@@ -18,13 +18,18 @@ def total_return(equity: np.ndarray) -> float:
 
 
 def ann_return(equity: np.ndarray, bars_per_year: int) -> float:
+    """年化收益。用对数增长率计算并设上限，避免短样本外推时数值溢出。"""
     e = _clean(equity)
-    if len(e) < 2 or e[0] <= 0:
+    if len(e) < 2 or e[0] <= 0 or e[-1] <= 0:
         return 0.0
     years = (len(e) - 1) / bars_per_year
     if years <= 0:
         return 0.0
-    return float((e[-1] / e[0]) ** (1.0 / years) - 1.0)
+    g = float(np.log(e[-1] / e[0]) / years)
+    if not np.isfinite(g):
+        return 0.0
+    g = min(g, 20.0)          # expm1(20) ≈ 4.85e8，超过即截断
+    return float(np.expm1(g))
 
 
 def ann_vol(returns: np.ndarray, bars_per_year: int) -> float:

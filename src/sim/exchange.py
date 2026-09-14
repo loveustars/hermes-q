@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-from ..env.market_view import MarketView
+from ..env.market_view import MarketView, Precomputed
 from .costs import CostModel
 
 
@@ -83,6 +83,8 @@ class SimExchange:
         for s in self.symbols[1:]:
             if not frames[s].index.equals(idx):
                 raise ValueError(f"{s} 的时间轴与其他标的不一致，请先对齐")
+        # 滚动统计预计算：等价但快一到两个数量级（详见 Precomputed 的说明）
+        self.pre = Precomputed(frames, {cfg.sigma_window}, {cfg.vol_window})
 
     def _sanitize(self, target: dict, view: MarketView) -> dict[str, float]:
         out = {}
@@ -116,7 +118,7 @@ class SimExchange:
         insolvent_at: int | None = None
 
         for t in range(start, self.T - cfg.latency_bars):
-            view = MarketView(self.frames, t)
+            view = MarketView(self.frames, t, self.pre)
             target = agent.decide(view)
             ex = t + cfg.latency_bars
 

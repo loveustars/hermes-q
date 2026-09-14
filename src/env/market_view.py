@@ -13,14 +13,40 @@ class LookaheadError(RuntimeError):
     """策略试图读取未来数据。"""
 
 
+class Precomputed:
+    """滚动统计预计算 —— sigma 与成交额中位数。
+
+    为什么需要：MarketView 每根 bar 都新建，缓存不跨 bar 生效，
+    于是每根 bar 都要做一次 pandas 切片 + 统计。7.7 万根 × 3 标的 × 上百次仿真
+    会退化成几十分钟的纯 pandas 开销。
+
+    等价性：只要 warmup >= n-1，MarketView 的 lo = max(0, t-n+1) 恒等于 t-n+1，
+    所以 rolling(n) 与逐根现算完全一致。注意标准差用 ddof=0，与 numpy .std() 默认一致。
+    """
+
+    def __init__(self, frames: dict[str, pd.DataFrame],
+                 sigma_windows: set[int], vol_windows: set[int]):
+        self.sigma: dict[tuple[str, int], np.ndarray] = {}
+        self.vmed: dict[tuple[str, int], np.ndarray] = {}
+        for s, f in frames.items():
+            logret = np.log(f["close"]).diff()
+            qv = f["quote_volume"]
+            for n in sigma_windows:
+                self.sigma[(s, n)] = logret.rolling(n).std(ddof=0).to_numpy()
+            for n in vol_windows:
+                self.vmed[(s, n)] = qv.rolling(n).median().to_numpy()
+
+
 class MarketView:
     """t 时刻的市场视图。索引 i 必须 <= t，否则抛 LookaheadError。"""
 
-    __slots__ = ("_frames", "_t", "_ret_cache")
+    __slots__ = ("_frames", "_t", "_ret_cache", "_pre")
 
-    def __init__(self, frames: dict[str, pd.DataFrame], t: int):
+    def __init__(self, frames: dict[str, pd.DataFrame], t: int,
+                 pre: "Precomputed | None" = None):
         self._frames = frames
         self._t = t
+        self._pre = pre
         self._ret_cache: dict[tuple[str, int], np.ndarray] = {}
 
     # ---------------- 元信息 ----------------
@@ -64,11 +90,25 @@ class MarketView:
         return self._ret_cache[key]
 
     def sigma(self, symbol: str, n: int, floor: float = 1e-4) -> float:
+        # 预计算只在窗口完整时等价：t < n-1 时现算会截断窗口，
+        # 而 rolling(n) 返回 NaN。此时回退到现算，保证无条件一致。
+        if self._pre is not None and self._t >= n - 1:
+            arr = self._pre.sigma.get((symbol, n))
+            if arr is not None:
+                v = float(arr[self._t])
+                if np.isfinite(v):
+                    return max(v, floor)
         r = self.returns(symbol, n)
         return max(float(r.std()), floor) if len(r) > 1 else floor
 
     def period_notional(self, symbol: str, n: int) -> float:
         """同周期市场成交名义额中位数 —— 冲击模型的分母。"""
+        if self._pre is not None and self._t >= n - 1:
+            arr = self._pre.vmed.get((symbol, n))
+            if arr is not None:
+                v = float(arr[self._t])
+                if np.isfinite(v):
+                    return v
         qv = self.window(symbol, "quote_volume", n)
         return float(np.median(qv)) if len(qv) else 0.0
 
