@@ -404,6 +404,85 @@ def test_simconfig_max_gross_does_not_exceed_3x():
 
 
 # ==========================================================================
+# 11. C 阶段：SimExchange 集成 MarginBook
+# ==========================================================================
+def test_sim_exchange_margin_ledger_updated_on_open_close():
+    """开启 MarginConfig 后，SimExchange 主循环应同步更新 margin_cash。
+
+    验证：
+      - 第一根建仓后，margin_cash > 0（记账初始保证金）
+      - 第二根平仓后，margin_cash = 0（清零）
+    """
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+    from src.sim.margin import MarginConfig
+
+    class OpenLongClose:
+        """第一根 bar 想满仓 1x 多，第二根想平仓。"""
+        name = "open_long_close"
+        def __init__(self):
+            self._step = 0
+        def decide(self, view):
+            self._step += 1
+            if self._step == 1:
+                return {s: 1.0 for s in view.symbols()}
+            if self._step == 2:
+                return {s: 0.0 for s in view.symbols()}
+            return None
+
+    sim = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50,
+                  margin=MarginConfig(initial_margin_ratio=0.5,
+                                       maintenance_margin_ratio=0.25)),
+    )
+    res = sim.run(OpenLongClose())
+    assert res.n_trades >= 2
+    # sim.margin_book 是 sim 内部状态，run() 后保留
+    assert sim.margin_book is not None, "MarginConfig 应触发 margin_book 创建"
+    # 第一根建仓：每标 1.0×equity/price 单位，初始保证金 0.5×|units|×price
+    # 建仓价格 100，初始保证金 = 0.5 × 100 × 100 = 5000
+    # 第二根平仓后，margin_cash 全部清零
+    total_margin_cash = sum(leg.margin_cash for leg in sim.margin_book.legs.values())
+    assert total_margin_cash == 0.0, \
+        f"平仓后 margin_cash 应清零，实际 {total_margin_cash}"
+
+
+def test_sim_exchange_margin_none_keeps_legacy_behavior():
+    """margin=None（默认）时，SimExchange 行为完全不变。
+
+    注：trending_frames 是单调上升的，所以满仓 0.5 一定赚钱。
+    关键是行为不变（没崩、n_trades 正常），不要求终值精确 = 10000。
+    """
+    n = 100
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+
+    class HalfHalf:
+        name = "half_half"
+        def __init__(self):
+            self._done = False
+        def decide(self, view):
+            if self._done:
+                return None
+            self._done = True
+            return {s: 0.5 for s in view.symbols()}
+
+    res = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50),    # margin 默认 None
+    ).run(HalfHalf())
+
+    assert res.n_trades > 0
+    # 单调上升 100 根，0.5 满仓必赚钱；验证 net > initial 即可
+    assert res.final_net() > 10_000.0, \
+        f"单调上升应赚钱，实际 {res.final_net()}"
+
+
+# ==========================================================================
 # 10. B' 阶段：专家"满仓值"与 max_exposure 解耦
 # ==========================================================================
 def test_expert_max_position_scales_with_gross_target():

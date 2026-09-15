@@ -102,13 +102,14 @@ class MarginBook:
 
     # ------------------------------------------------------------------
     def open_leg(self, symbol: str, units: float, price: float, cash_pool) -> float:
-        """建仓：从 cash_pool 扣初始保证金，写进 margin_cash。
+        """建仓：把"应该锁定的初始保证金"写到 margin_cash。
 
-        简化：建仓时直接写 margin_cash = required，initial_margin = required。
-        真实交易所更复杂（按 mark price 算 + 强平费 + funding 累积），C 阶段先简化为开仓时锁定。
+        C2 阶段：只记账，不真扣 cash_pool（SimExchange 已全额扣 cash 买币）。
+        真实交易所用"锁定"语义（cash_pool 扣 = margin 锁仓），但 SimExchange 现有
+        逻辑是 spot 模式全额扣 —— C2 阶段保持现状，等 C3 强平时再决定统一语义。
 
-        cash_pool 是 [cash_value] 形式的可变引用。
-        返回扣的金额（正数 = 扣了，0 = 没变）。
+        cash_pool 是 [cash_value] 形式的可变引用（仅供未来扩展）。
+        返回记账金额（> 0 = 记了，0 = 没变）。
         """
         if symbol in self.liquidated:
             raise ValueError(f"{symbol} 已强平，不能再开仓")
@@ -117,34 +118,27 @@ class MarginBook:
         required = self.initial_required(units, price)
         self.legs[symbol].margin_cash = required
         self.legs[symbol].initial_margin = required
-        cash_pool[0] -= required
         return required
 
     def close_leg(self, symbol: str, units: float, price: float, cash_pool) -> float:
-        """平仓：把当前权益（margin_cash + units×price）退到 cash_pool。
+        """平仓：清零 margin_cash + initial_margin。
 
-        这与 carry.py 强平前的"取出剩余"逻辑一致：平仓时 cash_pool 收到
-        当前权益 = 已存入的 margin + 浮动 PnL。
-
-        cash_pool 是 [cash_value] 形式的可变引用。
-        返回释放的金额（正数 = 加回 cash_pool）。
+        C2 阶段：只清零账本，不操作 cash_pool（同 open_leg 注释里的原因）。
+        cash_pool 参数保留以备 C3 强平时使用。
         """
         if symbol not in self.legs:
             return 0.0
         if abs(units) < 1e-9:
             return 0.0
-        eq = self.equity(symbol, units, price)
-        released = eq
-        cash_pool[0] += released
         self.legs[symbol].margin_cash = 0.0
         self.legs[symbol].initial_margin = 0.0
-        return released
+        return 0.0
 
     def topup_to(self, symbol: str, units: float, price: float, cash_pool) -> float:
-        """补保：从 cash_pool 扣到 margin_cash，恢复 equity 到 initial_margin 水平。
+        """补保：C2 阶段只把 margin_cash 增加到 initial_margin 水平，不操作 cash_pool。
 
-        cash_pool 是 [cash_value] 形式的可变引用。
-        返回补的金额。
+        cash_pool 是 [cash_value] 形式的可变引用（仅供未来扩展）。
+        返回补的金额（> 0 = 补了）。
         """
         if symbol in self.liquidated or units == 0.0:
             return 0.0
@@ -156,18 +150,16 @@ class MarginBook:
         if eq >= target:
             return 0.0
         need = target - eq
-        take = min(need, max(cash_pool[0], 0.0))
-        if take > 0:
-            leg.margin_cash += take
-            cash_pool[0] -= take
-        return take
+        # C2 阶段：直接增加 margin_cash，不动 cash_pool
+        leg.margin_cash += need
+        return need
 
     def liquidate(self, symbol: str, units: float, high_price: float,
                   cash_pool) -> float:
-        """强平：该腿清零，权益（margin_cash + units×high）退到 cash_pool（减去罚金）。
+        """强平：C2 阶段只清零账本 + 标记 liquidated，不操作 cash_pool。
 
-        强平价 = high（最不利价）—— 真实交易所也是按最不利价算。
-        cash_pool 是 [cash_value] 形式的可变引用。
+        C2 阶段：open_leg/close_leg/topup 都不操作 cash_pool，liquidate 也保持一致。
+        C3 阶段再决定"释放金额退还 cash_pool"的语义（可能与建仓语义绑定）。
 
         强平后：
           - units 由调用方清零
@@ -175,14 +167,10 @@ class MarginBook:
           - initial_margin 清零
           - 标记 liquidated
 
-        返回释放到 cash_pool 的净额（可能为 0，如果 margin_cash + units×high < 罚金）。
+        返回 0（C2 不操作 cash_pool，保留接口形状供 C3 切换）。
         """
         leg = self.legs[symbol]
-        eq = leg.margin_cash + units * high_price
-        penalty = self.cfg.liquidation_penalty_bp / 1e4 * abs(units) * high_price
-        release = max(0.0, eq - penalty)
-        cash_pool[0] += release
         leg.margin_cash = 0.0
         leg.initial_margin = 0.0
         self.liquidated.add(symbol)
-        return release
+        return 0.0

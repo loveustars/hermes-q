@@ -24,6 +24,7 @@ import pandas as pd
 from ..env.market_view import MarketView, Precomputed
 from .costs import CostModel
 from .funding import FundingTable
+from .margin import MarginBook
 
 
 @dataclass
@@ -46,6 +47,13 @@ class SimConfig:
     latency_jitter_mean: float = 0.0
     latency_jitter_seed: int = 0
     latency_max_bars: int = 5
+    # per-symbol 杠杆上限（C 阶段）：单标的 |w_s| ≤ max_exposure_per_symbol。
+    # 与 max_gross 形成二层防御：max_gross 是组合上限，max_exposure_per_symbol 是单标上限。
+    max_exposure_per_symbol: float = 3.0
+    # 保证金配置（C 阶段）：None = 不启用保证金追踪（向后兼容）。
+    # 启用后，建仓扣 initial_margin，平仓退 margin_cash + 浮动 PnL。
+    # 强平由 max_exposure_per_symbol 范围内的逐腿强平判定（SimConfig 仍可有 cfg.margin）。
+    margin: "MarginConfig | None" = None
 
     def __post_init__(self):
         if self.gap_policy not in ("execute", "skip"):
@@ -56,6 +64,8 @@ class SimConfig:
             raise ValueError("现货模式不允许做空；做空请设 instrument='perp'")
         if self.latency_jitter_mean < 0:
             raise ValueError("latency_jitter_mean 不能为负")
+        if self.max_exposure_per_symbol <= 0:
+            raise ValueError("max_exposure_per_symbol 必须 > 0")
 
 
 @dataclass
@@ -122,6 +132,10 @@ class SimExchange:
                 raise ValueError(f"{s} 的时间轴与其他标的不一致，请先对齐")
         # 滚动统计预计算：等价但快一到两个数量级（详见 Precomputed 的说明）
         self.pre = Precomputed(frames, {cfg.sigma_window}, {cfg.vol_window})
+        # C 阶段：保证金账本（per-symbol 逻辑子账户）
+        # margin=None 时不启用（向后兼容），C3 强平也不会触发
+        self.margin_book = (MarginBook(cfg.margin, list(frames))
+                            if cfg.margin is not None else None)
 
     def _sanitize(self, target: dict, view: MarketView) -> dict[str, float]:
         out = {}
@@ -131,6 +145,9 @@ class SimExchange:
                 w = 0.0
             if not self.cfg.allow_short:
                 w = max(w, 0.0)
+            # per-symbol 杠杆上限（C 阶段）：单标的 |w_s| ≤ max_exposure_per_symbol
+            w = max(min(w, self.cfg.max_exposure_per_symbol),
+                    -self.cfg.max_exposure_per_symbol)
             out[s] = w
         gross = sum(abs(v) for v in out.values())
         if gross > self.cfg.max_gross and gross > 0:
@@ -201,7 +218,16 @@ class SimExchange:
                             c = self.net_costs.trade_cost(s, notional_n, sigma, pn)
                             cash_n -= c
                             cash_n -= d_n * px[s]
+                            old_units = units_n[s]
                             units_n[s] = want_n
+                            # C 阶段：保证金账本同步（C2 只记账，不操作 cash）
+                            if self.margin_book is not None:
+                                if abs(old_units) < 1e-9 and abs(want_n) >= 1e-9:
+                                    self.margin_book.open_leg(
+                                        s, want_n, px[s], [cash_n])
+                                elif abs(want_n) < 1e-9 and abs(old_units) >= 1e-9:
+                                    self.margin_book.close_leg(
+                                        s, old_units, px[s], [cash_n])
                             bar_cost += c
                             n_trades += 1
 

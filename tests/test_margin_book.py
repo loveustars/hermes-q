@@ -52,24 +52,27 @@ def test_margin_config_rejects_negative_penalty():
 # ==========================================================================
 # 建仓 / 平仓
 # ==========================================================================
-def test_open_leg_deducts_initial_margin():
-    """建仓：cash_pool 扣 initial_required，margin_cash = initial_required。"""
+def test_open_leg_records_initial_margin_in_ledger():
+    """建仓：margin_cash = initial_required，C2 阶段不真扣 cash_pool。
+
+    注：C1 早期版本 open_leg 是扣 cash 的，但 SimExchange 现状是全额扣 cash 买币，
+    重复扣会双重扣钱。改 C2 后：open_leg 只记账，cash_pool 扣除由 SimExchange 主循环负责。
+    """
     book = MarginBook(MarginConfig(initial_margin_ratio=0.5), ["BTC"])
     cash = [10_000.0]
-    # 建 100 单位多单，价 100，初始保证金 0.5 × 100 × 100 = 5,000
     book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
-    assert cash[0] == 5_000
     assert book.legs["BTC"].margin_cash == 5_000
     assert book.legs["BTC"].initial_margin == 5_000
+    assert cash[0] == 10_000, f"C2 阶段 open_leg 不应扣 cash_pool，实际 {cash[0]}"
 
 
-def test_open_leg_short_also_deducts_initial_margin():
-    """做空建仓与做多对称，扣同样 initial_required。"""
+def test_open_leg_short_also_records_initial_margin():
+    """做空建仓：与做多对称，记同样的 initial_required。"""
     book = MarginBook(MarginConfig(initial_margin_ratio=0.5), ["BTC"])
     cash = [10_000.0]
     book.open_leg("BTC", units=-100.0, price=100.0, cash_pool=cash)
-    assert cash[0] == 5_000
     assert book.legs["BTC"].margin_cash == 5_000
+    assert cash[0] == 10_000
 
 
 def test_open_zero_units_no_op():
@@ -80,50 +83,41 @@ def test_open_zero_units_no_op():
     assert book.legs["BTC"].margin_cash == 0.0
 
 
-def test_close_leg_releases_equity_with_pnl():
-    """平仓：cash_pool 收到当前 equity（含浮动 PnL）。"""
+def test_close_leg_clears_ledger_no_cash_op():
+    """C2 阶段 close_leg 只清零账本，不操作 cash。"""
     book = MarginBook(MarginConfig(), ["BTC"])
     cash = [10_000.0]
-    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)  # cash=5000
-    # 价涨到 110，equity = 5000 + 100*110 = 16000
+    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
     released = book.close_leg("BTC", units=100.0, price=110.0, cash_pool=cash)
-    assert released == 16_000
-    assert cash[0] == 5_000 + 16_000
+    assert released == 0.0
     assert book.legs["BTC"].margin_cash == 0.0
+    assert cash[0] == 10_000
 
 
-def test_close_short_leg_with_profit():
-    """做空平仓盈利：价 100→90，equity = 5000 + (-100)*90 = -4000。"""
+def test_close_leg_records_pnl_for_liquidation_path():
+    """C3 强平路径用得到 close_leg 的 PnL 数值：通过 equity() 单独计算。"""
     book = MarginBook(MarginConfig(), ["BTC"])
     cash = [10_000.0]
     book.open_leg("BTC", units=-100.0, price=100.0, cash_pool=cash)
-    released = book.close_leg("BTC", units=-100.0, price=90.0, cash_pool=cash)
-    assert released == -4_000
-    assert cash[0] == 5_000 - 4_000    # 1000（做空盈利）
+    # 价跌 90：equity = 5000 + (-100)*90 = -4000（用于 C3 强平价计算）
+    eq = book.equity("BTC", units=-100.0, price=90.0)
+    assert eq == -4_000
 
 
 # ==========================================================================
 # 强平
 # ==========================================================================
-def test_liquidate_uses_high_price_in_release():
-    """强平 release 数额随 high_price 变化（验证用 high 而非 close）。"""
-    # 多仓 100 单位，价 100，margin_cash=5000
-    # 价跌触发强平：release = max(0, 5000 + 100*high)
-    rel_a = _liquidate_long_and_get_release(high_price=80.0)
-    rel_b = _liquidate_long_and_get_release(high_price=70.0)
-    rel_c = _liquidate_long_and_get_release(high_price=60.0)
-    assert rel_a == 13_000
-    assert rel_b == 12_000
-    assert rel_c == 11_000
-    assert rel_a > rel_b > rel_c, "high 价不同应影响 release"
-
-
-def _liquidate_long_and_get_release(high_price: float) -> float:
+def test_liquidate_clears_ledger_no_cash_op():
+    """C2 阶段 liquidate 只清零账本，不操作 cash_pool。"""
     book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5),
                       ["BTC"])
     cash = [10_000.0]
     book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
-    return book.liquidate("BTC", units=100.0, high_price=high_price, cash_pool=cash)
+    rel = book.liquidate("BTC", units=100.0, high_price=80.0, cash_pool=cash)
+    assert rel == 0.0
+    assert cash[0] == 10_000
+    assert book.legs["BTC"].margin_cash == 0.0
+    assert "BTC" in book.liquidated
 
 
 def test_liquidate_marks_symbol_and_blocks_reopen():
@@ -135,31 +129,6 @@ def test_liquidate_marks_symbol_and_blocks_reopen():
     assert "BTC" in book.liquidated
     with pytest.raises(ValueError, match="已强平"):
         book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
-
-
-def test_liquidate_with_penalty_reduces_release():
-    """liquidation_penalty_bp>0 时，release 减去罚金。"""
-    # 多仓 100 单位，价 100，margin_cash=5000
-    # 强平 high 80: equity=13000, penalty=100bp×|100|×80=80, release=12920
-    book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5,
-                                   liquidation_penalty_bp=100),
-                      ["BTC"])
-    cash = [10_000.0]
-    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
-    rel = book.liquidate("BTC", units=100.0, high_price=80.0, cash_pool=cash)
-    assert rel == pytest.approx(12_920, abs=1e-3)
-
-
-def test_liquidate_zero_equity_returns_zero():
-    """强平时 equity 已 ≤ 0 → release = 0。"""
-    book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5),
-                      ["BTC"])
-    cash = [10_000.0]
-    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
-    # 极端情况：high 跌到 0，equity = 5000 + 0 = 5000，**不**是 0
-    # 真正能 release=0：high 跌到 -50，equity = 5000 - 5000 = 0
-    rel = book.liquidate("BTC", units=100.0, high_price=-50.0, cash_pool=cash)
-    assert rel == 0.0
 
 
 def test_is_liquidatable_uses_high_price_threshold():
@@ -201,17 +170,19 @@ def test_needs_topup_threshold():
     assert book.needs_topup("BTC", units=100.0, price=-6.0)
 
 
-def test_topup_deducts_from_cash_pool():
-    """补保：cash_pool 减，margin_cash 加。"""
+def test_topup_records_in_ledger_no_cash_op():
+    """C2 阶段 topup_to 也只记账，不操作 cash（与 open_leg 一致）。"""
     book = MarginBook(MarginConfig(initial_margin_ratio=0.1, maintenance_margin_ratio=0.05,
                                    topup_trigger_ratio=0.5),
                       ["BTC"])
     cash = [10_000.0]
-    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)  # cash=9000
-    # 价跌到 -10: equity=0, 需补到 1000 → need 1000
+    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
+    # cash 仍 = 10000（C2 不扣），margin_cash=1000
+    # 价跌到 -10: equity=0, 需补到 1000
     book.topup_to("BTC", units=100.0, price=-10.0, cash_pool=cash)
-    assert cash[0] == 8_000
-    assert book.legs["BTC"].margin_cash == 2_000
+    # C2 阶段 topup 只调 margin_cash，不动 cash
+    assert cash[0] == 10_000
+    assert book.legs["BTC"].margin_cash == 2_000    # 1000 + 1000（补保）
 
 
 def test_topup_no_op_if_above_threshold():
@@ -222,21 +193,21 @@ def test_topup_no_op_if_above_threshold():
     book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
     taken = book.topup_to("BTC", units=100.0, price=100.0, cash_pool=cash)
     assert taken == 0
-    assert cash[0] == 9_000
+    assert cash[0] == 10_000
 
 
-def test_topup_capped_by_cash_pool():
-    """cash_pool 不足时，补到 cash_pool 归零为止。"""
+def test_topup_capped_by_initial_margin():
+    """C2 阶段：topup 把 margin_cash 加到 initial_margin 上限。"""
+    # cash_pool 上限测试在 C3 强平路径才有意义，C2 阶段不操作 cash
     book = MarginBook(MarginConfig(initial_margin_ratio=0.1, maintenance_margin_ratio=0.05,
                                    topup_trigger_ratio=0.5),
                       ["BTC"])
-    cash = [10_500.0]    # 只剩 500 可补
-    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)  # cash=9500
-    # 价跌到 -10: equity=0, 需补 1000, take min(1000, 9500)=1000
-    # 但实际 cash 9500 够
-    # 改用 cash 不足场景：先把 cash 调小
-    cash[0] = 200
-    # 价跌到 -10: equity=0, need 1000, take min(1000, 200)=200
+    cash = [10_000.0]
+    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
+    # 价跌到 -10: equity=0, 需补 1000
     book.topup_to("BTC", units=100.0, price=-10.0, cash_pool=cash)
-    assert cash[0] == 0
-    assert book.legs["BTC"].margin_cash == 1_200    # 1000 + 200
+    assert book.legs["BTC"].margin_cash == 1_000 + 1_000    # initial + 补
+    # 再补一次：equity 仍 0（margin_cash=2000，price=-10：equity = 2000 + 100*(-10) = 1000）
+    # 1000 = initial_margin → 不用再补
+    book.topup_to("BTC", units=100.0, price=-10.0, cash_pool=cash)
+    assert book.legs["BTC"].margin_cash == 2_000    # 不再增加
