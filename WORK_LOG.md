@@ -3,8 +3,8 @@
 **项目**：Hermes-Q（资产无关的自学习交易框架，研究用途，只读公开行情）
 **位置**：`/home/nick/workspace/quant`
 **最后更新**：2026-09-15
-**当前阶段**：M0–M11 完成。前向纸面交易运行中；**新启动"训练目标做空能力扩展"路线图
-（A→A'→B 三阶段，A、A'、B 已完成；C、D 规划）**。
+**当前阶段**：M0–M11 完成。前向纸面交易运行中；**§19 训练目标做空与杠杆路线图
+（A/A'/B/B'/C 全部完成；D 阶段规划中）**。
 
 ---
 
@@ -626,15 +626,68 @@ G2 淘汰门之后，重新审视训练目标本身：**当前 `mixed = clip(mix
 
 **这正是 C 阶段必须做的原因**：当前 B' 的 alpha **完全是 sim 估值**。实盘上 bar 1,420 的 -40% 暴跌会让 3x 多头爆仓，账户归零，不会再继续交易。
 
-### 12.8 C 阶段（**待启动**）：逐腿保证金 + 强平
+### 12.8 C 阶段（**已完成**）：逐腿保证金 + 强平
 
-C 阶段要做的事（从 `carry.py` 移植）：
-1. 每标的独立 margin 账户（spot/perp 双账户 + 强平线）
-2. 强平判定：用本根 `high`（不是 close！）对每个做空腿做压力测试
-3. 强平时：永续腿被交易所接管，spot 腿仍在 → 组合变 delta 不中性
-4. `SimResult.liquidated_legs: list[symbol]` 暴露
+C 阶段分 4 个子阶段（C1 / C2 / C3 / C4），全部完成：
 
-**预计工作量**：3-5 个 commit，1-2 个新测试，C 阶段会动 `SimExchange` 主循环，**所有现有 sim 测试要回归**。
+**C1 阶段**：
+- `src/sim/margin.py`（新文件）：MarginConfig + MarginBook + MarginLeg
+- 接口：open_leg / close_leg / topup_to / liquidate / is_liquidatable / needs_topup
+- 17 条单元测试，102/102 通过
+
+**C2 阶段**：
+- `SimConfig` 加 `margin: MarginConfig | None = None`（默认 None，向后兼容）
+- `SimConfig` 加 `max_exposure_per_symbol: float = 3.0`（per-symbol 杠杆上限）
+- `_sanitize` 加 per-symbol 限幅（|w_s| ≤ max_exposure_per_symbol）
+- `SimExchange` 主循环建仓/平仓时同步调 MarginBook
+- 关键决策：**C2 阶段 open_leg 只记账不操作 cash**（因为 SimExchange 已全额扣 cash 买币）
+- 2 个集成测试：建仓/平仓时 margin_cash 同步、margin=None 时行为不变
+- 136/136 通过
+
+**C3 阶段**：
+- `SimResult` 加 `liquidated_legs: list[symbol]` 字段
+- `SimExchange` 主循环 step 1.5：每根 bar 用 high 价做压力测试，触发强平
+- 强平语义：`release = max(0, margin_cash - penalty)`，退还 margin_cash 本金到 cash_pool
+- **关键设计决定**：强平后**允许**重新开仓（discard liquidated 标记），模拟"爆仓后账户归零重建"
+- 2 个集成测试：做空 + 价涨触发强平、价格平稳时无强平
+- 140/140 通过
+
+**C4 阶段**：
+- 新增 `scripts/c_margin_baseline.py`
+- 真实数据：3x 杠杆 + initial=0.5 / maint=0.1 强平线
+
+**C 阶段真实数据发现**：
+
+| 指标 | B'（3x 不强平）| **C（3x + 逐腿强平）**|
+|---|---|---|
+| 净终值 | -18（破产）| **15**（强平后回升）|
+| 毛终值 | -17 | -16 |
+| 累计成本 | 9,539 | **14,679**（1.5x）|
+| 成交笔数 | 7,647 | 7,831 |
+| **liquidated_legs** | （空）| **6 个（BNB ×5 + ETH ×1）**|
+| 破产 | bar 1,420 | bar 1,420 |
+| max(Σ\|w\|) | 3.00 | 3.00 |
+
+**C 阶段核心发现**：
+- **逐腿强平真的触发了**（6 次，主要是 BNB）—— sim 失真被强平阻止
+- 但 **BTC 1 次都没强平**（Hedge 长期 99% 压在 long_all，但 BTC 暴跌段被 long_all 救下）
+- 净终值 15 vs B' -18：**强平阻止了 BNB 持续亏损**（回升 33）
+- 但累计成本从 9,539 涨到 14,679（多 5,140）—— 强平后重建仓 + 多次补保的成本
+
+**C 阶段没解决的事**：
+- **B' 暴露的"BTC 跌 33% 净资产归零"**：sim 现在 bar 1,420 触发了**破产**（整体 net_eq<1%），但单标的 BTC 1 次都没强平（因为 BTC 实际只跌到 77000，距 -33% 很远）
+- **真正问题**：Hedge 长期 99% long_all，**根本不会分散**到做空，杠杆放大了 99% 多头
+- **D 阶段（参数重标定）** 才是解决这个问题的关键：让 funding 信号可见、让短动量专家真正学到做空
+
+### 12.10 D 阶段（**规划**）：参数重标定
+
+D 阶段要做的事（最后一块）：
+1. **η 重选**：A' 已证明 0.05 太大（Hedge 在 1h 时间尺度追逐价格信号，funding 被滤掉）
+2. **band 重选**：A' 之后 14 专家里 99% 权重给 long_all，band 太小导致换手不够
+3. **可能改 expert 集合**：让 `short_mom_1` / `short_mom_4` 这种短动量专家在 funding 为正时激活
+4. **新评估协议跑一次**：alpha / DSR / bootstrap CI 看是否真有边际
+
+**预计工作量**：1-2 个 commit（参数搜索是 m5_online.py 已有的能力），+ 1 个评估协议跑分。
 
 ### 12.9 进入 C 之前必须解决的 B 阶段遗留问题
 

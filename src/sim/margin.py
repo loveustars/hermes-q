@@ -108,13 +108,17 @@ class MarginBook:
         真实交易所用"锁定"语义（cash_pool 扣 = margin 锁仓），但 SimExchange 现有
         逻辑是 spot 模式全额扣 —— C2 阶段保持现状，等 C3 强平时再决定统一语义。
 
+        C3 阶段：被强平的 symbol 解除 liquidated 标记，允许重新开仓。
+        这模拟"爆仓后账户归零，agent 重新建仓"的真实场景。
+
         cash_pool 是 [cash_value] 形式的可变引用（仅供未来扩展）。
         返回记账金额（> 0 = 记了，0 = 没变）。
         """
-        if symbol in self.liquidated:
-            raise ValueError(f"{symbol} 已强平，不能再开仓")
         if abs(units) < 1e-9:
             return 0.0
+        # 强平过的 symbol 现在可以重新开仓（清零 + 重新记账）
+        if symbol in self.liquidated:
+            self.liquidated.discard(symbol)
         required = self.initial_required(units, price)
         self.legs[symbol].margin_cash = required
         self.legs[symbol].initial_margin = required

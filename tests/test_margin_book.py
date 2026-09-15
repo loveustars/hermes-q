@@ -159,15 +159,18 @@ def test_liquidate_margin_cash_below_penalty_returns_zero():
     assert rel2 == 0.0
 
 
-def test_liquidate_marks_symbol_and_blocks_reopen():
+def test_liquidate_marks_symbol_but_allows_reopen():
+    """C3 阶段：liquidate 后 symbol 仍可重新开仓（discard liquidated 标记）。"""
     book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5),
                       ["BTC"])
     cash = [10_000.0]
     book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
     book.liquidate("BTC", units=100.0, high_price=80.0, cash_pool=cash)
     assert "BTC" in book.liquidated
-    with pytest.raises(ValueError, match="已强平"):
-        book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
+    # C3 强平后允许重新开仓（账户已归零，agent 重新建仓）
+    book.open_leg("BTC", units=50.0, price=80.0, cash_pool=cash)
+    assert "BTC" not in book.liquidated, "重新开仓应解除 liquidated 标记"
+    assert book.legs["BTC"].margin_cash == 0.5 * 50 * 80  # 2000
 
 
 def test_is_liquidatable_uses_high_price_threshold():
