@@ -27,7 +27,7 @@ from src.data import store  # noqa: E402
 from src.eval import metrics, protocol  # noqa: E402
 from src.eval.benchmark import equal_weight_buyhold, strategy_returns  # noqa: E402
 from src.eval.holdout import HoldoutGuard  # noqa: E402
-from src.registry.runs import Run, trial_count  # noqa: E402
+from src.registry.runs import Run  # noqa: E402
 from src.sim.costs import CostModel  # noqa: E402
 from src.sim.exchange import SimConfig, SimExchange  # noqa: E402
 
@@ -118,7 +118,25 @@ def main() -> None:
     n_configs = len(ETA_GRID) * len(BAND_GRID)
     n_baselines = 5
     n_trials_this = n_configs + n_baselines
-    total_trials = trial_count() + n_trials_this
+
+    # ── 项目累计试验数：**显式取自配置**，绝不用 trial_count() ──────────────
+    # 原先写的是 `total_trials = trial_count() + n_trials_this`，而 trial_count() 是
+    # 「runs/ 下的目录个数」⇒ DSR 门槛不可复现：同一份代码、同一份数据，今天重跑与
+    # 当时跑会得到不同的结果，而且每加一个 Run 目录、乃至做一次归档都会改变它
+    # （实测 2026-09-15：trial_count()=55，真实登记数 44，虚增 20% → 门槛偏高 3.85%，
+    # 且随目录累积单调变严）。
+    # 现在改为显式声明、受版本控制的 configs/base.json: eval.cumulative_trials，
+    # 口径与构成写在同处的 cumulative_trials_note 里（append-only，新增搜索必须上调）。
+    eval_cfg = cfg["eval"]
+    if "cumulative_trials" not in eval_cfg:
+        raise SystemExit(
+            "configs/base.json 缺少 eval.cumulative_trials —— DSR 的累计试验数必须"
+            "显式声明，不允许从 runs/ 的目录数推断（那样不可复现）。")
+    cum_trials = int(eval_cfg["cumulative_trials"])
+    total_trials = cum_trials
+    print(f"试验数口径：本次 {n_trials_this}（{n_configs} 配置 + {n_baselines} 基线）；"
+          f"项目累计 {total_trials}（显式取自 configs/base.json: eval.cumulative_trials，"
+          f"不再取自 runs/ 目录数）")
 
     hypothesis = {
         "question": "在线学习体（每 bar 更新、含成本信号）能否在扣除成本后跑出"

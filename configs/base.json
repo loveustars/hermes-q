@@ -39,7 +39,27 @@
     "holdout_fraction": 0.25,
     "embargo_bars": 24,
     "bootstrap_samples": 2000,
-    "min_observations": 500
+    "min_observations": 500,
+
+    "cumulative_trials": 77,
+    "cumulative_trials_note": [
+      "DSR 多重试验校正用的『项目累计试验数』。**显式声明、受版本控制、append-only 手工维护**。",
+      "取代原先的 trial_count()（那是数 runs/ 目录个数，不可复现：同一份代码同一份数据，",
+      "今天重跑与当时跑会得到不同的门槛，且每加一个 Run 目录、乃至做一次归档都会改变它；",
+      "实测 2026-09-15 时 trial_count()=55 而真实登记数只有 44，虚增 20%，",
+      "使 DSR 门槛偏高 3.85%，且随目录累积单调变严）。",
+      "",
+      "口径：在评估数据上**做过参数搜索/选择**的配置数。仅作对照的评估（基线、只读分析）不计。",
+      "构成：m5_online 3η×3band=9 配置 + 5 基线 = 14；m10_carry_grid / m11_walkforward",
+      "同一网格 3×3×3 = 27（walk-forward 是同一批配置的再评估，不重复计）；",
+      "d_param_search 18（1x）+ 18（3x，杠杆是独立的选择维度）= 36。合计 77。",
+      "",
+      "已知为**下界**：以下大规模评估未计入（它们是『对固定规则集做归因/稳健性分析』，",
+      "不是为挑选配置而搜索）：pool_ceiling 18 规则×4 臂 = 72；vol_attribution ≤241。",
+      "若后续把这类分析也定义为搜索，必须上调此值并在 WORK_LOG 记录。",
+      "",
+      "**新增任何搜索网格时，必须同步上调此值并在 WORK_LOG §17.7 记录。**"
+    ]
   },
 
   "data": {

@@ -93,7 +93,24 @@ class Run:
 
 
 def trial_count() -> int:
-    """已登记的实验次数 —— DSR 的多重试验惩罚要用它。"""
+    """⚠️ **不要用它做 DSR 的多重试验校正。**
+
+    它数的是 `runs/` 下**目录的个数**（只排除 `_` 前缀），**不是**已登记的试验数：
+    空目录、被放弃的 scratch、未登记 run、乃至非试验目录（如 `runs/live/`）都被计入，
+    而同一个网格的归档/重跑会被重复计数。实测 2026-09-15：本函数返回 **55**，
+    而真正带 `meta.json` 的登记 run 只有 **44**（虚增 20%）。
+
+    因此它**不可复现**：同一份代码、同一份数据，今天重跑（55）与当时重跑会得到不同的
+    结果，而 DSR 门槛随目录累积**单调变严**（44 → 55 门槛 +3.85%；44 → 158 +20.8%）。
+    也就是说，删/归档目录这种家务操作会静默改变一个统计校正的值。
+
+    **正确做法（替换后的用法）**：把试验数**显式声明**，见
+    `configs/base.json` 的 `eval.cumulative_trials`（含口径与构成说明），
+    由调用方直接传入；`scripts/m11_walkforward.py` 用 `n_trials=len(GRID)`、
+    `scripts/m5_online.py` 用 `cfg["eval"]["cumulative_trials"]`。
+
+    保留此函数仅供**诊断/审计**（看看目录卫生状况），不参与任何判决。
+    """
     runs_dir = os.path.join(store.project_root(), "runs")
     if not os.path.isdir(runs_dir):
         return 0

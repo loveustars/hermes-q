@@ -1443,6 +1443,47 @@ trial_count() = 55        而真正有 meta.json 的登记试验 = 44     虚增
 
 项目里已有正确做法的先例：`pool_ceiling` 把自己的试验数写进了 `config.json`。
 
+**✅ 已修（2026-09-15，按用户选定的"正解"）**：
+
+1. **`configs/base.json` 新增 `eval.cumulative_trials = 77`** + 同处的
+   `cumulative_trials_note`（口径、构成、已知下界、维护规则全部写明）。
+   构成：m5 `3η×3band=9` + 5 基线 = 14；m10/m11 同一网格 `3×3×3` = 27
+   （walk-forward 是同一批配置的再评估，不重复计）；`d_param_search` 18(1x)+18(3x) = 36。
+   **已知为下界**：`pool_ceiling` 72 与 `vol_attribution` ≤241 未计入
+   （它们是"对固定规则集做归因/稳健性分析"，不是为挑选配置而搜索）；
+   若日后把它们也定义为搜索，必须上调此值。
+2. **`scripts/m5_online.py`**：删掉 `from src.registry.runs import ..., trial_count`，
+   改为读 `cfg["eval"]["cumulative_trials"]`；**缺该字段则直接 `SystemExit`**
+   （不允许退回目录数推断）。运行时打印试验数口径。
+3. **`src/registry/runs.py::trial_count()`** 的文档改为**警告**：说明它数的是目录个数
+   而非登记数、不可复现、会让门槛随目录累积变严，**不得用于 DSR**；保留仅供诊断。
+   并指向两处正确用法（`m11_walkforward` 的 `n_trials=len(GRID)`、本处配置）。
+
+**新增回归测试 `tests/test_trial_count_reproducibility.py`**（6 条，全套 **185 passed**）：
+
+| 测试 | 守什么 |
+|---|---|
+| 配置里存在且为正整数 | 字段不许丢 |
+| 必须带非空的构成说明（≥40 字且含分项数字） | 防止又变成一个无从审计的魔法常数 |
+| **AST 级**检查 m5 不得调用 `trial_count()` | 注释里的 `trial_count()` 不算（避免误伤说明文字） |
+| m5 必须显式读 `eval.cumulative_trials` | 口径不许回退 |
+| `expected_max_sharpe` 对同参数是纯函数、且随 n 单调不减 | 门槛自身的性质 |
+| 目录变动不得移动门槛 | **核心回归** |
+
+**"测试这个测试"**：临时把 `trial_count()` 调用加回 m5 ⇒ `test_m5_does_not_call_trial_count`
+**当场失败**（不是空测试）；还原后全绿。
+
+**可复现性实证**（改动前无法通过、改动后会通过）：
+
+```
+声明值 n = 77
+  变动前: trial_count()=56   门槛=1.089966
+  变动后: trial_count()=61   门槛=1.089966      ← 造 5 个目录
+  ⇒ 目录数变了 5，DSR 门槛变化 +0.000000
+```
+
+即**做家务不再改变一个统计校正的值**。附带证据：本函数在本次会话期间自己从 **55 漂到 56**。
+
 ### 17.8 两个 subagent 产物的复审（通知触发，2026-09-15 晚）
 
 一条后台通知（`proc_0c267c021a0a`）暴露了 **B 早先版本**的一次崩溃：
