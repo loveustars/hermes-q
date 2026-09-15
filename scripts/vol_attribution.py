@@ -759,6 +759,32 @@ def print_decomp(rows: list[dict], title: str) -> None:
 # ==========================================================================
 # 主流程
 # ==========================================================================
+CKPT_SCHEMA = 3
+CKPT_SCHEMA_KEY = "__schema__"
+# 记录里**必须**有这些字段；缺任一项则该条由旧版本写出，其结论不可用。
+# 为什么必须丢弃而不是沿用：`funding_paid` 缺失时 `rec.get("funding_paid", 0.0)`
+# 会把它变成 0.0，在表里与"这个策略真的没付过资金费"**无法区分** —— 那是静默错误。
+# （实测 2026-09-15：用旧 ckpt 恢复跑出的表里，`btc_bh` 的 `funding_pct_of_initial`
+# 显示 0.0，而同池真实值约 289%；`G_fund` 则退化成 nan。）
+CKPT_REQUIRED = ("funding_paid", "n_funding_events", "bankrupt_at")
+
+
+def drop_stale_ckpt_records(ckpt: dict) -> list[str]:
+    """丢弃 schema 不匹配的检查点记录，返回被丢弃的键（供调用方报告）。
+
+    纯函数（就地修改传入的 dict，无 I/O），便于单测。
+
+    为什么必须丢弃：缺 `funding_paid` 的记录经 `rec.get("funding_paid", 0.0)`
+    会变成 0.0，在表里与"这个策略真的没付过资金费"**无法区分**。
+    """
+    stale = [k for k, v in ckpt.items()
+             if k != CKPT_SCHEMA_KEY and isinstance(v, dict)
+             and any(f not in v for f in CKPT_REQUIRED)]
+    for k in stale:
+        del ckpt[k]
+    return stale
+
+
 def rows_from_ckpt(pool_name: str, ckpt: dict) -> list[dict]:
     """从断点记录重建某个池的归因表（不带收益序列，可 JSON 落盘）。"""
     pool = POOLS[pool_name]
@@ -1055,9 +1081,22 @@ def main() -> None:
                 ckpt[new_key] = rec
                 migrated += 1
             del ckpt[old_key]
-    print(f"断点：{args.ckpt}（已有 {len(ckpt)} 条，迁移 {migrated} 条）")
+
+    # ── schema 守卫：丢弃旧版本写出的记录，让它们重跑 ──────────────────────
+    # 不这样做的话，缺字段的记录会被防御式默认值变成 0.0，在表里与真实值无法区分
+    # （见 CKPT_REQUIRED 处的说明）。**丢弃并重跑**是唯一不会产出静默错值的做法。
+    ckpt_ver = ckpt.get(CKPT_SCHEMA_KEY)
+    stale = drop_stale_ckpt_records(ckpt)
+    n_recs = sum(1 for k in ckpt if k != CKPT_SCHEMA_KEY)
+    print(f"断点：{args.ckpt}（已有 {n_recs} 条，迁移 {migrated} 条，"
+          f"schema {ckpt_ver} → {CKPT_SCHEMA}）")
+    if stale:
+        print(f"⚠️ 丢弃 {len(stale)} 条旧版本记录（缺少 {CKPT_REQUIRED} 中至少一项）"
+              f"—— 它们**会被重跑**。沿用它们会把『资金费』静默写成 0.0，"
+              f"与『真的没收过资金费』无法区分。样例：{stale[:3]}")
 
     def save_ckpt() -> None:
+        ckpt[CKPT_SCHEMA_KEY] = CKPT_SCHEMA
         with open(args.ckpt, "w", encoding="utf-8") as f:
             json.dump(ckpt, f)
 
