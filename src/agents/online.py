@@ -260,8 +260,9 @@ def default_experts(symbols: list[str]) -> list[Expert]:
     for k in (24, 168):
         ex.append(ReversalExpert(k))
     ex.append(ShortExpert())                                # 纯空仓基线
-    for k in (24, 168):
-        ex.append(ShortMomentumExpert(k))                   # 动量型做空
+    # 短动量（1h/4h/12h）+ 中动量（720h=30 天）：覆盖更细的下行反弹和月级回调
+    for k in (1, 4, 12, 24, 168, 720):
+        ex.append(ShortMomentumExpert(k))
     for s in symbols[:2]:
         ex.append(SingleAssetExpert(s))
     return ex
