@@ -404,6 +404,76 @@ def test_simconfig_max_gross_does_not_exceed_3x():
 
 
 # ==========================================================================
+# 10. B' 阶段：专家"满仓值"与 max_exposure 解耦
+# ==========================================================================
+def test_expert_max_position_scales_with_gross_target():
+    """LongExpert 在 gross_target=3.0 时应返 [1.5, 1.5]（不再是 [0.5, 0.5]）。"""
+    from src.agents.online import LongExpert
+    frames = trending_frames(n=200, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    view = make_view_from_frames(frames, t=100)
+    e = LongExpert()
+    w1 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=1.0)
+    w3 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=3.0)
+    assert np.allclose(w1, [0.5, 0.5]), f"gross=1 应是 [0.5,0.5]，实际 {w1}"
+    assert np.allclose(w3, [1.5, 1.5]), f"gross=3 应是 [1.5,1.5]，实际 {w3}"
+
+
+def test_short_expert_max_position_scales_with_gross_target():
+    """ShortExpert 在 gross_target=3.0 时应返 [-1.5, -1.5]。"""
+    from src.agents.online import ShortExpert
+    frames = trending_frames(n=200, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    view = make_view_from_frames(frames, t=100)
+    e = ShortExpert()
+    w3 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=3.0)
+    assert np.allclose(w3, [-1.5, -1.5]), f"gross=3 应是 [-1.5,-1.5]，实际 {w3}"
+
+
+def test_single_asset_expert_uses_gross_target():
+    """SingleAssetExpert 在 gross_target=3.0 时应返 [3.0, 0.0]（不是 [1.0, 0.0]）。"""
+    from src.agents.online import SingleAssetExpert
+    frames = trending_frames(n=200, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    view = make_view_from_frames(frames, t=100)
+    e = SingleAssetExpert("BTCUSDT")
+    w3 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=3.0)
+    assert np.allclose(w3, [3.0, 0.0]), f"gross=3 应是 [3,0]，实际 {w3}"
+
+
+def test_inverse_vol_expert_uses_gross_target():
+    """InverseVolExpert 满仓值 = gross_target（不再写死 1.0）。"""
+    from src.agents.online import InverseVolExpert
+    frames = trending_frames(n=200, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    view = make_view_from_frames(frames, t=200)    # 200 根后能算 168 窗口 sigma
+    e = InverseVolExpert(window=168)
+    w1 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=1.0)
+    w3 = e.weights(view, ["BTCUSDT", "ETHUSDT"], gross_target=3.0)
+    assert abs(w1.sum() - 1.0) < 1e-6, f"gross=1 时 sum 应=1，实际 {w1.sum()}"
+    assert abs(w3.sum() - 3.0) < 1e-6, f"gross=3 时 sum 应=3，实际 {w3.sum()}"
+
+
+def test_hedge_with_3x_max_exposure_actually_uses_leverage():
+    """max_exposure=3.0 时，HedgeEnsemble 配 LongExpert 时，gross 真的能到 3.0。
+
+    这是 B' 阶段的核心断言：之前 max_exposure 改 3.0 但 Hedge 仍只到 1.0
+    （专家满仓值写死 1/n）。修完专家后，K=1 + LongExpert 应能输出 Σ|w|=3.0。
+    """
+    from src.agents.online import LongExpert
+    frames = trending_frames(n=200, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    view = make_view_from_frames(frames, t=150)
+
+    agent = HedgeEnsemble(
+        symbols=["BTCUSDT", "ETHUSDT"],
+        experts=[LongExpert()],          # K=1，全压 long
+        max_exposure=3.0,
+    )
+    out = agent.decide(view)
+    weights = np.array(list(out.values()))
+    # 关键：gross 应是 3.0（不是 1.0）
+    assert abs(np.abs(weights).sum() - 3.0) < 1e-6, (
+        f"max_exposure=3.0 + LongExpert 应得 gross=3.0，实际 {np.abs(weights).sum()}"
+    )
+
+
+# ==========================================================================
 # 7. max_gross=1.0 下的混合权重归一化（为 B 阶段 max_gross=3.0 做锁定）
 # ==========================================================================
 def test_mixed_normalization_under_unit_gross_constraint():
@@ -461,12 +531,12 @@ def test_gross_scale_down_preserves_direction():
     # max_exposure=1.0，但用两个 "DoubleLong" 风格的专家（手动 patch）让 target gross=2
     class DoubleLong(Expert):
         name = "double_long"
-        def weights(self, view, symbols):
+        def weights(self, view, symbols, gross_target=1.0):
             return np.array([1.0, 1.0])    # 单标的就是 max_exposure，但 gross=2
 
     class DoubleShort(Expert):
         name = "double_short"
-        def weights(self, view, symbols):
+        def weights(self, view, symbols, gross_target=1.0):
             return np.array([-1.0, -1.0])
 
     agent = HedgeEnsemble(

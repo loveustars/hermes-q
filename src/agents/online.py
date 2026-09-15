@@ -33,111 +33,125 @@ BARS_PER_YEAR = 24 * 365
 class Expert:
     name = "expert"
 
-    def weights(self, view: MarketView, symbols: list[str]) -> np.ndarray:
+    def weights(self, view: MarketView, symbols: list[str],
+                gross_target: float = 1.0) -> np.ndarray:
+        """返回每个 symbol 的目标权重。
+
+        gross_target 是 HedgeEnsemble 的 max_exposure（默认 1.0）：
+          - 满仓型专家（Long/Short/SingleAsset）应把"满仓"理解为 gross_target
+          - 0/1 决策型专家（Momentum/Reversal）应返 gross_target/n 或 0
+          - 比例型专家（InverseVol）应按比例缩到 gross_target
+
+        不接受 gross_target 的专家（继承旧接口）会用默认 1.0，行为不变。
+        """
         raise NotImplementedError
 
     @staticmethod
-    def _equal(symbols: list[str], on: bool) -> np.ndarray:
+    def _equal(symbols: list[str], on: bool, gross_target: float = 1.0) -> np.ndarray:
         n = len(symbols)
-        return np.full(n, 1.0 / n) if on else np.zeros(n)
+        return np.full(n, gross_target / n) if on else np.zeros(n)
 
 
 class FlatExpert(Expert):
     name = "flat"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         return np.zeros(len(symbols))
 
 
 class LongExpert(Expert):
+    """等权满仓。满仓值 = gross_target / n（n 标的时 n 标的各持 gross_target/n）。"""
+
     name = "long_all"
 
-    def weights(self, view, symbols):
-        return self._equal(symbols, True)
+    def weights(self, view, symbols, gross_target: float = 1.0):
+        return self._equal(symbols, True, gross_target)
 
 
 class MomentumExpert(Expert):
-    """过去 k 根累计收益为正则等权持有，否则空仓。"""
+    """过去 k 根累计收益为正则等权持有（满仓 = gross_target/n），否则空仓。"""
 
     def __init__(self, lookback: int):
         self.lookback = lookback
         self.name = f"mom_{lookback}"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         if view.available_history() <= self.lookback:
             return np.zeros(len(symbols))
         tot = 0.0
         for s in symbols:
             tot += float(view.returns(s, self.lookback).sum())
-        return self._equal(symbols, tot > 0.0)
+        return self._equal(symbols, tot > 0.0, gross_target)
 
 
 class ReversalExpert(Expert):
-    """过去 k 根累计收益为负则买入（反转）。"""
+    """过去 k 根累计收益为负则买入（反转），满仓 = gross_target/n。"""
 
     def __init__(self, lookback: int):
         self.lookback = lookback
         self.name = f"rev_{lookback}"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         if view.available_history() <= self.lookback:
             return np.zeros(len(symbols))
         tot = 0.0
         for s in symbols:
             tot += float(view.returns(s, self.lookback).sum())
-        return self._equal(symbols, tot < 0.0)
+        return self._equal(symbols, tot < 0.0, gross_target)
 
 
 class ShortExpert(Expert):
-    """等权做空 —— 纯空仓基线。"""
+    """等权做空 —— 纯空仓基线。满仓值 = -gross_target / n。"""
 
     name = "short_all"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         n = len(symbols)
-        return np.full(n, -1.0 / n)
+        return np.full(n, -gross_target / n)
 
 
 class ShortMomentumExpert(Expert):
-    """动量反转做空：过去 k 根累计收益为正则等权做空（追涨杀跌型空头）。"""
+    """动量反转做空：过去 k 根累计收益为正则等权做空（满仓值 = -gross_target/n）。"""
 
     def __init__(self, lookback: int):
         self.lookback = lookback
         self.name = f"short_mom_{lookback}"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         if view.available_history() <= self.lookback:
             return np.zeros(len(symbols))
         tot = 0.0
         for s in symbols:
             tot += float(view.returns(s, self.lookback).sum())
-        return self._equal(symbols, tot > 0.0) * -1.0
+        return self._equal(symbols, tot > 0.0, gross_target) * -1.0
 
 
 class InverseVolExpert(Expert):
-    """按逆波动率配权 —— 永远满仓，但倾斜到低波动标的。"""
+    """按逆波动率配权 —— 永远满仓（gross_target），但倾斜到低波动标的。"""
 
     name = "inv_vol"
 
     def __init__(self, window: int = 168):
         self.window = window
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         if view.available_history() <= self.window:
             return np.zeros(len(symbols))
         iv = np.array([1.0 / max(view.sigma(s, self.window), 1e-6) for s in symbols])
-        return iv / iv.sum()
+        return iv / iv.sum() * gross_target
 
 
 class SingleAssetExpert(Expert):
+    """100% 押一个标的。满仓值 = gross_target。"""
+
     def __init__(self, symbol: str):
         self.symbol = symbol
         self.name = f"only_{symbol}"
 
-    def weights(self, view, symbols):
+    def weights(self, view, symbols, gross_target: float = 1.0):
         w = np.zeros(len(symbols))
         if self.symbol in symbols:
-            w[symbols.index(self.symbol)] = 1.0
+            w[symbols.index(self.symbol)] = gross_target
         return w
 
 
@@ -238,7 +252,8 @@ class HedgeEnsemble:
         # 否则跳过的 bar 会让下一根把两段收益当成一段来学
         self.prev_close = close
 
-        targets = np.array([ex.weights(view, self.symbols) for ex in self.experts])
+        targets = np.array([ex.weights(view, self.symbols, self.max_exposure)
+                             for ex in self.experts])
         self.last_target = targets
         mixed = self.p @ targets
         # 对称裁剪：单标的 |w_s| ≤ max_exposure。
