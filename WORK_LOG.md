@@ -1314,3 +1314,33 @@ purged K-fold，也没有开封封存段。上面的结论是**描述性的**，
 才被抓到，而不是靠保证金钱。
 反向的一侧：资金费表只有 **7,684 条 / 8.7 年**（≈2.4 次/天，而应为 3 次/天），
 **约 20% 结算缺失** ⇒ 这一侧又是低估的反面。两者方向相反，**净偏差未量化**。
+
+### 17.6 审查中发现的第三个"看起来配好了、其实没接线"缺口：**`risk.allow_short` 是装饰性的**
+
+`configs/base.json:34` 写着 `"allow_short": true`，但：
+
+- `SimConfig` **没有 `from_config`**（实测 `grep` 无此方法），只能逐字段构造
+- **没有任何代码读 `cfg["risk"]["allow_short"]`**
+
+⇒ 那个配置项**没有任何效果**。真正生效的是脚本里显式传的 `SimConfig(allow_short=...)`。
+
+实测各脚本：
+
+| 显式传了 `allow_short=True`（能做空） | 没传 ⇒ `_sanitize` 把空头截成 0 |
+|---|---|
+| `c_margin_baseline` / `d_param_search` / `d_fair_comparison` / `m7_funding_latency` / `pool_ceiling` / `vol_attribution` | **`a_short_baseline`** / `b_leverage_baseline` / `m4_calibrate` / `m5_online` / `m11_walkforward` |
+
+**最严重的一条**：`scripts/a_short_baseline.py:73` 用
+`SimConfig(initial_cash=10_000.0, warmup=300)`（既无 `instrument` 也无 `allow_short`）
+⇒ `exchange.py:175-176` 的 `if not self.cfg.allow_short: w = max(w, 0.0)`
+把**全部空头截成 0**。**这个"验证 A 阶段放开做空"的基线，实际跑的是纯多头。**
+
+而 A 阶段的验收标准写的是"`min_w < -1e-9`（证明真在做空）" —— 那是**agent 输出的
+`mixed` 权重**，不是**引擎执行的仓位**。所以它验证的是"agent 能提出负权重"，
+**从未验证"引擎执行了负权重"**。这正是缺口所在。
+
+**同类缺口的第三次出现**（前两次：`funding=` 漏传 8/9 处；`initial_margin_ratio`
+硬编码）——共同形态是：**配置/接口允许某个能力，但实际调用链没有把它接通，
+而"看起来是通的"**（配置里有、签名上有默认值）。建议的修法方向：
+`SimConfig` 加 `from_config(cfg)` 并**从配置读 `risk.allow_short`**，
+或在构造处**断言配置与参数一致**（配置说 true 而参数是 False 就报错）。
