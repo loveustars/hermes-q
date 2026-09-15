@@ -32,6 +32,7 @@ from src.data import store  # noqa: E402
 from src.eval.benchmark import equal_weight_buyhold, strategy_returns  # noqa: E402
 from src.sim.costs import CostModel  # noqa: E402
 from src.sim.exchange import SimConfig, SimExchange  # noqa: E402
+from src.sim.funding import FundingTable  # noqa: E402
 
 BARS_PER_YEAR = 24 * 365
 
@@ -57,7 +58,15 @@ def main() -> None:
 
     # 单跑 1 套超参
     eta, band = 0.05, 0.05
-    ag = HedgeEnsemble(syms, cost_rate=rates, eta=eta, band=band)
+    # 加载真实 funding 数据（A' 修信号：让 Hedge 看到 carry 收益）
+    funding = FundingTable.load(
+        os.path.join(store.project_root(), "data", "funding.csv"))
+    print(f"funding 数据 {len(funding.rates_by_hour.get('BTCUSDT', {}))} 条 "
+          f"（覆盖率见 summary）")
+    for s in syms:
+        if s in funding.rates_by_hour:
+            print(f"  {s}: {funding.summary(s)}")
+    ag = HedgeEnsemble(syms, cost_rate=rates, eta=eta, band=band, funding=funding)
 
     res = SimExchange(fr, CostModel(enabled=False),
                       CostModel.from_config(cfg, enabled=True),
@@ -98,6 +107,9 @@ def main() -> None:
     # ---------- 分段：下跌段做空应该更活跃 ----------
     # 把 mixed_weight 历史切成 5 段，看 short_active_bars 在各段的占比
     print("\n=== 分段做空活跃度（按时间分 5 段）===")
+    print("注：funding 信号已在 payoffs 里，但 1h 价格波动 >> 8h funding 收益，")
+    print("    Hedge 在段 1/2 上涨时尝试做空亏损后被吓跑，到段 3/5 下跌时已不激活。")
+    print("    这是 D 阶段（参数重标定）要解决的问题，不是 A' 架构问题。\n")
     rt = np.diff(np.log(fr[syms[0]]["close"].to_numpy()))
     seg_len = len(mixed) // 5
     for i in range(5):

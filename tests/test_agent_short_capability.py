@@ -215,6 +215,87 @@ def test_sanitize_blocks_negative_weights_when_short_disallowed():
 
 
 # ==========================================================================
+# 8. funding carry 信号：正费率持续时 ShortExpert 应被激活
+# ==========================================================================
+def test_short_expert_activated_by_positive_funding_carry():
+    """给 HedgeEnsemble 喂一个 funding_table（每 8h +0.01%），
+    在横盘（零价格收益）场景下跑 sim，断言：
+      - ShortExpert 的终态 p > 2/K（Hedge 学到了 funding carry）
+      - min(mixed_weight) < -1e-6（Hedge 真的在做空）
+
+    这是 A' "修信号" 的核心断言：funding 持续为正时，ShortExpert 应该是
+    长期赚钱的专家（收 funding carry），Hedge 应该学会做空。
+
+    退化提示：如果这条断言失败，要么 funding 没接进 _update_experts 的 payoffs，
+    要么符号搞反了（空头收到 funding 应是 +payoff，不是 -）。
+    """
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    # 横盘：把 close 全设成常数 100（去掉价格 PnL，只看 funding 信号）
+    for s in frames:
+        f = frames[s]
+        f["open"] = f["high"] = f["low"] = f["close"] = 100.0
+        f["quote_volume"] = 100_000.0
+
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+    from src.sim.funding import FundingTable
+
+    # 构造 funding_table：每 8h（即每 8 根 1h bar）结算一次 +0.01%
+    ft = FundingTable()
+    idx = frames["BTCUSDT"].index
+    for t in range(0, n, 8):
+        ts_ms = int(idx[t].timestamp() * 1000)
+        ft.add("BTCUSDT", ts_ms, 0.0001)   # +1bp / 8h
+        ft.add("ETHUSDT", ts_ms, 0.0001)
+
+    agent = HedgeEnsemble(symbols=["BTCUSDT", "ETHUSDT"], funding=ft)
+    res = SimExchange(
+        frames,
+        CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50,
+                  instrument="perp", allow_short=True),
+    ).run(agent)
+
+    names = agent.expert_names()
+    short_idx = names.index("short_all")
+    final_p = agent.expert_weight_history()[-1]
+    assert final_p[short_idx] > 2.0 / len(names), (
+        f"有 funding 持续为正时 ShortExpert 终态 p={final_p[short_idx]:.4f}，"
+        f"应 > 2/K={2.0/len(names):.4f}（Hedge 没学到 carry 收益做空）"
+    )
+
+    mixed_log = agent.log["mixed_weight"]
+    mixed_arr = np.stack(mixed_log, axis=0) if len(mixed_log) > 1 else mixed_log[0][None, :]
+    assert float(mixed_arr.min()) < -1e-6, (
+        f"有 funding 持续为正时 mixed_weight min={mixed_arr.min()}，"
+        "应 < 0（Hedge 没在做空）"
+    )
+
+
+def test_funding_none_keeps_pure_price_signal():
+    """funding=None 时，payoffs 路径不应包含 funding 项（向后兼容）。"""
+    n = 100
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+
+    # funding=None
+    agent = HedgeEnsemble(symbols=["BTCUSDT", "ETHUSDT"], funding=None)
+    SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50, instrument="perp",
+                  allow_short=True),
+    ).run(agent)
+
+    # 不变量：log 正常填充、没崩
+    assert len(agent.log["step"]) > 0
+    history = agent.expert_weight_history()
+    assert history.shape[0] > 0
+    assert (history.sum(axis=1) > 0).all(), "p 必须归一化"
+
+
+# ==========================================================================
 # 7. max_gross=1.0 下的混合权重归一化（为 B 阶段 max_gross=3.0 做锁定）
 # ==========================================================================
 def test_mixed_normalization_under_unit_gross_constraint():
