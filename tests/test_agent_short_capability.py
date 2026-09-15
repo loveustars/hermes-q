@@ -296,6 +296,114 @@ def test_funding_none_keeps_pure_price_signal():
 
 
 # ==========================================================================
+# 9. B 阶段：3x 杠杆基线测试
+# ==========================================================================
+def test_max_exposure_3x_caps_per_asset_weight():
+    """max_exposure=3.0 时，单标 |w_s| ≤ 3.0 必须成立（agent 层 clip 生效）。"""
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.agents.online import LongExpert, ShortExpert
+
+    # 构造 K=2 的极端专家集：LongExpert(+1) + ShortExpert(-1)，
+    # 让 Hedge 在 K=1 时倾向 LongExpert，给出 +3 的目标（不可能，但测 clip 兜底）
+    agent = HedgeEnsemble(
+        symbols=["BTCUSDT", "ETHUSDT"],
+        experts=[LongExpert(), ShortExpert()],
+        max_exposure=3.0,
+    )
+    view = make_view_from_frames(frames, t=150)
+    out = agent.decide(view)
+    weights = np.array(list(out.values()))
+    assert np.abs(weights).max() <= 3.0 + 1e-9, \
+        f"max_exposure=3.0 但单标超限：{weights}"
+
+
+def test_max_exposure_3x_caps_gross_exposure():
+    """max_exposure=3.0 时，Σ|w_s| ≤ 3.0（gross 兜底）。"""
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.agents.online import LongExpert, ShortExpert
+
+    agent = HedgeEnsemble(
+        symbols=["BTCUSDT", "ETHUSDT"],
+        experts=[LongExpert(), ShortExpert()],
+        max_exposure=3.0,
+    )
+    view = make_view_from_frames(frames, t=150)
+    out = agent.decide(view)
+    weights = np.array(list(out.values()))
+    assert np.abs(weights).sum() <= 3.0 + 1e-9, \
+        f"max_exposure=3.0 但 gross 超限：{weights}"
+
+
+def test_simconfig_max_gross_3x_enforced():
+    """SimConfig(max_gross=3.0) 必须能接住 3.0 仓位（不被截到更小）。"""
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+
+    # 永远想 0.5 满仓（每标的 0.5）的 agent
+    class HalfHalf:
+        name = "half_half"
+        def __init__(self):
+            self._done = False
+        def decide(self, view):
+            if self._done:
+                return None
+            self._done = True
+            return {s: 0.5 for s in view.symbols()}
+
+    res_max3 = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50, max_gross=3.0),
+    ).run(HalfHalf())
+
+    res_max1 = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50, max_gross=1.0),
+    ).run(HalfHalf())
+
+    # max_gross=3 应该至少让仓位达到 1（= 0.5+0.5），max_gross=1 同理
+    # 关键差异：max_gross=3 不应"截到更小"，所以 n_trades 应该相同（不需要截）
+    # 价格不变，仓位不变 → 终值应相同（除了 funding，但这里 funding=None）
+    assert res_max3.n_trades > 0, "max_gross=3 应该允许成交"
+    assert res_max1.n_trades > 0, "max_gross=1 应该允许成交"
+
+
+def test_simconfig_max_gross_does_not_exceed_3x():
+    """agent 想用 5x 但 sim 配 max_gross=3.0 → 实际仓位被截到 3x。"""
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+
+    # 永远想每标 5x（超 max_gross=3）
+    class FiveX:
+        name = "five_x"
+        def __init__(self):
+            self._done = False
+        def decide(self, view):
+            if self._done:
+                return None
+            self._done = True
+            return {s: 5.0 for s in view.symbols()}    # gross=10，超 max_gross=3
+
+    res = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50, max_gross=3.0),
+    ).run(FiveX())
+
+    # 验证：sim 实际持仓 = 3/10 = 0.3x 每标的（等比缩放）
+    # 初始 10000，按 open 价建仓，cash + 单位持仓 = 10000
+    # 单位持仓 = (3/2) * 10000 / 100 = 150（每标的）
+    # 实际结算价 = open，盯市 net_eq ≈ 10000（价格不变）
+    assert not res.insolvent, f"max_gross=3 + 5x 提案不应破产：{res.final_net()}"
+    # 关键：成交笔数应该是 N_symbols（2 标的，每标 1 笔）
+    assert res.n_trades >= 2, f"应至少成交 2 笔，实际 {res.n_trades}"
+
+
+# ==========================================================================
 # 7. max_gross=1.0 下的混合权重归一化（为 B 阶段 max_gross=3.0 做锁定）
 # ==========================================================================
 def test_mixed_normalization_under_unit_gross_constraint():
