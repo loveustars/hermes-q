@@ -88,6 +88,32 @@ class ReversalExpert(Expert):
         return self._equal(symbols, tot < 0.0)
 
 
+class ShortExpert(Expert):
+    """等权做空 —— 纯空仓基线。"""
+
+    name = "short_all"
+
+    def weights(self, view, symbols):
+        n = len(symbols)
+        return np.full(n, -1.0 / n)
+
+
+class ShortMomentumExpert(Expert):
+    """动量反转做空：过去 k 根累计收益为正则等权做空（追涨杀跌型空头）。"""
+
+    def __init__(self, lookback: int):
+        self.lookback = lookback
+        self.name = f"short_mom_{lookback}"
+
+    def weights(self, view, symbols):
+        if view.available_history() <= self.lookback:
+            return np.zeros(len(symbols))
+        tot = 0.0
+        for s in symbols:
+            tot += float(view.returns(s, self.lookback).sum())
+        return self._equal(symbols, tot > 0.0) * -1.0
+
+
 class InverseVolExpert(Expert):
     """按逆波动率配权 —— 永远满仓，但倾斜到低波动标的。"""
 
@@ -231,6 +257,9 @@ def default_experts(symbols: list[str]) -> list[Expert]:
         ex.append(MomentumExpert(k))
     for k in (24, 168):
         ex.append(ReversalExpert(k))
+    ex.append(ShortExpert())                                # 纯空仓基线
+    for k in (24, 168):
+        ex.append(ShortMomentumExpert(k))                   # 动量型做空
     for s in symbols[:2]:
         ex.append(SingleAssetExpert(s))
     return ex
