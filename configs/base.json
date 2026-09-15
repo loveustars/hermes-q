@@ -30,7 +30,8 @@
   "risk": {
     "max_turnover_roundtrips_per_year": 100,
     "max_gross_exposure": 1.0,
-    "max_drawdown_kill": 0.5
+    "max_drawdown_kill": 0.5,
+    "allow_short": true
   },
 
   "eval": {

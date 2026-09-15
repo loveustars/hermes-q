@@ -216,12 +216,14 @@ class HedgeEnsemble:
         targets = np.array([ex.weights(view, self.symbols) for ex in self.experts])
         self.last_target = targets
         mixed = self.p @ targets
-        mixed = np.clip(mixed, 0.0, None)
-        s = mixed.sum()
-        if s > self.max_exposure:
-            mixed = mixed / s * self.max_exposure
-        elif s == 0.0:
-            mixed = np.zeros_like(mixed)
+        # 对称裁剪：单标的 |w_s| ≤ max_exposure。
+        # 此前 clip(0, None) 把所有负权重清零，使训练目标只能在 {0, 多} 之间选；
+        # 放开后允许做空，但 B 阶段把 max_exposure 提到 3.0 时也只需改这一处。
+        mixed = np.clip(mixed, -self.max_exposure, self.max_exposure)
+        # gross exposure 兜底：Σ|w_s| > max_exposure 时等比缩放
+        gross = float(np.abs(mixed).sum())
+        if gross > self.max_exposure and gross > 0:
+            mixed = mixed * (self.max_exposure / gross)
 
         # 带宽：混合权重每根 bar 都在微调，没有带宽会退化成逐 bar 再平衡
         if self.last_emitted is not None and \
