@@ -113,16 +113,19 @@ def main() -> None:
         print("\n② 引擎是否结算资金费（3 标的，k=1.0）")
         ew = {s: 1.0 / len(SYMS) for s in SYMS}
         cases = [
-            ("被动等权", FixedW(ew)),
-            ("只持 BTC", FixedW({"BTCUSDT": 1.0, "ETHUSDT": 0.0, "BNBUSDT": 0.0})),
-            ("学习体 η=.2 b=.2", HedgeEnsemble(
+            ("被动等权", lambda: FixedW(ew)),
+            ("只持 BTC", lambda: FixedW({"BTCUSDT": 1.0, "ETHUSDT": 0.0, "BNBUSDT": 0.0})),
+            ("学习体 η=.2 b=.2", lambda: HedgeEnsemble(
                 SYMS, cost_rate=np.array([COST_BY_SYM[s] for s in SYMS]),
                 eta=0.20, band=0.20, max_exposure=1.0, funding=FUNDING)),
         ]
         rows = []
-        for name, ag in cases:
-            off = go(fr_3, ag, funding_arg=None)
-            on = go(fr_3, ag, funding_arg=FUNDING)
+        for name, mk_agent in cases:
+            # **必须每跑新建 agent**：HedgeEnsemble 是有状态的（专家权重跨运行残留），
+            # 复用实例会让第二次运行从第一次的权重出发 ⇒ 路径不同、数字被污染。
+            # （本脚本初版就是这么错的：同一实例连跑 funding OFF/ON，见 WORK_LOG §17.5。）
+            off = go(fr_3, mk_agent(), funding_arg=None)
+            on = go(fr_3, mk_agent(), funding_arg=FUNDING)
             fc = float(np.sum(on.funding_paid)) if len(on.funding_paid) else 0.0
             rows.append({"策略": name, "终值_funding_OFF": round(float(off.net_equity[-1]), 2),
                          "终值_funding_ON": round(float(on.net_equity[-1]), 2),
