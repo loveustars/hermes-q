@@ -1,0 +1,62 @@
+{
+  "portfolio": {
+    "等权三币 每bar再平衡（★公平对照）": {
+      "tag": "ew_all_rebalanced",
+      "final": 501687.0524466566,
+      "cost": 33065.393975313236,
+      "sharpe": 0.9694,
+      "max_dd": -0.8544,
+      "n_trades": 227102,
+      "bankrupt": false
+    },
+    "BTC+ETH 各半 再平衡": {
+      "tag": "ew_btc_eth",
+      "final": 99024.90404344497,
+      "cost": 5494.054119237067,
+      "sharpe": 0.7242,
+      "max_dd": -0.8882,
+      "n_trades": 145203,
+      "bankrupt": false
+    },
+    "纯 BTC 满仓": {
+      "tag": "btc_only",
+      "final": 100756.7565871071,
+      "cost": 53.91788888720335,
+      "sharpe": 0.7269,
+      "max_dd": -0.8391,
+      "n_trades": 2,
+      "bankrupt": false
+    },
+    "★ 学习体 η=0.20 band=0.20": {
+      "tag": "hedge_best_d",
+      "final": 233380.3318513511,
+      "cost": 89029.92630284125,
+      "sharpe": 0.8624,
+      "max_dd": -0.7876,
+      "n_trades": 5327,
+      "bankrupt": false
+    }
+  },
+  "strategy_exposure": {
+    "BTCUSDT": {
+      "mean_w": 0.2673,
+      "mean_abs_w": 0.4487,
+      "long_pct": 0.6895,
+      "short_pct": 0.2918
+    },
+    "ETHUSDT": {
+      "mean_w": 0.1194,
+      "mean_abs_w": 0.3036,
+      "long_pct": 0.6488,
+      "short_pct": 0.3381
+    },
+    "BNBUSDT": {
+      "mean_w": 0.0433,
+      "mean_abs_w": 0.2292,
+      "long_pct": 0.6104,
+      "short_pct": 0.3558
+    }
+  },
+  "buyhold_incomparable": 1584312.77,
+  "verdict": "学习体输给等权再平衡组合；差异主因是 BNB 敞口（学习体 mean_w_BNB=0.043 vs 等权 0.333）"
+}

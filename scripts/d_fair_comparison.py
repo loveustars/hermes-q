@@ -85,16 +85,24 @@ def main() -> None:
     funding = FundingTable.load(
         os.path.join(store.project_root(), "data", "funding.csv"))
     rates = np.array([0.0012, 0.0013, 0.0014])
-    margin_cfg = MarginConfig(initial_margin_ratio=0.5,
-                             maintenance_margin_ratio=0.1,
-                             topup_trigger_ratio=0.5)
+    # 保证金参数：由实际杠杆推出（本脚本 max_gross / max_exposure = 1.0 ⇒ k = 1.0）。
+    # 2026-09-15 修：此前硬编码 k=0.5（= 假设 2x）会给 1x 仓位加上与杠杆无关的
+    # −44.4% 强平线；band 又阻止重入，于是静态规则被"停损"后永不返场。
+    # 本脚本 2026-09-15 的那次 commit 产物是用 k=0.5 跑的，其数字受此影响
+    # （见 FRAMEWORK_AUDIT.md 问题二的影响量化表）。
+    EXPOSURE = 1.0
+    margin_cfg = MarginConfig.for_leverage(
+        EXPOSURE,
+        maintenance_margin_ratio=0.1,
+        topup_trigger_ratio=0.5,
+    )
     net_cost = CostModel.from_config(cfg, enabled=True)
     gross_cost = CostModel(enabled=False)
 
     def run(ag, tag: str) -> dict:
         res = SimExchange(fr, gross_cost, net_cost,
                           SimConfig(initial_cash=10_000.0, warmup=300,
-                                    max_gross=1.0, max_exposure_per_symbol=1.0,
+                                    max_gross=EXPOSURE, max_exposure_per_symbol=EXPOSURE,
                                     margin=margin_cfg, allow_short=True,
                                     instrument="perp")).run(ag)
         eq = res.net_equity
@@ -125,7 +133,11 @@ def main() -> None:
         "bars": n, "universe": list(syms),
         "window": f"{fr[syms[0]].index[0]:%Y-%m-%d}~{fr[syms[0]].index[-1]:%Y-%m-%d}",
         "engine": "SimExchange(instrument=perp, allow_short=True, max_gross=1.0)",
-        "margin": {"initial": 0.5, "maintenance": 0.1, "topup_trigger": 0.5},
+        "margin": {"initial": margin_cfg.initial_margin_ratio,
+                   "maintenance": margin_cfg.maintenance_margin_ratio,
+                   "topup_trigger": margin_cfg.topup_trigger_ratio,
+                   "derived_from": f"leverage={EXPOSURE}",
+                   "long_liquidation_ratio": margin_cfg.long_liquidation_ratio()},
     }, HYPOTHESIS) as run_ctx:
         rows = []
         for ag, lab in cands:

@@ -1,0 +1,42 @@
+{
+  "script": "scripts/pool_ceiling.py",
+  "bars": 77503,
+  "window": "2017-11-06~2026-09-14",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT"
+  ],
+  "engine": "SimExchange(instrument=perp, allow_short=True, max_gross=1.0, max_exposure_per_symbol=1.0, warmup=300, latency_bars=1)",
+  "band_semantics": "|Δw|₁ < 0.20 ⇒ None（与 HedgeEnsemble 相同；开环、强平后不重入）",
+  "cost": "net=CostModel.from_config(cfg, enabled=True)；gross=CostModel(enabled=False)",
+  "margin_arms": {
+    "off": null,
+    "on_k1overL": {
+      "initial_margin_ratio": 1.0,
+      "maintenance_margin_ratio": 0.1,
+      "long_liquidation_ratio": 0.0,
+      "description": "k=1.0000 m=0.1 ⇒ 多头 永不强平 / 空头 p/p0≥1.8182"
+    },
+    "legacy_k0.5": {
+      "initial_margin_ratio": 0.5,
+      "maintenance_margin_ratio": 0.1,
+      "long_liquidation_ratio": 0.5555555555555556,
+      "description": "k=0.5000 m=0.1 ⇒ 多头 p/p0≤0.5556（跌 44.4%） / 空头 p/p0≥1.3636"
+    }
+  },
+  "funding_arms": {
+    "fund_off": "SimExchange(funding=None) ⇒ use_funding=False ⇒ 现金流恒为 0",
+    "fund_on": "SimExchange(funding=FundingTable.load(data/funding.csv), 7684 个 8h 结算点/标的)"
+  },
+  "primary_arm": "on_k1overL|fund_on",
+  "control_arm": "off|fund_off",
+  "pool_size": 18,
+  "learner": {
+    "class": "HedgeEnsemble",
+    "eta": 0.2,
+    "band": 0.2,
+    "max_exposure": 1.0,
+    "agent_funding": "data/funding.csv"
+  }
+}

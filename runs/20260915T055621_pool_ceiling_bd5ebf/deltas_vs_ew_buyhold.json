@@ -1,0 +1,662 @@
+{
+  "off|fund_off": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1124506.34235423,
+      "ratio": 0.28858582832743823,
+      "delta_sharpe": -0.13751211100474492
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1426660.6893113807,
+      "ratio": 0.09742916129810113,
+      "delta_sharpe": -0.267334474004169
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1479412.1502852084,
+      "ratio": 0.06405617308120459,
+      "delta_sharpe": -0.36821820162613483
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1505664.9959824763,
+      "ratio": 0.04744742151412267,
+      "delta_sharpe": -0.393203826543843
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1553574.411526801,
+      "ratio": 0.017137732816923844,
+      "delta_sharpe": -0.6111895282647893
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1569076.5329725165,
+      "ratio": 0.007330381384487898,
+      "delta_sharpe": -0.8039975384858864
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1570663.3985241996,
+      "ratio": 0.006326457618577484,
+      "delta_sharpe": -1.0958060781525247
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1580346.4599598255,
+      "ratio": 0.00020050983952052336,
+      "delta_sharpe": -1.4993726803072007
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1580606.059220451,
+      "ratio": 3.6275467504409446e-05,
+      "delta_sharpe": -2.0307479339651886
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1580642.2152440234,
+      "ratio": 1.340151242577785e-05,
+      "delta_sharpe": -1.980493246969653
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1580660.4277093122,
+      "ratio": 1.879473447736175e-06,
+      "delta_sharpe": -3.6516974737727423
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1580660.4589786006,
+      "ratio": 1.8596910650064053e-06,
+      "delta_sharpe": -3.3519286148465657
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1580660.5783463286,
+      "ratio": 1.7841735777291173e-06,
+      "delta_sharpe": -2.5687597539834366
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1580661.338649056,
+      "ratio": 1.3031712796835998e-06,
+      "delta_sharpe": -3.189906015974654
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1580663.3985241996,
+      "ratio": 0.0,
+      "delta_sharpe": -5.9132399080301
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1580663.3985241996,
+      "ratio": 0.0,
+      "delta_sharpe": -5.9132399080301
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1580663.3985241996,
+      "ratio": 0.0,
+      "delta_sharpe": -1.708044570876666
+    }
+  ],
+  "off|fund_on": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1317561.6510497362,
+      "ratio": 0.16316442988574759,
+      "delta_sharpe": -0.21503687674536787
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1450590.6417503918,
+      "ratio": 0.07867245094418343,
+      "delta_sharpe": -0.3034253478536826
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1554729.8591941516,
+      "ratio": 0.01252951081582721,
+      "delta_sharpe": -0.6688707144321104
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1564457.0356514012,
+      "ratio": 0.0063513959247942856,
+      "delta_sharpe": -1.0851000742201355
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1565762.568630602,
+      "ratio": 0.00552220024041628,
+      "delta_sharpe": -0.8577229623185175
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1574159.9927462146,
+      "ratio": 0.00018866370974905165,
+      "delta_sharpe": -1.501236015037395
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1574419.2273779262,
+      "ratio": 2.4013531407255648e-05,
+      "delta_sharpe": -2.1149714252720284
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1574438.6739978553,
+      "ratio": 1.1662213150359028e-05,
+      "delta_sharpe": -1.9971421728625733
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1574454.038076709,
+      "ratio": 1.9038783684097443e-06,
+      "delta_sharpe": -3.3357259414375804
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1574454.0648365137,
+      "ratio": 1.8868821568735535e-06,
+      "delta_sharpe": -3.640991469840353
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1574454.0963401103,
+      "ratio": 1.86687297542339e-06,
+      "delta_sharpe": -2.539579669248183
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1574454.4940316775,
+      "ratio": 1.6142833155564522e-06,
+      "delta_sharpe": -3.1271169853553116
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -5.9025339040977105
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -5.9025339040977105
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -1.6973385669442769
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -1.1977124403277872
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -0.5874520307739517
+    }
+  ],
+  "on_k1overL|fund_off": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1252724.8522523982,
+      "ratio": 0.20746893144864637,
+      "delta_sharpe": -0.18537398070176214
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1426660.6893113807,
+      "ratio": 0.09742916129810113,
+      "delta_sharpe": -0.267334474004169
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1479412.1502852084,
+      "ratio": 0.06405617308120459,
+      "delta_sharpe": -0.36821820162613483
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1505664.9959824763,
+      "ratio": 0.04744742151412267,
+      "delta_sharpe": -0.393203826543843
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1553574.411526801,
+      "ratio": 0.017137732816923844,
+      "delta_sharpe": -0.6111895282647893
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1569076.5329725165,
+      "ratio": 0.007330381384487898,
+      "delta_sharpe": -0.8039975384858864
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1570663.3985241996,
+      "ratio": 0.006326457618577484,
+      "delta_sharpe": -1.0958060781525247
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1579590.3146658537,
+      "ratio": 0.0006788819551004152,
+      "delta_sharpe": -1.774106885446134
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1580346.4599598255,
+      "ratio": 0.00020050983952052336,
+      "delta_sharpe": -1.4993726803072007
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1580606.059220451,
+      "ratio": 3.6275467504409446e-05,
+      "delta_sharpe": -2.0307479339651886
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1580642.2152440234,
+      "ratio": 1.340151242577785e-05,
+      "delta_sharpe": -1.980493246969653
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1580660.4111463919,
+      "ratio": 1.8899519091209403e-06,
+      "delta_sharpe": -2.895347611042528
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1580660.4277093122,
+      "ratio": 1.879473447736175e-06,
+      "delta_sharpe": -3.6516974737727423
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1580660.4589786006,
+      "ratio": 1.8596910650064053e-06,
+      "delta_sharpe": -3.3519286148465657
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1580660.504038831,
+      "ratio": 1.8311839012478582e-06,
+      "delta_sharpe": -2.3765753336686823
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1580660.6377576822,
+      "ratio": 1.7465872367557037e-06,
+      "delta_sharpe": -3.2285022313713077
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1580661.6290638787,
+      "ratio": 1.119441572848662e-06,
+      "delta_sharpe": -2.115854818860467
+    }
+  ],
+  "on_k1overL|fund_on": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1390059.1965720223,
+      "ratio": 0.11711836836696392,
+      "delta_sharpe": -0.2641326685126755
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1450590.6417503918,
+      "ratio": 0.07867245094418343,
+      "delta_sharpe": -0.3034253478536826
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1554729.8591941516,
+      "ratio": 0.01252951081582721,
+      "delta_sharpe": -0.6688707144321104
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1564457.0356514012,
+      "ratio": 0.0063513959247942856,
+      "delta_sharpe": -1.0851000742201355
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1565762.568630602,
+      "ratio": 0.00552220024041628,
+      "delta_sharpe": -0.8577229623185175
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1573383.9517930553,
+      "ratio": 0.0006815580444859885,
+      "delta_sharpe": -1.763400881513745
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1574159.9927462146,
+      "ratio": 0.00018866370974905165,
+      "delta_sharpe": -1.501236015037395
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1574419.2273779262,
+      "ratio": 2.4013531407255648e-05,
+      "delta_sharpe": -2.1149714252720284
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1574438.6739978553,
+      "ratio": 1.1662213150359028e-05,
+      "delta_sharpe": -1.9971421728625733
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1574454.038076709,
+      "ratio": 1.9038783684097443e-06,
+      "delta_sharpe": -3.3357259414375804
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1574454.0553173954,
+      "ratio": 1.8929281258936113e-06,
+      "delta_sharpe": -2.8632862001656187
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1574454.0648365137,
+      "ratio": 1.8868821568735535e-06,
+      "delta_sharpe": -3.640991469840353
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1574454.0954218442,
+      "ratio": 1.867456202588708e-06,
+      "delta_sharpe": -2.346163396316917
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1574454.9362750836,
+      "ratio": 1.3333970188050178e-06,
+      "delta_sharpe": -2.0684382881668117
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1574455.0274529245,
+      "ratio": 1.275486362126535e-06,
+      "delta_sharpe": -3.267108555157768
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -1.1977124403277872
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1574457.0356514012,
+      "ratio": 0.0,
+      "delta_sharpe": -0.5874520307739517
+    }
+  ],
+  "legacy_k0.5|fund_off": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1150201.125568493,
+      "ratio": 0.24604008825585683,
+      "delta_sharpe": -0.1588752128125266
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1371544.083994954,
+      "ratio": 0.10094918746412025,
+      "delta_sharpe": -0.26412512096797935
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1498457.8062103742,
+      "ratio": 0.017756903372618572,
+      "delta_sharpe": -0.6079801752285997
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1513959.9276560897,
+      "ratio": 0.007595221335242968,
+      "delta_sharpe": -0.8007881854496968
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1515546.7932077728,
+      "ratio": 0.006555026725186819,
+      "delta_sharpe": -1.092596725116335
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1519681.3555650692,
+      "ratio": 0.0038448100502838614,
+      "delta_sharpe": -1.8546720089239184
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1520077.9597999419,
+      "ratio": 0.003584834914392589,
+      "delta_sharpe": -1.0829594366879283
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1520115.7917841696,
+      "ratio": 0.0035600359476246975,
+      "delta_sharpe": -1.0432226120975139
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1525393.5004806514,
+      "ratio": 0.00010048379230572466,
+      "delta_sharpe": -1.7288532407924535
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1525489.453904024,
+      "ratio": 3.758606684755073e-05,
+      "delta_sharpe": -2.027538580928999
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1525515.999138389,
+      "ratio": 2.0185594778730215e-05,
+      "delta_sharpe": -2.4906466310774165
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1525532.4397686042,
+      "ratio": 9.408717734741898e-06,
+      "delta_sharpe": -2.0898514625422475
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1525543.810474408,
+      "ratio": 1.9551896919277e-06,
+      "delta_sharpe": -2.858113628109213
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1525543.8774352667,
+      "ratio": 1.911296670162875e-06,
+      "delta_sharpe": -3.3755443818636985
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1525544.0600557155,
+      "ratio": 1.79158847801971e-06,
+      "delta_sharpe": -2.8920135717539663
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1525544.324895065,
+      "ratio": 1.6179855764723928e-06,
+      "delta_sharpe": -3.3049287764021633
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1525544.613025423,
+      "ratio": 1.429115356891251e-06,
+      "delta_sharpe": -3.6458437444784915
+    }
+  ],
+  "legacy_k0.5|fund_on": [
+    {
+      "candidate": "long_all",
+      "delta_net": 0.0,
+      "ratio": 1.0,
+      "delta_sharpe": 0.0
+    },
+    {
+      "candidate": "inv_vol",
+      "delta_net": -1341385.5419546836,
+      "ratio": 0.13601837561427263,
+      "delta_sharpe": -0.24245498281606148
+    },
+    {
+      "candidate": "mom_720",
+      "delta_net": -1428696.1885594456,
+      "ratio": 0.07978190077511049,
+      "delta_sharpe": -0.3038757156706986
+    },
+    {
+      "candidate": "mom_168",
+      "delta_net": -1532835.4060032053,
+      "ratio": 0.012706203717718379,
+      "delta_sharpe": -0.6693210822491265
+    },
+    {
+      "candidate": "flat",
+      "delta_net": -1542562.582460455,
+      "ratio": 0.006440964192343408,
+      "delta_sharpe": -1.0855504420371516
+    },
+    {
+      "candidate": "mom_72",
+      "delta_net": -1543868.1154396557,
+      "ratio": 0.005600075075247878,
+      "delta_sharpe": -0.8581733301355335
+    },
+    {
+      "candidate": "short_all",
+      "delta_net": -1546697.1448177514,
+      "ratio": 0.003777907382907676,
+      "delta_sharpe": -1.8476257258447348
+    },
+    {
+      "candidate": "only_BTCUSDT",
+      "delta_net": -1547093.749052624,
+      "ratio": 0.003522456015373004,
+      "delta_sharpe": -1.0759131536087447
+    },
+    {
+      "candidate": "only_ETHUSDT",
+      "delta_net": -1547131.5810368517,
+      "ratio": 0.0034980885697994623,
+      "delta_sharpe": -1.0361763290183303
+    },
+    {
+      "candidate": "rev_168",
+      "delta_net": -1552420.3081719163,
+      "ratio": 9.16383597968764e-05,
+      "delta_sharpe": -1.737508391135452
+    },
+    {
+      "candidate": "short_mom_720",
+      "delta_net": -1552520.2716166351,
+      "ratio": 2.725226299911854e-05,
+      "delta_sharpe": -2.401958612781719
+    },
+    {
+      "candidate": "mom_24",
+      "delta_net": -1552524.77418698,
+      "ratio": 2.4352173562673477e-05,
+      "delta_sharpe": -2.1154217930890447
+    },
+    {
+      "candidate": "rev_24",
+      "delta_net": -1552550.2131270159,
+      "ratio": 7.96704337636208e-06,
+      "delta_sharpe": -2.111951758924408
+    },
+    {
+      "candidate": "short_mom_168",
+      "delta_net": -1552559.6310465115,
+      "ratio": 1.9009951526557692e-06,
+      "delta_sharpe": -2.811850368970828
+    },
+    {
+      "candidate": "short_mom_12",
+      "delta_net": -1552559.635458261,
+      "ratio": 1.8981535604904344e-06,
+      "delta_sharpe": -3.2471317013138252
+    },
+    {
+      "candidate": "short_mom_4",
+      "delta_net": -1552559.675615445,
+      "ratio": 1.8722884620718122e-06,
+      "delta_sharpe": -3.3698335996308986
+    },
+    {
+      "candidate": "short_mom_24",
+      "delta_net": -1552559.7878439678,
+      "ratio": 1.800002472458588e-06,
+      "delta_sharpe": -2.8290376915029474
+    },
+    {
+      "candidate": "short_mom_1",
+      "delta_net": -1552560.2944228745,
+      "ratio": 1.473716812573127e-06,
+      "delta_sharpe": -3.564523452612896
+    }
+  ]
+}

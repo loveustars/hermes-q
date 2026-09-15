@@ -1,0 +1,668 @@
+{
+  "status": "complete",
+  "n_done": 135,
+  "n_planned": 141,
+  "n_rows": 178,
+  "n_headline_rows": 40,
+  "n_headline_wiped": 23,
+  "note_wiped_metric_policy": "net ≤ 1% × 初始本金（10,000）即视为归零：vol/sharpe 置 null 且不参与排名（归零路径末期收益恰为 −100%，会把年化波动抬到几百 %，是假信号）。",
+  "H1_no_significant_positive_alpha": false,
+  "n_sig_positive_alpha_HAC_t>=1.96": 2,
+  "sig_positive_alpha_examples": [
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "ew_bh",
+      "alpha_ann": 0.28689212745032433,
+      "t_hac": 2.139146522287902,
+      "beta": 1.1449130161224563,
+      "r2": 0.8573949577200242
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "exp:long_all",
+      "alpha_ann": 0.28689212745032433,
+      "t_hac": 2.139146522287902,
+      "beta": 1.1449130161224563,
+      "r2": 0.8573949577200242
+    }
+  ],
+  "n_beat_beta_matched_passive": 4,
+  "beat_beta_matched_examples": [
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "exp:mom_720",
+      "ratio": 2.693983356076493
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "hedge_eta0.20_b0.20",
+      "ratio": 1.7757303700221354
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "ew_bh",
+      "ratio": 2.307962352796701
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "exp:long_all",
+      "ratio": 2.307962352796701
+    }
+  ],
+  "n_4block_additive_ok": 24,
+  "decomp_residual_max_abs": 1.7763568394002505e-15,
+  "n_headline_with_nonzero_G_liq": 7,
+  "G_liq_examples": [
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "ew_rebal",
+      "G_liq": -0.03744797943389244,
+      "n_liquidated": 1
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "exp:inv_vol",
+      "G_liq": -0.030144344444789084,
+      "n_liquidated": 1
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "exp:short_mom_168",
+      "G_liq": -0.4084548414937419,
+      "n_liquidated": 2
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT",
+      "candidate": "hedge_eta0.20_b0.20",
+      "G_liq": -0.6426829299527164,
+      "n_liquidated": 37
+    },
+    {
+      "pool": "BTCUSDT",
+      "candidate": "hedge_eta0.20_b0.20",
+      "G_liq": 0.010338241129236536,
+      "n_liquidated": 64
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "ew_rebal",
+      "G_liq": -0.006024366513043944,
+      "n_liquidated": 2
+    },
+    {
+      "pool": "BTCUSDT+ETHUSDT+BNBUSDT",
+      "candidate": "hedge_eta0.20_b0.20",
+      "G_liq": -0.334971923098081,
+      "n_liquidated": 63
+    }
+  ],
+  "n_funding_block_larger_than_trade_block": 8,
+  "robustness_per_pool": [
+    {
+      "pool": "be",
+      "n_candidates": 25,
+      "n_experts": 18,
+      "bm1_final": 41247.85267637571,
+      "bm1_funding_pct": 311.44327784933625,
+      "best_candidate": "exp:mom_720",
+      "best_final": 159107.69351151196,
+      "x_vs_bm1": 3.8573570061900284,
+      "n_sig_pos_alpha": 0,
+      "n_beat_beta_matched": 2,
+      "n_experts_beating_ew_bh": 1,
+      "n_wiped": 16
+    },
+    {
+      "pool": "btc",
+      "n_candidates": 9,
+      "n_experts": 6,
+      "bm1_final": 44700.53883377347,
+      "bm1_funding_pct": 288.7151768299395,
+      "best_candidate": "ew_rebal",
+      "best_final": 44700.53883377347,
+      "x_vs_bm1": 1.0,
+      "n_sig_pos_alpha": 0,
+      "n_beat_beta_matched": 0,
+      "n_experts_beating_ew_bh": 0,
+      "n_wiped": 5
+    },
+    {
+      "pool": "full",
+      "n_candidates": 6,
+      "n_experts": 2,
+      "bm1_final": 280414.94051078625,
+      "bm1_funding_pct": 985.5099704573594,
+      "best_candidate": "ew_bh",
+      "best_final": 1574457.0356514012,
+      "x_vs_bm1": 5.61474018746458,
+      "n_sig_pos_alpha": 2,
+      "n_beat_beta_matched": 2,
+      "n_experts_beating_ew_bh": 0,
+      "n_wiped": 2
+    }
+  ],
+  "net_value_ratios_vs_bm1": {
+    "be": {
+      "btc_bh": 0.0,
+      "btc_rebal": 1.083705840022437,
+      "btceth_bh": 0.0,
+      "ew_bh": 0.0,
+      "ew_rebal": 1.0,
+      "exp:flat": 0.24243686279764567,
+      "exp:inv_vol": 0.8926546447503776,
+      "exp:long_all": 0.0,
+      "exp:mom_168": 0.5303050566811442,
+      "exp:mom_24": 0.0015817751071074114,
+      "exp:mom_72": 0.18683007093514048,
+      "exp:mom_720": 3.8573570061900284,
+      "exp:only_BTCUSDT": 0.0,
+      "exp:only_ETHUSDT": 0.0,
+      "exp:rev_168": 0.002018867902939705,
+      "exp:rev_24": 0.00013301434235045827,
+      "exp:short_all": 0.03119388875142637,
+      "exp:short_mom_1": 4.807698456248832e-05,
+      "exp:short_mom_12": 4.7632620600089365e-05,
+      "exp:short_mom_168": 2.6037213989428223e-05,
+      "exp:short_mom_24": 4.7402043866184744e-05,
+      "exp:short_mom_4": 4.7984333691787865e-05,
+      "exp:short_mom_720": 4.5287765545022416e-05,
+      "hedge_eta0.01_b0.20": 0.0,
+      "hedge_eta0.20_b0.20": 2.6284957563143734
+    },
+    "btc": {
+      "btc_bh": 0.0,
+      "ew_rebal": 1.0,
+      "exp:inv_vol": 0.0,
+      "exp:long_all": 0.0,
+      "exp:mom_720": 0.8131848229080085,
+      "exp:only_BTCUSDT": 0.0,
+      "exp:short_all": 0.03882384416421534,
+      "exp:short_mom_1": 2.2253073169512186e-05,
+      "hedge_eta0.20_b0.20": 0.061316416623158475
+    },
+    "full": {
+      "btc_bh": 0.0,
+      "ew_bh": 5.61474018746458,
+      "ew_rebal": 1.0,
+      "exp:long_all": 5.61474018746458,
+      "exp:only_BTCUSDT": 0.0,
+      "hedge_eta0.20_b0.20": 0.5064265534901179
+    }
+  },
+  "robustness_spearman": {
+    "bevsbtc": 0.7833333333333333,
+    "bevsfull": 0.02857142857142857,
+    "btcvsfull": 0.4
+  },
+  "variant_sensitivity": {
+    "be|btc_bh": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912,
+        "k05_head": 5468.833407830874,
+        "k05_nofund": 5468.833407830874,
+        "k1_noengfund": 101251.2482389912
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "be|btc_rebal": {
+      "values": {
+        "A_head": 44700.53883377347,
+        "B_fund": 44700.53883377347,
+        "C_nofund": 100756.7565871071,
+        "k05_nofund": 99367.28175871547,
+        "k1_noengfund": 100756.7565871071
+      },
+      "min": 44700.53883377347,
+      "max": 100756.7565871071,
+      "ratio": 2.2540389716953566
+    },
+    "be|btceth_bh": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 88160.93791408214,
+        "k1_noengfund": 88160.93791408214
+      },
+      "min": 0.0,
+      "max": 88160.93791408214,
+      "ratio": Infinity
+    },
+    "be|ew_bh": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 88160.93791408214,
+        "k05_head": 5486.02993944192,
+        "k05_nofund": 5486.02993944192,
+        "k1_noengfund": 88160.93791408214
+      },
+      "min": 0.0,
+      "max": 88160.93791408214,
+      "ratio": Infinity
+    },
+    "be|ew_rebal": {
+      "values": {
+        "A_head": 41247.85267637571,
+        "B_fund": 42821.787830890426,
+        "C_nofund": 102803.63851408516,
+        "k05_head": 40376.67338819891,
+        "k05_nofund": 96933.34231733318,
+        "k1_noengfund": 99024.90404344497
+      },
+      "min": 40376.67338819891,
+      "max": 102803.63851408516,
+      "ratio": 2.546114622313885
+    },
+    "be|exp:flat": {
+      "values": {
+        "A_head": 10000.0,
+        "B_fund": 10000.0,
+        "C_nofund": 10000.0,
+        "k1_noengfund": 10000.0
+      },
+      "min": 10000.0,
+      "max": 10000.0,
+      "ratio": 1.0
+    },
+    "be|exp:inv_vol": {
+      "values": {
+        "A_head": 36820.087277546074,
+        "B_fund": 37946.902905043906,
+        "C_nofund": 108151.09263971694,
+        "k05_nofund": 83459.31993480801,
+        "k1_noengfund": 104939.71734776287
+      },
+      "min": 36820.087277546074,
+      "max": 108151.09263971694,
+      "ratio": 2.937285070089188
+    },
+    "be|exp:long_all": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 88160.93791408214,
+        "k05_head": 5486.02993944192,
+        "k05_nofund": 5486.02993944192,
+        "k1_noengfund": 88160.93791408214,
+        "k1m005": 88160.93791408214
+      },
+      "min": 0.0,
+      "max": 88160.93791408214,
+      "ratio": Infinity
+    },
+    "be|exp:mom_168": {
+      "values": {
+        "A_head": 21873.944851520908,
+        "B_fund": 21873.944851520908,
+        "C_nofund": 37068.217115502164,
+        "k1_noengfund": 37068.217115502164
+      },
+      "min": 21873.944851520908,
+      "max": 37068.217115502164,
+      "ratio": 1.6946288091662987
+    },
+    "be|exp:mom_24": {
+      "values": {
+        "A_head": 65.24482658512491,
+        "B_fund": 65.24482658512491,
+        "C_nofund": 111.96753868150321,
+        "k1_noengfund": 111.96753868150321
+      },
+      "min": 65.24482658512491,
+      "max": 111.96753868150321,
+      "ratio": 1.7161136681912885
+    },
+    "be|exp:mom_72": {
+      "values": {
+        "A_head": 7706.339241449498,
+        "B_fund": 7706.339241449498,
+        "C_nofund": 12908.246063281425,
+        "k1_noengfund": 12908.246063281425
+      },
+      "min": 7706.339241449498,
+      "max": 12908.246063281425,
+      "ratio": 1.6750165881425032
+    },
+    "be|exp:mom_720": {
+      "values": {
+        "A_head": 159107.69351151196,
+        "B_fund": 159107.69351151196,
+        "C_nofund": 264874.0945012287,
+        "k1_noengfund": 264874.0945012287
+      },
+      "min": 159107.69351151196,
+      "max": 264874.0945012287,
+      "ratio": 1.6647472454376584
+    },
+    "be|exp:only_BTCUSDT": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912,
+        "k05_head": 5468.833407830874,
+        "k05_nofund": 5468.833407830874,
+        "k1_noengfund": 101251.2482389912
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "be|exp:only_ETHUSDT": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 74998.40254172336,
+        "k1_noengfund": 74998.40254172336
+      },
+      "min": 0.0,
+      "max": 74998.40254172336,
+      "ratio": Infinity
+    },
+    "be|exp:rev_168": {
+      "values": {
+        "A_head": 83.27396583352052,
+        "B_fund": 83.27396583352052,
+        "C_nofund": 101.45593476363119,
+        "k1_noengfund": 101.45593476363119
+      },
+      "min": 83.27396583352052,
+      "max": 101.45593476363119,
+      "ratio": 1.2183391741719094
+    },
+    "be|exp:rev_24": {
+      "values": {
+        "A_head": 5.486555997116705,
+        "B_fund": 5.486555997116705,
+        "C_nofund": 7.472996250418962,
+        "k1_noengfund": 7.472996250418962
+      },
+      "min": 5.486555997116705,
+      "max": 7.472996250418962,
+      "ratio": 1.362055951738426
+    },
+    "be|exp:short_all": {
+      "values": {
+        "A_head": 1286.6809276220883,
+        "B_fund": 0.0,
+        "C_nofund": 0.0,
+        "k05_nofund": 6037.604982562758,
+        "k1_noengfund": 1286.6809276220883,
+        "k1m005": 0.0,
+        "k1m005_head": 0.0
+      },
+      "min": 0.0,
+      "max": 6037.604982562758,
+      "ratio": Infinity
+    },
+    "be|exp:short_mom_1": {
+      "values": {
+        "A_head": 1.9830723763579077,
+        "B_fund": 1.9830723763579077,
+        "C_nofund": 1.9955976531217134,
+        "k05_nofund": 1.9955976531217134,
+        "k1_noengfund": 1.9955976531217134,
+        "k1m005": 1.9955976531217134,
+        "k1m005_head": 1.9830723763579077
+      },
+      "min": 1.9830723763579077,
+      "max": 1.9955976531217134,
+      "ratio": 1.0063160966352673
+    },
+    "be|exp:short_mom_12": {
+      "values": {
+        "A_head": 1.9647433171021849,
+        "B_fund": 1.9647433171021849,
+        "C_nofund": 1.9932409221581766,
+        "k1_noengfund": 1.9932409221581766
+      },
+      "min": 1.9647433171021849,
+      "max": 1.9932409221581766,
+      "ratio": 1.0145044926774573
+    },
+    "be|exp:short_mom_168": {
+      "values": {
+        "A_head": 1.073979166739204,
+        "B_fund": 1.6157923241713732,
+        "C_nofund": 1.9037299218601318,
+        "k1_noengfund": 1.7476620356785304,
+        "k1m005_head": 1.842285568857207
+      },
+      "min": 1.073979166739204,
+      "max": 1.9037299218601318,
+      "ratio": 1.772594833138339
+    },
+    "be|exp:short_mom_24": {
+      "values": {
+        "A_head": 1.9552325219514872,
+        "B_fund": 1.9552325219514872,
+        "C_nofund": 1.9997307471093542,
+        "k1_noengfund": 1.9997307471093542
+      },
+      "min": 1.9552325219514872,
+      "max": 1.9997307471093542,
+      "ratio": 1.0227585336568839
+    },
+    "be|exp:short_mom_4": {
+      "values": {
+        "A_head": 1.9792507268929174,
+        "B_fund": 1.9792507268929174,
+        "C_nofund": 1.8823673961685332,
+        "k1_noengfund": 1.8823673961685332
+      },
+      "min": 1.8823673961685332,
+      "max": 1.9792507268929174,
+      "ratio": 1.0514688742068024
+    },
+    "be|exp:short_mom_720": {
+      "values": {
+        "A_head": 1.8680230812433285,
+        "B_fund": 0.0,
+        "C_nofund": 0.0,
+        "k1_noengfund": 1.7492484533510357
+      },
+      "min": 0.0,
+      "max": 1.8680230812433285,
+      "ratio": Infinity
+    },
+    "be|hedge_eta0.01_b0.20": {
+      "values": {
+        "A_agentNoFund": 0.0,
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 56758.2424143667,
+        "k05_head": 0.0,
+        "k05_nofund": 56689.049953716036,
+        "k1_noengfund": 48791.85410775955
+      },
+      "min": 0.0,
+      "max": 56758.2424143667,
+      "ratio": Infinity
+    },
+    "be|hedge_eta0.20_b0.20": {
+      "values": {
+        "A_agentNoFund": 295982.340875876,
+        "A_head": 108419.80571693403,
+        "B_fund": 206168.48272885496,
+        "C_nofund": 348963.8965925785,
+        "k05_head": 192513.05910510765,
+        "k05_nofund": 332990.33604056796,
+        "k1_noengfund": 181714.75048818754,
+        "k1m005_head": 149054.1150780585
+      },
+      "min": 108419.80571693403,
+      "max": 348963.8965925785,
+      "ratio": 3.2186360627103947
+    },
+    "btc|btc_bh": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912,
+        "k05_head": 5468.833407830874
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "btc|ew_rebal": {
+      "values": {
+        "A_head": 44700.53883377347,
+        "B_fund": 44700.53883377347,
+        "C_nofund": 100756.7565871071,
+        "k05_head": 44084.20998937809
+      },
+      "min": 44084.20998937809,
+      "max": 100756.7565871071,
+      "ratio": 2.2855520516616727
+    },
+    "btc|exp:inv_vol": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "btc|exp:long_all": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912,
+        "k05_head": 5468.833407830874
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "btc|exp:mom_720": {
+      "values": {
+        "A_head": 36349.79975543464,
+        "B_fund": 36349.79975543464,
+        "C_nofund": 62922.838778922065
+      },
+      "min": 36349.79975543464,
+      "max": 62922.838778922065,
+      "ratio": 1.731036737541161
+    },
+    "btc|exp:only_BTCUSDT": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912,
+        "k05_head": 5468.833407830874
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "btc|exp:short_all": {
+      "values": {
+        "A_head": 1735.4467537388773,
+        "B_fund": 0.0,
+        "C_nofund": 0.0,
+        "k1m005_head": 0.0
+      },
+      "min": 0.0,
+      "max": 1735.4467537388773,
+      "ratio": Infinity
+    },
+    "btc|exp:short_mom_1": {
+      "values": {
+        "A_head": 0.994724361384582,
+        "B_fund": 0.994724361384582,
+        "C_nofund": 0.9858433405854397,
+        "k1m005_head": 0.994724361384582
+      },
+      "min": 0.9858433405854397,
+      "max": 0.994724361384582,
+      "ratio": 1.0090085517987761
+    },
+    "btc|hedge_eta0.20_b0.20": {
+      "values": {
+        "A_head": 2740.8768624113286,
+        "B_fund": 2712.686984455619,
+        "C_nofund": 3550.6572162855537
+      },
+      "min": 2712.686984455619,
+      "max": 3550.6572162855537,
+      "ratio": 1.30890782336175
+    },
+    "full|btc_bh": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "full|ew_bh": {
+      "values": {
+        "A_head": 1574457.0356514012,
+        "B_fund": 1574457.0356514012,
+        "C_nofund": 1580663.3985241996
+      },
+      "min": 1574457.0356514012,
+      "max": 1580663.3985241996,
+      "ratio": 1.0039419067858086
+    },
+    "full|ew_rebal": {
+      "values": {
+        "A_head": 280414.94051078625,
+        "B_fund": 282109.3616705727,
+        "C_nofund": 504717.13446000795
+      },
+      "min": 280414.94051078625,
+      "max": 504717.13446000795,
+      "ratio": 1.7998938770546493
+    },
+    "full|exp:long_all": {
+      "values": {
+        "A_head": 1574457.0356514012,
+        "B_fund": 1574457.0356514012,
+        "C_nofund": 1580663.3985241996
+      },
+      "min": 1574457.0356514012,
+      "max": 1580663.3985241996,
+      "ratio": 1.0039419067858086
+    },
+    "full|exp:only_BTCUSDT": {
+      "values": {
+        "A_head": 0.0,
+        "B_fund": 0.0,
+        "C_nofund": 101251.2482389912
+      },
+      "min": 0.0,
+      "max": 101251.2482389912,
+      "ratio": Infinity
+    },
+    "full|hedge_eta0.20_b0.20": {
+      "values": {
+        "A_head": 142009.57187001393,
+        "B_fund": 198515.34183121598,
+        "C_nofund": 325267.5317816858
+      },
+      "min": 142009.57187001393,
+      "max": 325267.5317816858,
+      "ratio": 2.2904620265978544
+    }
+  },
+  "variant_sensitivity_max_ratio": 3.2186360627103947,
+  "long_all_vs_ew_buyhold_abs_diff": {
+    "be": 0.0,
+    "full": 0.0
+  },
+  "H2_leader_flips_without_BNB": {
+    "be_best": "exp:mom_720",
+    "full_best": "ew_bh",
+    "flips": true
+  },
+  "verdict_location": "/home/nick/workspace/quant/runs/20260915T064200_vol_attribution_c9c280"
+}

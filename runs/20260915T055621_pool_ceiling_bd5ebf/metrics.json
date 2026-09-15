@@ -1,0 +1,860 @@
+{
+  "per_arm": {
+    "off|fund_off": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    },
+    "off|fund_on": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    },
+    "on_k1overL|fund_off": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1580663.3985241996,
+        "sharpe": 1.0958060781525247,
+        "max_dd": -0.8477831808762515,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    },
+    "on_k1overL|fund_on": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1574457.0356514012,
+        "sharpe": 1.0851000742201355,
+        "max_dd": -0.8477831808762515,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    },
+    "legacy_k0.5|fund_off": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1525546.7932077728,
+        "sharpe": 1.092596725116335,
+        "max_dd": -0.827366011818112
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1525546.7932077728,
+        "sharpe": 1.092596725116335,
+        "max_dd": -0.827366011818112
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1525546.7932077728,
+        "sharpe": 1.092596725116335,
+        "max_dd": -0.827366011818112,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    },
+    "legacy_k0.5|fund_on": {
+      "best_by_net": {
+        "candidate": "long_all",
+        "final_net": 1552562.582460455,
+        "sharpe": 1.0855504420371516,
+        "max_dd": -0.827366011818112
+      },
+      "best_by_sharpe": {
+        "candidate": "long_all",
+        "final_net": 1552562.582460455,
+        "sharpe": 1.0855504420371516,
+        "max_dd": -0.827366011818112
+      },
+      "benchmark_ew_buyhold": {
+        "final_net": 1552562.582460455,
+        "sharpe": 1.0855504420371516,
+        "max_dd": -0.827366011818112,
+        "cost": 248.86067640929235
+      },
+      "n_pool_rules_beating_ew_buyhold": 0,
+      "rules_beating_ew_buyhold": []
+    }
+  },
+  "on_else_off_identical": {
+    "fund_off": {
+      "flat": true,
+      "long_all": true,
+      "only_BTCUSDT": true,
+      "only_ETHUSDT": true,
+      "ew_buyhold_band": true
+    },
+    "fund_on": {
+      "flat": true,
+      "long_all": true,
+      "only_BTCUSDT": true,
+      "only_ETHUSDT": true,
+      "ew_buyhold_band": true
+    }
+  },
+  "learner": {
+    "off|fund_off": {
+      "final_net": 325267.5317816858,
+      "sharpe": 0.9121129328665178,
+      "funding_paid": 0.0,
+      "rank_by_net": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      },
+      "rank_by_sharpe": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      }
+    },
+    "off|fund_on": {
+      "final_net": 198515.34183121598,
+      "sharpe": 0.8318081144428042,
+      "funding_paid": 120680.54000674469,
+      "rank_by_net": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      },
+      "rank_by_sharpe": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      }
+    },
+    "on_k1overL|fund_off": {
+      "final_net": 233380.3318513511,
+      "sharpe": 0.8624270599428644,
+      "funding_paid": 0.0,
+      "rank_by_net": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      },
+      "rank_by_sharpe": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      }
+    },
+    "on_k1overL|fund_on": {
+      "final_net": 142009.57187001393,
+      "sharpe": 0.7803692769507333,
+      "funding_paid": 96754.27305121378,
+      "rank_by_net": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      },
+      "rank_by_sharpe": {
+        "rank": 4,
+        "of": 18,
+        "beats_pct": 88.23529411764706
+      }
+    },
+    "legacy_k0.5|fund_off": {
+      "final_net": 200594.56253620767,
+      "sharpe": 0.8382224925829012,
+      "funding_paid": 0.0,
+      "rank_by_net": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      },
+      "rank_by_sharpe": {
+        "rank": 3,
+        "of": 18,
+        "beats_pct": 94.11764705882352
+      }
+    },
+    "legacy_k0.5|fund_on": {
+      "final_net": 121065.50170960474,
+      "sharpe": 0.7547970436818958,
+      "funding_paid": 96964.57523286108,
+      "rank_by_net": {
+        "rank": 4,
+        "of": 18,
+        "beats_pct": 88.23529411764706
+      },
+      "rank_by_sharpe": {
+        "rank": 4,
+        "of": 18,
+        "beats_pct": 88.23529411764706
+      }
+    }
+  },
+  "funding_channel": {
+    "off": {
+      "flat": {
+        "net_no_settle": 10000.0,
+        "net_settle": 10000.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "long_all": {
+        "net_no_settle": 1580663.3985241996,
+        "net_settle": 1574457.0356514012,
+        "delta": -6206.3628727984615,
+        "funding_paid": 6206.362872798632,
+        "n_funding_events": 22350
+      },
+      "inv_vol": {
+        "net_no_settle": 456157.0561699697,
+        "net_settle": 256895.38460166505,
+        "delta": -199261.67156830468,
+        "funding_paid": 94640.79634618756,
+        "n_funding_events": 22350
+      },
+      "mom_24": {
+        "net_no_settle": 57.339303748574,
+        "net_settle": 37.80827347498955,
+        "delta": -19.53103027358445,
+        "funding_paid": 800.9504030562372,
+        "n_funding_events": 12055
+      },
+      "mom_72": {
+        "net_no_settle": 11586.865551683168,
+        "net_settle": 8694.467020799271,
+        "delta": -2892.3985308838965,
+        "funding_paid": 18270.94923227316,
+        "n_funding_events": 12182
+      },
+      "mom_168": {
+        "net_no_settle": 27088.986997398548,
+        "net_settle": 19727.17645724948,
+        "delta": -7361.810540149068,
+        "funding_paid": 26056.673457361045,
+        "n_funding_events": 12296
+      },
+      "mom_720": {
+        "net_no_settle": 154002.70921281894,
+        "net_settle": 123866.39390100932,
+        "delta": -30136.315311809623,
+        "funding_paid": 91689.73591645037,
+        "n_funding_events": 12673
+      },
+      "rev_24": {
+        "net_no_settle": 21.183280176294307,
+        "net_settle": 18.361653545849062,
+        "delta": -2.8216266304452446,
+        "funding_paid": 55.232537727105345,
+        "n_funding_events": 10295
+      },
+      "rev_168": {
+        "net_no_settle": 316.9385643740523,
+        "net_settle": 297.0429051864882,
+        "delta": -19.895659187564092,
+        "funding_paid": 103.44929967452696,
+        "n_funding_events": 10054
+      },
+      "short_all": {
+        "net_no_settle": 0.0,
+        "net_settle": 0.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_1": {
+        "net_no_settle": 2.970814887334657,
+        "net_settle": 2.970814887334657,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_4": {
+        "net_no_settle": 2.9395455990181127,
+        "net_settle": 2.997574692167232,
+        "delta": 0.058029093149119415,
+        "funding_paid": -0.4970168163118006,
+        "n_funding_events": 1138
+      },
+      "short_mom_12": {
+        "net_no_settle": 2.059875143803809,
+        "net_settle": 2.541619723712527,
+        "delta": 0.4817445799087179,
+        "funding_paid": -3.6418094034293205,
+        "n_funding_events": 2291
+      },
+      "short_mom_24": {
+        "net_no_settle": 2.8201778709303866,
+        "net_settle": 2.939311290822822,
+        "delta": 0.1191334198924352,
+        "funding_paid": -9.450883678479226,
+        "n_funding_events": 3544
+      },
+      "short_mom_168": {
+        "net_no_settle": 0.0,
+        "net_settle": 0.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_720": {
+        "net_no_settle": 0.0,
+        "net_settle": 0.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "only_BTCUSDT": {
+        "net_no_settle": 101251.2482389912,
+        "net_settle": 0.0,
+        "delta": -101251.2482389912,
+        "funding_paid": 24269.226697476035,
+        "n_funding_events": 3035
+      },
+      "only_ETHUSDT": {
+        "net_no_settle": 74998.40254172336,
+        "net_settle": 0.0,
+        "delta": -74998.40254172336,
+        "funding_paid": 29474.535525366977,
+        "n_funding_events": 2800
+      },
+      "ew_buyhold_band": {
+        "net_no_settle": 1580663.3985241996,
+        "net_settle": 1574457.0356514012,
+        "delta": -6206.3628727984615,
+        "funding_paid": 6206.362872798632,
+        "n_funding_events": 22350
+      },
+      "ew_rebalanced": {
+        "net_no_settle": 504717.13446000795,
+        "net_settle": 282109.3616705727,
+        "delta": -222607.77278943523,
+        "funding_paid": 99147.14697631275,
+        "n_funding_events": 22350
+      },
+      "hedge_eta0.20_band0.20": {
+        "net_no_settle": 325267.5317816858,
+        "net_settle": 198515.34183121598,
+        "delta": -126752.1899504698,
+        "funding_paid": 120680.54000674469,
+        "n_funding_events": 22350
+      }
+    },
+    "on_k1overL": {
+      "flat": {
+        "net_no_settle": 10000.0,
+        "net_settle": 10000.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "long_all": {
+        "net_no_settle": 1580663.3985241996,
+        "net_settle": 1574457.0356514012,
+        "delta": -6206.3628727984615,
+        "funding_paid": 6206.362872798632,
+        "n_funding_events": 22350
+      },
+      "inv_vol": {
+        "net_no_settle": 327938.5462718016,
+        "net_settle": 184397.83907937884,
+        "delta": -143540.70719242273,
+        "funding_paid": 67791.89652512346,
+        "n_funding_events": 22350
+      },
+      "mom_24": {
+        "net_no_settle": 57.339303748574,
+        "net_settle": 37.80827347498955,
+        "delta": -19.53103027358445,
+        "funding_paid": 800.9504030562372,
+        "n_funding_events": 12055
+      },
+      "mom_72": {
+        "net_no_settle": 11586.865551683168,
+        "net_settle": 8694.467020799271,
+        "delta": -2892.3985308838965,
+        "funding_paid": 18270.94923227316,
+        "n_funding_events": 12182
+      },
+      "mom_168": {
+        "net_no_settle": 27088.986997398548,
+        "net_settle": 19727.17645724948,
+        "delta": -7361.810540149068,
+        "funding_paid": 26056.673457361045,
+        "n_funding_events": 12296
+      },
+      "mom_720": {
+        "net_no_settle": 154002.70921281894,
+        "net_settle": 123866.39390100932,
+        "delta": -30136.315311809623,
+        "funding_paid": 91689.73591645037,
+        "n_funding_events": 12673
+      },
+      "rev_24": {
+        "net_no_settle": 21.183280176294307,
+        "net_settle": 18.361653545849062,
+        "delta": -2.8216266304452446,
+        "funding_paid": 55.232537727105345,
+        "n_funding_events": 10295
+      },
+      "rev_168": {
+        "net_no_settle": 316.9385643740523,
+        "net_settle": 297.0429051864882,
+        "delta": -19.895659187564092,
+        "funding_paid": 103.44929967452696,
+        "n_funding_events": 10054
+      },
+      "short_all": {
+        "net_no_settle": 1073.0838583457753,
+        "net_settle": 1073.0838583457753,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_1": {
+        "net_no_settle": 2.970814887334657,
+        "net_settle": 2.970814887334657,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_4": {
+        "net_no_settle": 2.9395455990181127,
+        "net_settle": 2.997574692167232,
+        "delta": 0.058029093149119415,
+        "funding_paid": -0.4970168163118006,
+        "n_funding_events": 1138
+      },
+      "short_mom_12": {
+        "net_no_settle": 2.7607665174692615,
+        "net_settle": 2.008198476727534,
+        "delta": -0.7525680407417275,
+        "funding_paid": -3.1913483389338237,
+        "n_funding_events": 2290
+      },
+      "short_mom_24": {
+        "net_no_settle": 2.9873778077184046,
+        "net_settle": 2.9803340057956174,
+        "delta": -0.007043801922787196,
+        "funding_paid": -10.394076848076185,
+        "n_funding_events": 3756
+      },
+      "short_mom_168": {
+        "net_no_settle": 2.8944853686692418,
+        "net_settle": 2.94022955693664,
+        "delta": 0.04574418826739812,
+        "funding_paid": -10.920916495858949,
+        "n_funding_events": 2884
+      },
+      "short_mom_720": {
+        "net_no_settle": 1.7694603209882416,
+        "net_settle": 2.0993763175741638,
+        "delta": 0.3299159965859222,
+        "funding_paid": -128.0997411600075,
+        "n_funding_events": 9759
+      },
+      "only_BTCUSDT": {
+        "net_no_settle": 101251.2482389912,
+        "net_settle": 0.0,
+        "delta": -101251.2482389912,
+        "funding_paid": 24269.226697476035,
+        "n_funding_events": 3035
+      },
+      "only_ETHUSDT": {
+        "net_no_settle": 74998.40254172336,
+        "net_settle": 0.0,
+        "delta": -74998.40254172336,
+        "funding_paid": 29474.535525366977,
+        "n_funding_events": 2800
+      },
+      "ew_buyhold_band": {
+        "net_no_settle": 1580663.3985241996,
+        "net_settle": 1574457.0356514012,
+        "delta": -6206.3628727984615,
+        "funding_paid": 6206.362872798632,
+        "n_funding_events": 22350
+      },
+      "ew_rebalanced": {
+        "net_no_settle": 501687.0524466566,
+        "net_settle": 280414.94051078625,
+        "delta": -221272.11193587037,
+        "funding_paid": 98550.99704573593,
+        "n_funding_events": 22350
+      },
+      "hedge_eta0.20_band0.20": {
+        "net_no_settle": 233380.3318513511,
+        "net_settle": 142009.57187001393,
+        "delta": -91370.75998133718,
+        "funding_paid": 96754.27305121378,
+        "n_funding_events": 20985
+      }
+    },
+    "legacy_k0.5": {
+      "flat": {
+        "net_no_settle": 10000.0,
+        "net_settle": 10000.0,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "long_all": {
+        "net_no_settle": 1525546.7932077728,
+        "net_settle": 1552562.582460455,
+        "delta": 27015.789252682123,
+        "funding_paid": -27015.789252682116,
+        "n_funding_events": 7222
+      },
+      "inv_vol": {
+        "net_no_settle": 375345.6676392798,
+        "net_settle": 211177.04050577126,
+        "delta": -164168.62713350853,
+        "funding_paid": 77696.99315038908,
+        "n_funding_events": 22350
+      },
+      "mom_24": {
+        "net_no_settle": 57.339303748574,
+        "net_settle": 37.80827347498955,
+        "delta": -19.53103027358445,
+        "funding_paid": 800.9504030562372,
+        "n_funding_events": 12055
+      },
+      "mom_72": {
+        "net_no_settle": 11586.865551683168,
+        "net_settle": 8694.467020799271,
+        "delta": -2892.3985308838965,
+        "funding_paid": 18270.94923227316,
+        "n_funding_events": 12182
+      },
+      "mom_168": {
+        "net_no_settle": 27088.986997398548,
+        "net_settle": 19727.17645724948,
+        "delta": -7361.810540149068,
+        "funding_paid": 26056.673457361045,
+        "n_funding_events": 12296
+      },
+      "mom_720": {
+        "net_no_settle": 154002.70921281894,
+        "net_settle": 123866.39390100932,
+        "delta": -30136.315311809623,
+        "funding_paid": 91689.73591645037,
+        "n_funding_events": 12673
+      },
+      "rev_24": {
+        "net_no_settle": 14.353439168432603,
+        "net_settle": 12.369333438979172,
+        "delta": -1.9841057294534306,
+        "funding_paid": 43.709568280168604,
+        "n_funding_events": 10284
+      },
+      "rev_168": {
+        "net_no_settle": 153.29272712135412,
+        "net_settle": 142.27428853867875,
+        "delta": -11.018438582675373,
+        "funding_paid": 72.79459687767418,
+        "n_funding_events": 9938
+      },
+      "short_all": {
+        "net_no_settle": 5865.43764270356,
+        "net_settle": 5865.43764270356,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "short_mom_1": {
+        "net_no_settle": 2.1801823498294297,
+        "net_settle": 2.288037580343924,
+        "delta": 0.10785523051449442,
+        "funding_paid": -0.026529166884421397,
+        "n_funding_events": 745
+      },
+      "short_mom_4": {
+        "net_no_settle": 2.915772506035668,
+        "net_settle": 2.906845009785126,
+        "delta": -0.0089274962505419,
+        "funding_paid": -0.3623845118247765,
+        "n_funding_events": 907
+      },
+      "short_mom_12": {
+        "net_no_settle": 2.4683127076438884,
+        "net_settle": 2.947002193781536,
+        "delta": 0.4786894861376476,
+        "funding_paid": -3.664598929165832,
+        "n_funding_events": 2284
+      },
+      "short_mom_24": {
+        "net_no_settle": 2.982733364633196,
+        "net_settle": 2.7946164870755092,
+        "delta": -0.1881168775576869,
+        "funding_paid": -15.037876426742937,
+        "n_funding_events": 5621
+      },
+      "short_mom_168": {
+        "net_no_settle": 2.733152057390963,
+        "net_settle": 2.9514139434520477,
+        "delta": 0.21826188606108454,
+        "funding_paid": -43.65915935082254,
+        "n_funding_events": 8520
+      },
+      "short_mom_720": {
+        "net_no_settle": 30.794069383683443,
+        "net_settle": 42.31084381980298,
+        "delta": 11.51677443611954,
+        "funding_paid": -258.0131881555673,
+        "n_funding_events": 8952
+      },
+      "only_BTCUSDT": {
+        "net_no_settle": 5468.833407830874,
+        "net_settle": 5468.833407830874,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "only_ETHUSDT": {
+        "net_no_settle": 5431.001423603252,
+        "net_settle": 5431.001423603252,
+        "delta": 0.0,
+        "funding_paid": 0.0,
+        "n_funding_events": 0
+      },
+      "ew_buyhold_band": {
+        "net_no_settle": 1525546.7932077728,
+        "net_settle": 1552562.582460455,
+        "delta": 27015.789252682123,
+        "funding_paid": -27015.789252682116,
+        "n_funding_events": 7222
+      },
+      "ew_rebalanced": {
+        "net_no_settle": 490656.6863495765,
+        "net_settle": 274246.7369605965,
+        "delta": -216409.94938898,
+        "funding_paid": 96380.93417097245,
+        "n_funding_events": 22350
+      },
+      "hedge_eta0.20_band0.20": {
+        "net_no_settle": 200594.56253620767,
+        "net_settle": 121065.50170960474,
+        "delta": -79529.06082660293,
+        "funding_paid": 96964.57523286108,
+        "n_funding_events": 20181
+      }
+    }
+  },
+  "funding_order_check": {
+    "off": {
+      "identical_order": false,
+      "top3_no_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ],
+      "top3_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ]
+    },
+    "on_k1overL": {
+      "identical_order": false,
+      "top3_no_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ],
+      "top3_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ]
+    },
+    "legacy_k0.5": {
+      "identical_order": false,
+      "top3_no_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ],
+      "top3_settle": [
+        "long_all",
+        "ew_buyhold_band",
+        "ew_rebalanced"
+      ]
+    }
+  },
+  "stale_anchor_contamination": {
+    "fund_off": {
+      "ew_rebalanced": {
+        "off": 504717.13446000795,
+        "on": 501687.0524466566,
+        "n_liquidated_on": 2,
+        "n_liquidated_while_stale": 2,
+        "stale_anchor_bars": 0
+      },
+      "inv_vol": {
+        "off": 456157.0561699697,
+        "on": 327938.5462718016,
+        "n_liquidated_on": 3,
+        "n_liquidated_while_stale": 3,
+        "stale_anchor_bars": 0
+      }
+    },
+    "fund_on": {
+      "ew_rebalanced": {
+        "off": 282109.3616705727,
+        "on": 280414.94051078625,
+        "n_liquidated_on": 2,
+        "n_liquidated_while_stale": 2,
+        "stale_anchor_bars": 0
+      },
+      "inv_vol": {
+        "off": 256895.38460166505,
+        "on": 184397.83907937884,
+        "n_liquidated_on": 3,
+        "n_liquidated_while_stale": 3,
+        "stale_anchor_bars": 0
+      }
+    }
+  },
+  "short_side_channel": {
+    "fund_off": {
+      "short_all": {
+        "off": 0.0,
+        "on": 1073.0838583457753,
+        "n_liquidated_on": 3,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_168": {
+        "off": 0.0,
+        "on": 2.8944853686692418,
+        "n_liquidated_on": 7,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_720": {
+        "off": 0.0,
+        "on": 1.7694603209882416,
+        "n_liquidated_on": 15,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_12": {
+        "off": 2.059875143803809,
+        "on": 2.7607665174692615,
+        "n_liquidated_on": 2,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_24": {
+        "off": 2.8201778709303866,
+        "on": 2.9873778077184046,
+        "n_liquidated_on": 5,
+        "n_liquidated_while_stale": 0
+      },
+      "hedge_eta0.20_band0.20": {
+        "off": 325267.5317816858,
+        "on": 233380.3318513511,
+        "n_liquidated_on": 63,
+        "n_liquidated_while_stale": 63
+      }
+    },
+    "fund_on": {
+      "short_all": {
+        "off": 0.0,
+        "on": 1073.0838583457753,
+        "n_liquidated_on": 3,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_168": {
+        "off": 0.0,
+        "on": 2.94022955693664,
+        "n_liquidated_on": 8,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_720": {
+        "off": 0.0,
+        "on": 2.0993763175741638,
+        "n_liquidated_on": 16,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_24": {
+        "off": 2.939311290822822,
+        "on": 2.9803340057956174,
+        "n_liquidated_on": 5,
+        "n_liquidated_while_stale": 0
+      },
+      "short_mom_12": {
+        "off": 2.541619723712527,
+        "on": 2.008198476727534,
+        "n_liquidated_on": 3,
+        "n_liquidated_while_stale": 0
+      },
+      "hedge_eta0.20_band0.20": {
+        "off": 198515.34183121598,
+        "on": 142009.57187001393,
+        "n_liquidated_on": 63,
+        "n_liquidated_while_stale": 63
+      }
+    }
+  },
+  "legacy_worst_damage": {
+    "fund_off": {
+      "candidate": "hedge_eta0.20_band0.20",
+      "delta_net": -124672.9692454781,
+      "final_off": 325267.5317816858,
+      "long_only": false
+    },
+    "fund_on": {
+      "candidate": "hedge_eta0.20_band0.20",
+      "delta_net": -77449.84012161124,
+      "final_off": 198515.34183121598,
+      "long_only": false
+    }
+  }
+}

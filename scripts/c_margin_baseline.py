@@ -64,14 +64,18 @@ def main() -> None:
         os.path.join(store.project_root(), "data", "funding.csv"))
     print(f"funding 数据 {len(funding.rates_by_hour.get('BTCUSDT', {}))} 条")
     print(f"杠杆上限 = {LEVERAGE}x  （agent max_exposure + sim max_gross）")
-    print(f"margin: initial=0.5  maint=0.1  topup=0.5\n")
 
     # 关键：margin 配置 + per-symbol 杠杆 + 总杠杆 配齐
-    margin_cfg = MarginConfig(
-        initial_margin_ratio=0.5,        # 50% 初始保证金 = 2x 杠杆
-        maintenance_margin_ratio=0.1,    # 10% 维持保证金 = 10x 强平线
+    # 2026-09-15 修：k 由实际杠杆推出（k = 1/LEVERAGE）而不是硬编码 0.5。
+    # 硬编码 0.5 等于假设 2x 杠杆 ⇒ 无论 LEVERAGE 填几，强平阈值都是 −44.4%
+    # （阈值只由 (k, m) 决定），"3x 强平风险更高"在代码层面根本不成立。
+    # 见 src/sim/margin.py 模块 docstring 的第二次修复。
+    margin_cfg = MarginConfig.for_leverage(
+        LEVERAGE,
+        maintenance_margin_ratio=0.1,    # 10% 维持保证金
         topup_trigger_ratio=0.5,
     )
+    print(f"margin: {margin_cfg.liquidation_description()}\n")
     ag = HedgeEnsemble(syms, cost_rate=rates, eta=eta, band=band,
                        max_exposure=LEVERAGE, funding=funding)
 

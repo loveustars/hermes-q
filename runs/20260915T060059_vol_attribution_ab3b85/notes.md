@@ -1,0 +1,8 @@
+- 2026-09-15T06:00:59Z hypothesis 已在跑之前写入 meta.json（铁律 5）。
+- 2026-09-15T06:19:25Z 推导验证 be/ew_bh：A vs B |ΔE|=0.000000（A n_liq=0）
+- 2026-09-15T06:23:40Z hypothesis 已在跑之前写入 meta.json（铁律 5）。
+- 2026-09-15T06:24:45Z hypothesis 已在跑之前写入 meta.json（铁律 5）。
+- 2026-09-15T06:26:04Z 自检 [be] BM1 对自身 β=1.000000 α_bar=-2.743e-15bp R²=1.000000
+- 2026-09-15T06:35:51Z 自检 [btc] BM1 对自身 β=1.000000 α_bar=-1.472e-15bp R²=1.000000
+- 2026-09-15T06:40:20Z 自检 [full] BM1 对自身 β=1.000000 α_bar=-1.169e-15bp R²=1.000000
+- 2026-09-15T06:40:28Z 因 deadline 未起跑 28 个 run：['full|hedge_eta0.20_b0.20|A_head', 'full|hedge_eta0.20_b0.20|B_fund', 'full|hedge_eta0.20_b0.20|C_nofund', 'full|ew_rebal|k05_head', 'full|ew_bh|k05_head', 'full|btc_bh|k05_head', 'full|exp:long_all|k05_head', 'full|exp:only_BTCUSDT|k05_head', 'full|hedge_eta0.20_b0.20|k05_head', 'be_raw|ew_rebal|A_head', 'be_raw|ew_rebal|B_fund', 'be_raw|ew_rebal|C_nofund', 'be_raw|ew_bh|A_head', 'be_raw|ew_bh|B_fund', 'be_raw|ew_bh|C_nofund', 'be_raw|btc_bh|A_head', 'be_raw|btc_bh|B_fund', 'be_raw|btc_bh|C_nofund', 'be_raw|exp:long_all|A_head', 'be_raw|exp:long_all|B_fund', 'be_raw|exp:long_all|C_nofund', 'be_raw|exp:only_BTCUSDT|A_head', 'be_raw|exp:only_BTCUSDT|B_fund', 'be_raw|exp:only_BTCUSDT|C_nofund', 'be_raw|hedge_eta0.20_b0.20|A_head', 'be_raw|hedge_eta0.20_b0.20|B_fund', 'be_raw|hedge_eta0.20_b0.20|C_nofund', 'be_raw|hedge_eta0.20_b0.20|k1_noengfund']

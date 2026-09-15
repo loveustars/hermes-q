@@ -140,11 +140,17 @@ def main() -> None:
         os.path.join(store.project_root(), "data", "funding.csv"))
     print(f"funding 数据 {len(funding.rates_by_hour.get('BTCUSDT', {}))} 条\n")
 
-    margin_cfg = MarginConfig(
-        initial_margin_ratio=0.5,
+    # 保证金参数：**由实际杠杆推出**（k = 1/LEVERAGE）。
+    # 2026-09-15 修：此前硬编码 k=0.5 = 无条件假设 2x 杠杆，于是给 1x 仓位
+    # 加了一个与杠杆无关的 −44.4% 停损（阈值只由 (k,m) 决定），把 18 组超参
+    # 搜索变成在"被停损改写的路径空间"里搜索。推导与实测见
+    # src/sim/margin.py 的模块 docstring。
+    margin_cfg = MarginConfig.for_leverage(
+        LEVERAGE,
         maintenance_margin_ratio=0.1,
         topup_trigger_ratio=0.5,
     )
+    print(f"margin: {margin_cfg.liquidation_description()}\n")
 
     # 网格扫描
     n_total = len(ETA_GRID) * len(BAND_GRID) * len(FUNDING_FLAGS)

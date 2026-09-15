@@ -1,0 +1,5 @@
+- 2026-09-15T06:42:00Z hypothesis 已在跑之前写入 meta.json（铁律 5）。
+- 2026-09-15T06:42:17Z 自检 [be] BM1 对自身 β=1.000000 α_bar=-2.743e-15bp R²=1.000000
+- 2026-09-15T06:42:23Z 自检 [btc] BM1 对自身 β=1.000000 α_bar=-1.472e-15bp R²=1.000000
+- 2026-09-15T06:46:56Z 自检 [full] BM1 对自身 β=1.000000 α_bar=-1.169e-15bp R²=1.000000
+- 2026-09-15T06:47:00Z 因 deadline 未起跑 6 个 run：['full|ew_rebal|k05_head', 'full|ew_bh|k05_head', 'full|btc_bh|k05_head', 'full|exp:long_all|k05_head', 'full|exp:only_BTCUSDT|k05_head', 'full|hedge_eta0.20_b0.20|k05_head']

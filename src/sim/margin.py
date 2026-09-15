@@ -36,6 +36,47 @@
 主循环并未调用它（只有单测在用），但既然它会影响强平判定（经 `equity()`），
 一并改成**真正从现金池扣款**、并以可用现金为上限。
 
+**2026-09-15 第二次修复：参数语义（`initial_margin_ratio` 必须由杠杆推出）**
+
+前三处修的是**记账**，这一处修的是**参数**：公式修对了，但喂给它的 `k` 是错的。
+
+`open_leg` 里 `margin_cash = k × |units| × p₀`（`margin.py:98-100`），
+而 D/C 阶段把所有脚本**硬编码成 `k = 0.5`** —— 这等于无条件假设每个仓位都是 2 倍杠杆。
+推导强平阈值（`|u|` 两边约掉）：
+
+    k|u|p₀ + |u|(p − p₀) ≤ m|u|p   ⇒   p/p₀ ≤ (1−k)/(1−m)
+
+代入 (k=0.5, m=0.1) 得 **p/p₀ ≤ 0.5556，即跌 44.4% 就强平，且与杠杆完全无关**
+（1x / 2x / 3x 都是 44.4%）。实测后果（可复现）：一条 1x、只交易一次、
+买入 BTC 后不动的规则（`only_BTCUSDT`，band=0.20）在 **bar 9104 =
+2018-11-23 01:00**（该根 `low = 4,239.67`，入场价 = bar 301 的 open = 7,676.8，
+`low/p₀ = 0.5523 ≤ 0.5556`）被判定强平；因为 agent 是**开环**的（不看 fill、
+不看强平），它此后每 bar 重发同一个目标、被 band 滤掉、**永不重入**，
+曲线从索引 8803 起恒定 7.9 年：终值 5,469 vs 关掉保证金的 101,251（−94.6%），
+而 BTC 同期从入场价涨到 77,770。
+
+**为什么 `k` 必须由杠杆决定**：`SimExchange` 的现金记账是"全额扣现金买入"
+（`exchange.py:251-252` 的 `cash -= d_n × px`）。1x 时现金归零、**没有任何隐性借款**，
+所以*实际*杠杆由现金余额决定，不是由 `k` 决定。把 `k = 1/L`（L = 该账户的
+max gross，即 `SimConfig.max_gross` / `HedgeEnsemble.max_exposure`）代回得教科书式
+
+    p/p₀ ≤ (L−1) / (L(1−m))        L=1 ⇒ 0（**永不强平**）；L=2 ⇒ 0.5556；L=3 ⇒ 0.7407
+
+L=1 的"永不强平"就是正确答案：满额持仓无法被强平（账上没有借款）。
+**旁证**：同仓库 `src/sim/carry.py:31-32`（M10 阶段、已通过完整评估协议）
+把"满额自筹"写成 `initial_margin_ratio=1.0` + `maintenance=0.005` ——
+项目自己已经把这一档参数用对过一次，是 D 阶段另起炉灶时传成了 0.5。
+（注意两套账的公式不同：`carry.py` 的 `margin_cash` 含卖出永续收到的现金
+（`M + N`，`carry.py:139`），代入得**空头**阈值 `(1+k)/(1+m) = +98.5%`
+（≈永不强平）；本模块多头的阈值是 0、空头是 `(1+k)/(1+m) = 1.818`。
+两边的**意图**一致（满额自筹 ⇒ 不该有提前停损），数值不必也不该相等。）
+
+因此**新增** `MarginConfig.for_leverage(L, ...)`：调用方的杠杆是唯一输入，
+`k` 由它推出，杜绝每个脚本各写一个常数。**注意向后兼容**：`dataclass` 的默认值
+与"显式传 `initial_margin_ratio=...`"的语义**都没有变**（`tests/test_margin_book.py`
+的 22 条与 `tests/test_sim_conservation.py` 全部继续通过）——
+本模块不猜调用方的杠杆，只提供一条不会写错的路径。
+
 设计要点（沿用）：
   - 单桶 cash（整体账户），但 per-symbol 维护 margin_cash（逻辑子账户）用于强平判定
   - 与 carry.py 的 spot+perp 双账户不同：SimExchange 是单账户主 sim
@@ -44,6 +85,7 @@
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 
@@ -55,6 +97,13 @@ class MarginConfig:
     maintenance_margin_ratio: 维持保证金率（< initial_margin_ratio，强平线）
     topup_trigger_ratio: 保证金权益跌破初始保证金的该比例时，触发补保
     liquidation_penalty_bp: 强平罚金（基点），从平仓所得中扣除（0 表示不罚）
+
+    **不要手写 `initial_margin_ratio`**：它必须与调用方的实际杠杆一致，
+    否则会凭空给每条腿加一个与杠杆无关的停损（见模块 docstring 的第二次修复）。
+    用 `MarginConfig.for_leverage(L)`。
+
+    默认值 0.5 / 0.25 是历史值（= 2x 杠杆），保留只为向后兼容既有单测；
+    新代码请一律用类方法构造。
     """
     initial_margin_ratio: float = 0.5       # 50% 初始保证金 = 2x 杠杆
     maintenance_margin_ratio: float = 0.25  # 25% 维持保证金 = 4x 杠杆强平
@@ -71,6 +120,80 @@ class MarginConfig:
         if self.liquidation_penalty_bp < 0:
             raise ValueError("liquidation_penalty_bp 不能为负")
 
+    # ------------------------------------------------------------------
+    @classmethod
+    def for_leverage(cls, leverage: float, *,
+                     maintenance_margin_ratio: float = 0.1,
+                     topup_trigger_ratio: float = 0.5,
+                     liquidation_penalty_bp: float = 0.0) -> "MarginConfig":
+        """由**实际杠杆**推出初始保证金比例：`k = 1 / leverage`。
+
+        参数
+        ----
+        leverage: 该账户的最大总敞口（gross），即 `SimConfig.max_gross` /
+            `HedgeEnsemble.max_exposure`。1.0 = 满额、无借款。
+
+        为什么是 `1/leverage`
+        -------------------
+        `SimExchange` 建仓时**全额扣现金**（`cash -= notional`），所以 1x
+        持仓的账户里没有借款，不该有任何强平通道。把 `k = 1/L` 代入阈值式
+
+            p/p₀ ≤ (1−k)/(1−m)
+
+        得到教科书形式 `p/p₀ ≤ (L−1)/(L(1−m))`：
+
+            L=1 ⇒ 0      （**永不强平** —— 满额持仓无法被强平）
+            L=2 ⇒ 0.5556 （跌 44.4%）
+            L=3 ⇒ 0.7407 （跌 25.9%）
+
+        旁证：`src/sim/carry.py:31-32` 用的就是 `initial_margin_ratio=1.0`
+        （M10 阶段、已通过完整评估协议）—— 项目已把"满额自筹"这一档用对过，
+        C/D 阶段只是另起炉灶时传成了 0.5。（两套账公式不同：carry 的
+        `margin_cash` 含卖出永续收到的现金，阈值是 `(1+k)/(1+m)`；
+        **意图**一致，数值不必相等。）
+
+        注意 `L` 与 `m` 的关系：`k = 1/L < m` ⇔ `L > 1/m`，此时仓位在**开仓
+        那一刻**就满足强平条件（p/p₀ = 1 ≤ (1−k)/(1−m) 成立）。例如 m=0.1
+        时 L > 10 会被拒绝 —— 这不是"更严格的风控"，而是一个无解的参数组合。
+        """
+        if not math.isfinite(leverage) or leverage <= 0.0:
+            raise ValueError(f"leverage 必须为正的有限数，收到 {leverage!r}")
+        k = 1.0 / float(leverage)
+        if k < maintenance_margin_ratio:
+            raise ValueError(
+                f"leverage={leverage:g} ⇒ initial_margin_ratio={k:.4f} < "
+                f"maintenance_margin_ratio={maintenance_margin_ratio:g}；"
+                f"该组合下仓位在开仓瞬间即满足强平条件。"
+                f"请用 leverage ≤ {1.0 / maintenance_margin_ratio:g}")
+        return cls(initial_margin_ratio=k,
+                   maintenance_margin_ratio=maintenance_margin_ratio,
+                   topup_trigger_ratio=topup_trigger_ratio,
+                   liquidation_penalty_bp=liquidation_penalty_bp)
+
+    # ------------------------------------------------------------------
+    def long_liquidation_ratio(self) -> float:
+        """多头强平阈值 `p/p₀ = (1−k)/(1−m)`；返回 **0.0 表示永不强平**。
+
+        解析式由 `equity ≤ maintenance` 两边约掉 `|u|` 得到（见模块 docstring）：
+        与持仓量、与名义规模无关。1x（k=1）时分子为 0 ⇒ 价格必须 ≤ 0 才触发，
+        即不可能触发。
+        """
+        num = 1.0 - self.initial_margin_ratio
+        if num <= 0.0:
+            return 0.0
+        return num / (1.0 - self.maintenance_margin_ratio)
+
+    def short_liquidation_ratio(self) -> float:
+        """空头强平阈值 `p/p₀ = (1+k)/(1+m)`（k=1/3, m=0.1 ⇒ 1.2121）。"""
+        return (1.0 + self.initial_margin_ratio) / (1.0 + self.maintenance_margin_ratio)
+
+    def liquidation_description(self) -> str:
+        """一行说明这套参数的强平距离 —— 便于把参数打进 run 的 config。"""
+        lo = self.long_liquidation_ratio()
+        return (f"k={self.initial_margin_ratio:.4f} m={self.maintenance_margin_ratio:g} ⇒ "
+                f"多头 {'永不强平' if lo <= 0 else f'p/p0≤{lo:.4f}（跌 {(1-lo)*100:.1f}%）'}"
+                f" / 空头 p/p0≥{self.short_liquidation_ratio():.4f}")
+
 
 @dataclass
 class MarginLeg:
@@ -79,10 +202,14 @@ class MarginLeg:
     margin_cash: 保证金账户现金
     initial_margin: 开仓时存入的初始保证金（用于 topup 触发判断）
     entry_price: 建仓价 —— **浮动盈亏的基准**（见缺陷 2）。为 0 表示无持仓。
+    units_at_anchor: **锚定时的持仓量**（2026-09-15 加）。仅用于检测
+        "仓位被调整但锚点没跟着刷新"（见 `n_stale_anchor_bars`），
+        不参与任何金额计算 ⇒ 加上它不改变任何既有行为。
     """
     margin_cash: float = 0.0
     initial_margin: float = 0.0
     entry_price: float = 0.0
+    units_at_anchor: float = 0.0
 
 
 class MarginBook:
@@ -93,6 +220,20 @@ class MarginBook:
         self.symbols = list(symbols)
         self.legs: dict[str, MarginLeg] = {s: MarginLeg() for s in symbols}
         self.liquidated: set[str] = set()        # 已强平的标的（一次性记录）
+        # 诊断计数器（2026-09-15 加，不改变任何金额）：
+        # 主循环只在"空→有仓 / 有仓→空 / 多空翻转"时同步保证金账本
+        # （`exchange.py:258-269`）。**仓位被调大或调小却不穿过零**时，
+        # `margin_cash`/`entry_price` 仍是旧仓位的锚 ⇒ 权益公式
+        # `margin_cash + (p − p₀)·|u_现|` 不再是 `|u_现|·p`，
+        # 于是连 k=1（本该永不强平）都会凭空触发强平。实测案例：`inv_vol`
+        # 这条**只做多**的规则在 k=1 下被强平，终值 23,400 vs 关保证金的 29,516。
+        # 修它要改 `exchange.py` 的同步路径（本次不在范围内），这里先把
+        # "有多少根 bar 处在锚点过期状态"变成可见的数字。
+        self.n_stale_anchor_bars = 0
+        self.stale_anchor_symbols: set[str] = set()
+        # 强平时该腿正处于"锚点过期"状态的记录（纯诊断，见 `liquidate`）。
+        # 用途：把"空头腿的正常强平"与"锚点过期造成的假强平"分开数。
+        self.liquidated_stale: list[str] = []
 
     # ------------------------------------------------------------------
     def initial_required(self, units: float, price: float) -> float:
@@ -137,7 +278,16 @@ class MarginBook:
 
         参数是**不利价**（多头传 low、空头传 high），不是固定的 high ——
         见模块 docstring 缺陷 3。已强平的腿不再被强平（防止重复触发）。
+
+        顺带（纯诊断，不影响返回值）统计"锚点过期"的 bar 数：传入的 `units`
+        与锚定时记录的 `units_at_anchor` 不一致 ⇒ 仓位被调整过，但
+        `margin_cash`/`entry_price` 仍锚在旧仓位上（`exchange.py` 只在
+        穿越零点时同步）。
         """
+        leg = self.legs[symbol]
+        if abs(units) > 1e-9 and abs(units - leg.units_at_anchor) > 1e-9:
+            self.n_stale_anchor_bars += 1
+            self.stale_anchor_symbols.add(symbol)
         if symbol in self.liquidated or units == 0.0:
             return False
         eq = self.equity(symbol, units, adverse_price)
@@ -170,6 +320,7 @@ class MarginBook:
         self.legs[symbol].margin_cash = required
         self.legs[symbol].initial_margin = required
         self.legs[symbol].entry_price = price
+        self.legs[symbol].units_at_anchor = units      # 诊断用（见 n_stale_anchor_bars）
         return required
 
     def close_leg(self, symbol: str, units: float, price: float, cash_pool) -> float:
@@ -184,6 +335,7 @@ class MarginBook:
         self.legs[symbol].margin_cash = 0.0
         self.legs[symbol].initial_margin = 0.0
         self.legs[symbol].entry_price = 0.0
+        self.legs[symbol].units_at_anchor = 0.0
         return 0.0
 
     def topup_to(self, symbol: str, units: float, price: float, cash_pool) -> float:
@@ -221,13 +373,20 @@ class MarginBook:
 
         强平后：units 由调用方清零、账本清零、标记 liquidated。
         返回释放到 cash_pool 的净额。
+
+        顺带记录**强平发生时该腿是否处于"锚点过期"状态**（纯诊断）：若是，则
+        这次强平的触发线比"锚点刷新"时更近，可能与真实经济含义无关
+        （见 `n_stale_anchor_bars` 与 `liquidated_stale`）。
         """
         leg = self.legs[symbol]
+        if abs(units) > 1e-9 and abs(units - leg.units_at_anchor) > 1e-9:
+            self.liquidated_stale.append(symbol)
         penalty = self.cfg.liquidation_penalty_bp / 1e4 * abs(units) * exit_price
         realized = units * exit_price - penalty
         cash_pool[0] += realized
         leg.margin_cash = 0.0
         leg.initial_margin = 0.0
         leg.entry_price = 0.0
+        leg.units_at_anchor = 0.0
         self.liquidated.add(symbol)
         return realized

@@ -1,0 +1,39 @@
+{
+  "run_id": "20260915T055621_pool_ceiling_bd5ebf",
+  "name": "pool_ceiling",
+  "config_hash": "df6e158777b4f772",
+  "git_head": "a516b46",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-15T05:56:21+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
+    "data/raw/binance_funding_BTCUSDT.csv": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "data/raw/binance_funding_ETHUSDT.csv": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "data/raw/binance_funding_BNBUSDT.csv": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "data/raw/binance_funding_TRXUSDT.csv": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
+    "data/raw/binanceperp_BTCUSDT_1h.csv": "ef36cdbedfe77ff4c3cc606f7dc0eb53c88a03c51a299b8dbdc191e126cfe352",
+    "data/raw/binanceperp_ETHUSDT_1h.csv": "26d1b3a1060289da5b93f53c2664e22ec8f6f66fdaccf9423831ae3854622a69",
+    "data/raw/binanceperp_BNBUSDT_1h.csv": "5a2616a8f3e0093009876da0d4842a5dace446ebe99b0b2e81433bd6bdbb12a6"
+  },
+  "hypothesis": {
+    "claim": "(1) 池内事后最优就是**等权买入持有**（池内的 `long_all`，其 weights 恰为 1/n 等权 ⇒ 与同 band 语义的等权买入持有逐点相同），即「池子的上界 = 零智能」；(2) 学习体（η=0.20, band=0.20）**不在**池内前 30%；(3) 在 max_gross=1.0 且 k=1/L=1.0 下，**只能做多的规则**上margin ON 与 OFF 的每一格**完全相同**（1x 无借款 ⇒ 不该有任何强平通道）。",
+    "why": "审计已给出三条前置事实：① 18 条规则里没有一条 carry/basis 规则，funding 只作为 payoff 项加在既有方向性规则上；② 学习体在 D 阶段收敛到 `long_all`（p_long_all≈0.96）但把权重摊在一堆 on/off 规则上（mean_gross≈0.65），于是既没拿满等权也不停付成本；③ 修正前旧参数给 1x 仓位强加了 −44.4% 的隐形停损，且 band 让它永不重入。",
+    "claim_3_scope": "(3) 只对**多头**成立，这一点是跑之前就划定的：空头腿卖的是借来的资产，强平通道在经济上**本来就该存在**（k=1/L 下空头阈值 (1+1/L)/(1+m) = 1.818 ⇒ 涨 82% 强平，与「1x 空头 + 10% 维持保证金」一致）。所以 on/off 在空头规则上不一致是**预期行为**，不是缺陷；脚本按 `long_only` 分类断言。",
+    "claim_3_status": "**跑全窗口之前已被冒烟跑（3,000 根）证伪过一次**（如实记录，不事后改假设）：`inv_vol`（`iv/Σiv × gross`，恒正的只做多规则）在 k=1 下**仍被强平**，终值 23,400 vs 关保证金的 29,516。机制不是参数，而是**第三条缺陷**：主循环只在「空→有仓 / 有仓→空 / 多空翻转」时同步保证金账本（`exchange.py:258-269`），仓位被**调大调小却不穿过零**时`margin_cash`/`entry_price` 仍是旧仓位的锚 ⇒ 权益式 `margin_cash + (p−p₀)·|u_现|` 不再等于 `|u_现|·p`，连 k=1 都会凭空触发强平。全窗口实测 `n_stale_anchor_bars` 量级见 pool_table 的 `stale_anchor_bars` 列（inv_vol 一条规则就有 22.9 万腿-bar）。",
+    "claim_4": "(4) 「锚点过期」在池子里是**普遍状态**而不是个别边角：任何会在不穿零的前提下调整仓位的规则（`inv_vol`、以及几乎总在调权的 `HedgeEnsemble`）都受影响；而只交易一次的静态规则（`long_all` / `only_*` / 等权买入持有）不受影响（仓位从不变化 ⇒ 锚点始终有效），它们的 on/off 必然逐格相同。",
+    "claim_5_funding": "(5) 引擎**真实结算资金费**（`SimExchange(funding=...)`）会显著压低所有绝对水平，但**不翻转池内次序**；且**资金费的方向由平均净持仓决定，不由「是否做空」决定** —— 学习体平均是净多头，所以它是净支付方，方向与永远满仓的等权买入持有相同。（委托人在本脚本之外已实测过同一件事并给出了数字：等权 ×0.56、学习体 ×0.61，次序未翻转。本条是**独立复核**，不是新预注册：如实标注它晚于委托人的报告。）",
+    "falsified_by": "任一条：出现某规则在**同 band 语义**下净终值显著高于等权买入持有（池内真有 alpha，上界不是买入持有）；或学习体进入池内前 30%；或**仓位从不变化的静态多头规则**在 on/off 两套之间出现差异（那才是参数没修好的证据 —— 锚点过期不在这一类里，单列）。",
+    "decision_rule": "（FRAMEWORK_AUDIT.md §3 预登记）若学习体不在池内前 30%，**停止参数调整**，按 G2 转信号源研究（最直接的一条是把已验证的 funding carry 做成专家，但需要引擎能表达双腿仓）。",
+    "registered": "2026-09-15",
+    "note": "本脚本的 (a) 是**事后**最优，有前视偏差；它的用途是当「天花板」，不是当目标。任何「学习体赢不了它」的解读都必须先声明这一点。"
+  },
+  "ended_at": "2026-09-15T06:19:24+00:00",
+  "status": "ok"
+}

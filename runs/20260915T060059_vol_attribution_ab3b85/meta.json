@@ -1,0 +1,39 @@
+{
+  "run_id": "20260915T062445_vol_attribution_2a2bc5",
+  "name": "vol_attribution",
+  "config_hash": "60e408dd66346f8a",
+  "git_head": "c156367",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-15T06:24:45+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
+    "data/raw/binance_funding_BTCUSDT.csv": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "data/raw/binance_funding_ETHUSDT.csv": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "data/raw/binance_funding_BNBUSDT.csv": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "data/raw/binance_funding_TRXUSDT.csv": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
+    "data/raw/binanceperp_BTCUSDT_1h.csv": "ef36cdbedfe77ff4c3cc606f7dc0eb53c88a03c51a299b8dbdc191e126cfe352",
+    "data/raw/binanceperp_ETHUSDT_1h.csv": "26d1b3a1060289da5b93f53c2664e22ec8f6f66fdaccf9423831ae3854622a69",
+    "data/raw/binanceperp_BNBUSDT_1h.csv": "5a2616a8f3e0093009876da0d4842a5dace446ebe99b0b2e81433bd6bdbb12a6"
+  },
+  "hypothesis": {
+    "claim": "H1（波动口径）: 本池 18 条专家规则中，没有任何一条在剥离 β 之后取得显著的正年化 α（HAC |t|<1.96）；且没有任何候选赢过「与其同 β 的无摩擦被动持有」。H2（单一标的依赖）: 「等权池里谁最强」的结论由池内是否含 BNB 决定 —— 去掉 BNB 后池内最优候选的名字发生改变。H3（强平通道）: 在 k=1/L（与真实杠杆一致）下，band 开环的买入持有型候选通道贡献恒为 0（ON 与 OFF 逐位一致）；但任何逐 bar 再平衡的候选仍有非零通道，因为 margin_cash 只在「从 0 开仓/多空翻转」时重锚、与当前持仓量脱钩 —— 即 k=1/L 只修掉了 k=0.5 的一半。H4（冻结参数对照）: 委托人引用的「关强平 1.62 倍 / 2.45x→1.55x」在 k=1/L 下显著缩小。H5（资金费，2026-09-15 追加）: 引擎结算资金费后，资金费是四块里**单块最大**的负贡献项（|G_fund| > |G_trade|），且被动等权的终值至少 −30%。H6（混沌敏感）: 同一候选在不同「等价」配置下的终值 max/min ≥ 2，所以单次运行的数字不能作为结论。",
+    "why": "项目至今用终值倍数做标尺，而倍数随对照物翻转（同一学习体 2.45/1.55/7.61/4.86）。没有归因层就回答不了「输在哪儿」，也回答不了「波动里有没有正期望」；而不结算资金费会让「成本」这一块漏掉项目自己认定的最大项。",
+    "falsified_by": {
+      "H1": "出现 ≥1 个候选 HAC t_α ≥ 1.96 且 α_ann > 0；或 ≥1 个候选 G_total > 0。",
+      "H2": "be 池与 full 池的「池内净终值最强候选」是同一个名字。",
+      "H3": "某个 band=0.2 的纯多头买入持有候选在 k=1/L 下 n_liquidated > 0；或全部候选在 k=1/L 下 G_liq 恒为 0。",
+      "H4": "k=1/L 下的 OFF/ON 比值与 k=0.5 下的比值相差 < 5 个百分点。",
+      "H5": "|G_fund| < |G_trade| 的候选占多数；或被动的终值变化 > −30%。",
+      "H6": "全部候选的变体终值 max/min < 2。"
+    },
+    "registered": "2026-09-15",
+    "note": "H1~H4 在本脚本第一次运行（2026-09-15T054036）之前写定，该次运行因发现引擎未结算资金费而被中止（委托人 out-of-band 指出）。H5/H6 是中止后、在委托人明确要求下追加的 —— **如实记录：这两条是事后补充的，不是事前预注册**。其余假设的阈值未被改动，以便结果出来后用同一把尺子判定。"
+  }
+}

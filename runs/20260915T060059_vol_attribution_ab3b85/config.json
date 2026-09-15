@@ -1,0 +1,72 @@
+{
+  "script": "scripts/vol_attribution.py",
+  "pools": {
+    "be": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ],
+    "btc": [
+      "BTCUSDT"
+    ],
+    "full": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT"
+    ],
+    "be_raw": [
+      "BTCUSDT",
+      "ETHUSDT"
+    ]
+  },
+  "engine": "SimExchange(instrument=perp, allow_short=True, max_gross=1.0, warmup=300, funding=FundingTable[data/funding.csv])",
+  "benchmark": "同池等权每bar再平衡（FixedWeights, band=0, 同引擎同变体）",
+  "band_semantics": "专家/买入持有候选一律 band=0.2（开环，与真专家一致）；再平衡候选 band=0",
+  "engine_variants": {
+    "A_head": {
+      "margin": "k=1/max_gross=1.0, m=0.1：与真实杠杆一致的「正确值」",
+      "engine_settles_funding": true,
+      "agent_believes_funding": true
+    },
+    "B_fund": {
+      "margin": "margin=None：完全没有强平通道",
+      "engine_settles_funding": true,
+      "agent_believes_funding": true
+    },
+    "C_nofund": {
+      "margin": "margin=None：完全没有强平通道",
+      "engine_settles_funding": false,
+      "agent_believes_funding": true
+    },
+    "k1_noengfund": {
+      "margin": "k=1/max_gross=1.0, m=0.1：与真实杠杆一致的「正确值」",
+      "engine_settles_funding": false,
+      "agent_believes_funding": true
+    },
+    "k05_nofund": {
+      "margin": "k=0.5, m=0.1：仓库现状（另一个 subagent 正在修的 bug）",
+      "engine_settles_funding": false,
+      "agent_believes_funding": true
+    },
+    "k05_head": {
+      "margin": "k=0.5, m=0.1：仓库现状（另一个 subagent 正在修的 bug）",
+      "engine_settles_funding": true,
+      "agent_believes_funding": true
+    },
+    "k1m005_head": {
+      "margin": "k=1.0, m=0.005：再把维持保证金率换到 carry.py 的现实量级",
+      "engine_settles_funding": true,
+      "agent_believes_funding": true
+    },
+    "A_agentNoFund": {
+      "margin": "k=1/max_gross=1.0, m=0.1：与真实杠杆一致的「正确值」",
+      "engine_settles_funding": true,
+      "agent_believes_funding": false
+    }
+  },
+  "decomposition": "G_total = G_exp(敞口缺口) + G_trade(交易成本) + G_fund(资金费) + G_liq(强平通道)，对数空间严格可加",
+  "bars_per_year": 8760,
+  "hac_lags": 24,
+  "initial_cash": 10000.0,
+  "wiped_policy": "net ≤ 1% × 本金 → vol/sharpe 置空、不参与排名",
+  "window": "77503 根 2017-11-06~2026-09-14（子池统一裁到三币交集；be_raw 故意不裁，作为窗口扰动对照）"
+}
