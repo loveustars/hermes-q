@@ -62,8 +62,14 @@ def max_drawdown(equity: np.ndarray) -> float:
     e = _clean(equity)
     if len(e) < 2:
         return 0.0
+    # 破产时 e < 0 / peak < 0 → (e-peak)/peak 可能溢出或无意义
+    # 处理：peak ≤ 0 时视为"已破产"，用 1.0 当分母把负值"归一化"
     peak = np.maximum.accumulate(e)
-    dd = (e - peak) / peak
+    safe_peak = np.where(peak > 0, peak, 1.0)
+    dd = (e - peak) / safe_peak
+    # 出现 nan/inf 时兜底为 0
+    if not np.all(np.isfinite(dd)):
+        dd = np.where(np.isfinite(dd), dd, 0.0)
     return float(dd.min())
 
 
