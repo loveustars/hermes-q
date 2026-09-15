@@ -85,6 +85,7 @@ class SimResult:
     n_funding_events: int = 0
     latency_histogram: dict = field(default_factory=dict)
     symbols: list[str] = field(default_factory=list)
+    liquidated_legs: list[str] = field(default_factory=list)    # C 阶段：被强平的标的列表（按时间顺序）
 
     @property
     def net_ret(self) -> np.ndarray:
@@ -180,6 +181,7 @@ class SimExchange:
         latency_hist: dict[int, int] = {}
         gap_mask = self.pre.gaps if self.pre is not None else None
         n_gap_bars = int(gap_mask.sum()) if gap_mask is not None else 0
+        result_liquidated_legs: list[str] = []        # C 阶段：被强平的标的（按时间顺序）
 
         first_record = start + cfg.latency_bars
         pending: dict[int, tuple[dict[str, float], int]] = {}
@@ -239,6 +241,21 @@ class SimExchange:
                             units_g[s] = want_g
                             bar_turnover += notional_g
 
+            # ---------- 1.5) 逐腿强平判定（C 阶段）----------
+            # 用本根 high 做压力测试，触发时清零该腿 + 退还 margin_cash
+            if self.margin_book is not None:
+                for s in self.symbols:
+                    if s in self.margin_book.liquidated:
+                        continue
+                    if abs(units_n[s]) < 1e-9:
+                        continue
+                    high_px = float(self.frames[s]["high"].iloc[ex])
+                    if self.margin_book.is_liquidatable(s, units_n[s], high_px):
+                        self.margin_book.liquidate(
+                            s, units_n[s], high_px, [cash_n])
+                        units_n[s] = 0.0
+                        result_liquidated_legs.append(s)
+
             # ---------- 2) 资金费结算（按收盘价近似结算价）----------
             if use_funding:
                 ts_ms = int(idx[ex].timestamp() * 1000)
@@ -295,4 +312,5 @@ class SimExchange:
             n_funding_events=n_funding_events,
             latency_histogram=latency_hist,
             symbols=self.symbols,
+            liquidated_legs=result_liquidated_legs,
         )

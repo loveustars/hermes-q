@@ -107,17 +107,56 @@ def test_close_leg_records_pnl_for_liquidation_path():
 # ==========================================================================
 # 强平
 # ==========================================================================
-def test_liquidate_clears_ledger_no_cash_op():
-    """C2 阶段 liquidate 只清零账本，不操作 cash_pool。"""
+def test_liquidate_releases_margin_cash_to_cash_pool():
+    """C3 阶段 liquidate 把 margin_cash 退到 cash_pool（扣除罚金）。
+
+    注意：C2 阶段这个方法是 no-op，但 C3 阶段 release = max(0, margin_cash - penalty)。
+    浮动 PnL 不补，所以浮亏时只退 margin_cash 本金（用户实际亏了浮亏）。
+    """
     book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5),
                       ["BTC"])
     cash = [10_000.0]
     book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
     rel = book.liquidate("BTC", units=100.0, high_price=80.0, cash_pool=cash)
-    assert rel == 0.0
-    assert cash[0] == 10_000
+    # margin_cash=5000, penalty=0, release=5000
+    assert rel == 5_000.0
+    assert cash[0] == 15_000
     assert book.legs["BTC"].margin_cash == 0.0
     assert "BTC" in book.liquidated
+
+
+def test_liquidate_with_penalty_reduces_release():
+    """liquidation_penalty_bp>0 时，release 减去罚金。"""
+    # 100 单位，价 100，margin_cash=5000, penalty=100bp×100×high
+    # high=100: penalty=100, release=4900
+    book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5,
+                                   liquidation_penalty_bp=100),
+                      ["BTC"])
+    cash = [10_000.0]
+    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)
+    rel = book.liquidate("BTC", units=100.0, high_price=100.0, cash_pool=cash)
+    assert rel == pytest.approx(4_900, abs=1e-3)
+
+
+def test_liquidate_margin_cash_below_penalty_returns_zero():
+    """margin_cash 不足以付罚金 → release = 0（账户已亏光）。"""
+    # penalty=1000, margin_cash=500 → release=0
+    book = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5,
+                                   liquidation_penalty_bp=100),
+                      ["BTC"])
+    cash = [10_000.0]
+    book.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash)  # margin=5000
+    rel = book.liquidate("BTC", units=100.0, high_price=100.0, cash_pool=cash)
+    # penalty = 100bp × 100 × 100 = 100, release = 5000-100=4900, 仍 > 0
+    # 改 penalty=10000：10000bp × 100 × 100 = 10000, release = max(0, 5000-10000) = 0
+    # 重新构造：
+    book2 = MarginBook(MarginConfig(initial_margin_ratio=0.5, maintenance_margin_ratio=0.5,
+                                    liquidation_penalty_bp=10000),
+                       ["BTC"])
+    cash2 = [10_000.0]
+    book2.open_leg("BTC", units=100.0, price=100.0, cash_pool=cash2)
+    rel2 = book2.liquidate("BTC", units=100.0, high_price=100.0, cash_pool=cash2)
+    assert rel2 == 0.0
 
 
 def test_liquidate_marks_symbol_and_blocks_reopen():

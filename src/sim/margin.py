@@ -156,10 +156,17 @@ class MarginBook:
 
     def liquidate(self, symbol: str, units: float, high_price: float,
                   cash_pool) -> float:
-        """强平：C2 阶段只清零账本 + 标记 liquidated，不操作 cash_pool。
+        """强平：C3 阶段把 margin_cash 退到 cash_pool（扣除罚金）。
 
-        C2 阶段：open_leg/close_leg/topup 都不操作 cash_pool，liquidate 也保持一致。
-        C3 阶段再决定"释放金额退还 cash_pool"的语义（可能与建仓语义绑定）。
+        C3 语义：
+          - release = max(0, margin_cash - penalty)
+          - 浮动 PnL 部分（margin_cash + units × high 之外的 equity）不补
+            （这意味着强平**会**让用户"亏掉"浮亏部分，但不会"凭空"产生 PnL）
+          - 这是 C2 "open_leg 不扣 cash_pool" 语义的对应：
+            建仓没扣，强平退 margin_cash = 退还锁仓的本金
+
+        强平价 = high（最不利价）—— 真实交易所也是按最不利价算。
+        cash_pool 是 [cash_value] 形式的可变引用。
 
         强平后：
           - units 由调用方清零
@@ -167,10 +174,13 @@ class MarginBook:
           - initial_margin 清零
           - 标记 liquidated
 
-        返回 0（C2 不操作 cash_pool，保留接口形状供 C3 切换）。
+        返回释放到 cash_pool 的净额。
         """
         leg = self.legs[symbol]
+        penalty = self.cfg.liquidation_penalty_bp / 1e4 * abs(units) * high_price
+        release = max(0.0, leg.margin_cash - penalty)
+        cash_pool[0] += release
         leg.margin_cash = 0.0
         leg.initial_margin = 0.0
         self.liquidated.add(symbol)
-        return 0.0
+        return release

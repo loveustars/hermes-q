@@ -482,6 +482,108 @@ def test_sim_exchange_margin_none_keeps_legacy_behavior():
         f"单调上升应赚钱，实际 {res.final_net()}"
 
 
+def test_sim_exchange_liquidates_on_crash():
+    """C3 阶段：高杠杆 + 暴跌 → 必触发逐腿强平。
+
+    设计：构造 initial=0.1, maint=0.05 的高杠杆（10x 强平线），让价格
+    跌到接近 0（trending_frames 最低 close=1，h=1）。
+
+    算账：
+      - 满仓 1.5x BTC 多：150 单位 × 100 价 = 15000 名义
+      - initial = 0.1 × 15000 = 1500
+      - maint 强平线：equity = 1500 + 150×h ≤ 0.05 × 150 × h = 7.5h
+        → 1500 ≤ -142.5h → h ≤ -10.5
+      - **价不会跌到 -10**，所以这个杠杆也不会强平
+
+    真正能强平的方式：让 margin_cash 被浮亏"侵蚀"完。
+    但永续合约里 margin_cash 永远 lock 在账户里 —— equity = margin_cash + PnL
+    永远 ≥ margin_cash - |亏损|，强平线 = 0.05 × |units| × h，**当 h 很小时
+    强平线也接近 0**。所以**永续合约实际上很难强平**，除非初始保证金用得差不多。
+
+    这个测试改用：构造一个**做空 + 价格上涨**的场景，做空的 margin_cash
+    会随价格上涨被亏完，触发强平。
+    """
+    n = 200
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+    from src.sim.margin import MarginConfig
+
+    # 用做空：BTC 价格**上涨**触发强平
+    # 做空 1.5x：-150 单位，initial=0.1×150×100=1500
+    # 价从 100 涨到 110：equity = 1500 + (-150)*110 = 1500 - 16500 = -15000
+    #                  maint = 0.05 × 150 × 110 = 825
+    # -15000 ≤ 825 → 必强平
+    btc_close = frames["BTCUSDT"]["close"].copy()
+    n_bars = len(btc_close)
+    # bar 50 起开始涨（仍用 trending 默认上升即可）
+    frames["BTCUSDT"]["close"] = btc_close
+    frames["BTCUSDT"]["high"] = btc_close + 1.0
+    frames["BTCUSDT"]["open"] = btc_close
+
+    class Short1_5X:
+        name = "short_1_5x"
+        def __init__(self):
+            self._done = False
+        def decide(self, view):
+            if self._done:
+                return None
+            self._done = True
+            # 做空 1.5x
+            return {"BTCUSDT": -1.5, "ETHUSDT": -1.5, "BNBUSDT": -1.5}
+
+    sim = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=10,
+                  margin=MarginConfig(initial_margin_ratio=0.1,
+                                       maintenance_margin_ratio=0.05),
+                  max_exposure_per_symbol=1.5,
+                  max_gross=4.5,
+                  allow_short=True,
+                  instrument="perp"),
+    )
+    res = sim.run(Short1_5X())
+
+    # 做空 + 价涨 → 必强平 BTC
+    assert "BTCUSDT" in res.liquidated_legs, \
+        f"做空 + 价涨应触发 BTC 强平，实际 {res.liquidated_legs}"
+    # 强平后该腿清零
+    assert sim.margin_book.legs["BTCUSDT"].margin_cash == 0.0
+    assert "BTCUSDT" in sim.margin_book.liquidated
+
+
+def test_sim_exchange_no_liquidation_when_safe():
+    """C3 阶段：价格平稳时不应触发强平。"""
+    n = 100
+    frames = trending_frames(n=n, symbols=("BTCUSDT", "ETHUSDT"), uptrend=True)
+    # 默认 trending 是上升的，不会强平
+    from src.sim.costs import CostModel
+    from src.sim.exchange import SimConfig, SimExchange
+    from src.sim.margin import MarginConfig
+
+    class HalfHalf:
+        name = "half_half"
+        def __init__(self):
+            self._done = False
+        def decide(self, view):
+            if self._done:
+                return None
+            self._done = True
+            return {s: 0.5 for s in view.symbols()}
+
+    res = SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=50,
+                  margin=MarginConfig(initial_margin_ratio=0.1,
+                                       maintenance_margin_ratio=0.05),
+                  max_exposure_per_symbol=3.0,
+                  max_gross=9.0),
+    ).run(HalfHalf())
+
+    assert len(res.liquidated_legs) == 0, \
+        f"价格上升不应强平，实际 {res.liquidated_legs}"
+
+
 # ==========================================================================
 # 10. B' 阶段：专家"满仓值"与 max_exposure 解耦
 # ==========================================================================
