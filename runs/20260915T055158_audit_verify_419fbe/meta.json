@@ -1,0 +1,33 @@
+{
+  "run_id": "20260915T055158_audit_verify_419fbe",
+  "name": "audit_verify",
+  "config_hash": "977824eb9417e23e",
+  "git_head": "a516b46",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-15T05:51:58+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
+    "data/raw/binance_funding_BTCUSDT.csv": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "data/raw/binance_funding_ETHUSDT.csv": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "data/raw/binance_funding_BNBUSDT.csv": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "data/raw/binance_funding_TRXUSDT.csv": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
+    "data/raw/binanceperp_BTCUSDT_1h.csv": "ef36cdbedfe77ff4c3cc606f7dc0eb53c88a03c51a299b8dbdc191e126cfe352",
+    "data/raw/binanceperp_ETHUSDT_1h.csv": "26d1b3a1060289da5b93f53c2664e22ec8f6f66fdaccf9423831ae3854622a69",
+    "data/raw/binanceperp_BNBUSDT_1h.csv": "5a2616a8f3e0093009876da0d4842a5dace446ebe99b0b2e81433bd6bdbb12a6"
+  },
+  "hypothesis": {
+    "claim": "① 审计报告关于「1x 下凭空强平」的论断成立（事件与解析阈值均可复现）；② 引擎漏结算资金费，且量级足以让训练线绝对值虚高约 2 倍；③ funding 开关造成的数倍摆幅来自学习体的路径混沌，不是经济量级；④ 学习体对取数窗口混沌敏感 ⇒ 单次运行不构成结论。",
+    "why": "这些数字直接决定「学习体有没有价值」能否被回答。若 ②③④ 成立，则项目所有关于该学习体的单次数值都需要重述为分布。",
+    "falsified_by": "① 事件对不上；② 引擎结算资金费后终值变化 < 5%；③ η=0 时 funding 摆幅也远离 1.0；④ 不同窗口终值差异 < 20%。",
+    "registered": "2026-09-15"
+  },
+  "ended_at": "2026-09-15T06:00:18+00:00",
+  "status": "ok"
+}

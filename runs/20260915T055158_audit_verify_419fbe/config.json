@@ -1,0 +1,11 @@
+{
+  "script": "scripts/audit_verify.py",
+  "universe": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT"
+  ],
+  "bars_3sym": 77503,
+  "bars_2sym": 79440,
+  "bars_2sym_from_3sym_window": 77503
+}
