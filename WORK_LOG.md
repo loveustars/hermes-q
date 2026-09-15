@@ -2,8 +2,9 @@
 
 **项目**：Hermes-Q（资产无关的自学习交易框架，研究用途，只读公开行情）
 **位置**：`/home/nick/workspace/quant`
-**最后更新**：2026-09-14
-**当前阶段**：M0–M5 全部完成。M5 结论为**无边际**，下一步按淘汰门 G2 转信号源研究。
+**最后更新**：2026-09-15
+**当前阶段**：M0–M11 完成。前向纸面交易运行中；**新启动"训练目标做空能力扩展"路线图
+（A→B→C→D 四阶段），A 已完成、B 待启动**。
 
 ---
 
@@ -487,7 +488,74 @@ quant/
 
 ---
 
-## 十二、合规
+## 十二、做空能力扩展（**训练目标改造路线图，A 阶段已完成**）
+
+### 12.1 背景与目标
+
+M5 智能体（`HedgeEnsemble` + 11 个专家）在"只用价格 + 扣成本"设定下被判无边际。
+G2 淘汰门之后，重新审视训练目标本身：**当前 `mixed = clip(mixed, 0, None)` 把所有负权重
+清零，训练目标只能在 {0, 多} 之间选**，从架构上排除了做空信号。
+
+本路线图目标：让训练目标**能使用杠杆做多做空**，且仿真结果在实盘可复现。
+分四阶段（**A 已完成**，**B 待启动**，C、D 是规划）：
+
+| 阶段 | 内容 | 风险 |
+|---|---|---|
+| **A** 放开做空 | clip(0) → 对称 clip；加做空专家；配置 allow_short | 低：sim 层早已支持 |
+| **B** 加杠杆 | max_gross 1.0 → 3.0；单标的上限 | 中：杠杆会放大冲击成本 |
+| **C** 逐标的保证金 + 强平 | 把 carry.py 的 margin_cash/reserve 移植到主 sim | 高：sim 失真会导致仿真结果比实盘乐观一个数量级 |
+| **D** 参数重标定 | max_turnover、band、η 等 | 中：贯穿全程 |
+
+### 12.2 A 阶段变更摘要（**已完成**）
+
+**3 个 commit**：
+- `ee87e35` 训练目标: 增加做空专家集合
+- `300a652` 训练目标: 放开做空裁剪并配套测试
+- `8801252` 做空训练: 补兜底与归一化回归测试
+
+**代码改动**：
+
+| 文件 | 改动 |
+|---|---|
+| `src/agents/online.py` | 新增 `ShortExpert`（恒为 -1/n）和 `ShortMomentumExpert(24/168)`；`default_experts` 从 11 → 14；`decide()` 的 clip 改为 `[-max_exposure, +max_exposure]`，gross 兜底改用 `Σ\|w\|` |
+| `configs/base.json` | `risk` 段加 `allow_short: true` |
+| `tests/test_agent_short_capability.py`（新） | 8 条断言：专家存在性、专家提案、端到端 Hedge 学到做空、`_sanitize` 兜底、归一化不变量 |
+
+**关键不变量（被新测试锁死，B 阶段改 max_exposure 时回归会立刻暴露）**：
+- 单标的 `|w_s| ≤ max_exposure`
+- 总仓位 `Σ\|w_s\| ≤ max_exposure`（等比缩放后）
+- 多空等权混合 → `[0, 0]`（保留方向、不翻号）
+- `allow_short=False` 时 sim 端仍截断负权重（兜底被覆盖）
+
+**A 阶段的实际能力**（108/108 测试通过）：
+- `mixed` 权重范围 `[-1, +1]`（之前 `[0, +1]`）
+- 上涨场景 Hedge 学到 `p_long_all` 主导（min_w ≈ +0.11，验证现有 long-only 路径未坏）
+- 下跌场景 Hedge 学到 `p_short_all` 主导（终态 p > 2/K，且 min_w < -1e-9）
+- **总仓位仍 = 1.0**：做空 0.5 时只能做多 0.5，**离真杠杆还远**
+
+### 12.3 A 阶段没做的事（**这是进入 B 之前必须知道的边界**）
+
+1. **没改 `max_gross_exposure`** —— 还是 1.0。A 只是"放开做空"，没"放大仓位"
+2. **没动 sim 层 `_sanitize`** —— 兜底代码 `max(w, 0)` 没改也没删，靠 `allow_short=true` 自然失效
+3. **没做保证金/强平** —— sim 里仍然只在 `net_eq < 0.01*initial` 时判定破产，不模拟逐腿爆仓
+4. **没改 `risk.max_turnover_roundtrips_per_year: 100`** —— A 不影响换手
+5. **没在 LIVE paper 上跑过 A** —— 前向纸面交易还跑着旧 agent，B 阶段才换
+
+### 12.4 B 阶段待办（**启动前要拍板的 3 个分叉**）
+
+1. `max_gross_exposure`：1.0 → **3.0**（你已确认）
+2. agent 层 `max_exposure` 与 sim 层 `max_gross` 是否同时改 —— 必须**配齐**，否则任一边是安全网
+3. C 阶段（保证金/强平）是否合并到 B 一起做 —— 建议**分开**，风险等级不同
+
+### 12.5 已知坑（务必看）
+
+- **A 没改 base.json 的 `max_gross_exposure`**，所以默认仍是 1.0。要让 A 的"放开做空"真的发挥作用，必须接着做 B 改 3.0
+- 旧测试 `test_hedge_ensemble_can_emit_negative_mixed_weights` 用的是**下跌** 600 根合成数据。若改用真实历史数据回归，需重新调阈值（`p > 2/K` 是合成的，真实场景下 Hedge 可能更保守）
+- `runs/live/*.json` 没加 `.gitignore`（cron 会自动追加事件，下次 commit 前手动 `git restore`）
+
+---
+
+## 十三、合规
 
 - 只读公开行情，**不接账号、不存 key、不碰下单接口**（代码级白名单强制，
   非白名单请求抛 `ComplianceError`）

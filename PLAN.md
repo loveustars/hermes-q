@@ -4,7 +4,8 @@
 > 在**未参与训练的封存数据**上，评估智能体是否存在**可重复、统计显著**的交易边际。
 >
 > 项目地点：`/home/nick/workspace/quant`
-> 状态：计划阶段（尚未写业务代码）
+> **状态**：M0–M11 完成；前向纸面交易运行中；**新启动"训练目标做空能力扩展"路线图
+> （§19，A 已完成 / B 待启动 / C、D 规划）**
 > 数据锚点实测日：2026-09-14
 
 ---
@@ -1143,6 +1144,89 @@ G3 封存段的峰度没有记录，但如上所述不影响定论——这一�
    新策略评估中**首次全量使用**，检验它们在真实评估流程里是否顺手。
 
 其余待办：部分成交队列模型；协议已知局限（集中度被算作 alpha）。
+
+---
+
+## 19. 训练目标扩展：做空与杠杆（**A 阶段已完成，2026-09-15**）
+
+### 19.1 触发
+
+§4 的 L1 阶梯（M5）跑下来被判无边际。重新审视训练目标：
+
+```
+mixed = np.clip(mixed, 0.0, None)    ← 旧代码：所有负权重清零
+```
+
+这个 clip 让 11 个专家（全是 long-only 提案）的 Hedge 集成**永远不可能学到做空信号**。
+G2 淘汰门要求"转信号源"，但本路线图选择另一条路：**先让训练目标有能力响应"做空"信号，
+再谈有没有信号可学**。
+
+### 19.2 四阶段路线图
+
+| 阶段 | 内容 | 风险等级 | 状态 |
+|---|---|---|---|
+| **A** 放开做空 | clip(0) → 对称 clip；加做空专家；配置 `allow_short` | 低 | ✅ **已完成** |
+| **B** 加杠杆 | `max_gross_exposure` 1.0 → 3.0；agent 层 `max_exposure` 配齐 | 中 | 待启动 |
+| **C** 逐标的保证金 + 强平 | 把 `carry.py` 的 `margin_cash` / `reserve` / 强平移植到主 sim | **高** | 规划 |
+| **D** 参数重标定 | `max_turnover`、`band`、`η` 配合新范围 | 中 | 贯穿 |
+
+### 19.3 A 阶段交付物
+
+**3 个 commit**：
+- `ee87e35` 训练目标: 增加做空专家集合
+- `300a652` 训练目标: 放开做空裁剪并配套测试
+- `8801252` 做空训练: 补兜底与归一化回归测试
+
+**代码改动**：
+
+| 文件 | 改动 |
+|---|---|
+| `src/agents/online.py` | 新增 `ShortExpert`（恒为 `-1/n`）和 `ShortMomentumExpert(24/168)`；`default_experts` 从 **11 → 14**；`decide()` 的 clip 改为 `[-max_exposure, +max_exposure]`，gross 兜底改用 `Σ\|w\|`（之前用 `Σw`，对冲组合会算成 0） |
+| `configs/base.json` | `risk` 段加 `allow_short: true` |
+| `tests/test_agent_short_capability.py`（新） | 8 条断言：专家存在性、专家提案、端到端 Hedge 学到做空、`_sanitize` 兜底、归一化不变量 |
+
+**关键不变量**（新测试锁死，B 阶段改 `max_exposure` 时回归会立刻暴露）：
+
+- 单标的 `|w_s| ≤ max_exposure`
+- 总仓位 `Σ\|w_s\| ≤ max_exposure`（等比缩放后，**保留方向不翻号**）
+- 多空等权混合 → `[0, 0]`
+- `allow_short=False` 时 sim 端 `_sanitize` 兜底仍截断负权重
+
+**A 阶段的实际能力边界**（108/108 测试通过）：
+- `mixed` 权重范围 `[-1, +1]`（之前 `[0, +1]`）
+- 上涨场景 Hedge 学到 `p_long_all` 主导（min_w ≈ +0.11，验证 long-only 路径未坏）
+- 下跌场景 Hedge 学到 `p_short_all` 主导（终态 `p_short_all` > 2/K，且 min_w < -1e-9）
+- **总仓位仍 = 1.0**：做空 0.5 时只能做多 0.5，**不是真杠杆**
+
+### 19.4 A 阶段没做的事（**进入 B 前必看**）
+
+| 项 | 状态 | 风险 |
+|---|---|---|
+| `max_gross_exposure: 1.0 → 3.0` | 未改 | A 阶段"做空"只在 ±1 范围内有效 |
+| sim 层 `_sanitize` 兜底 `max(w, 0)` | **保留** | `allow_short=true` 时自然失效，spot 模式仍需要 |
+| 逐标的保证金 / 强平 | **没做** | B 完成后 sim 结果会比实盘乐观一个数量级 |
+| `risk.max_turnover_roundtrips_per_year: 100` | 未改 | A 不影响换手 |
+| LIVE paper trading 切换到 A agent | 未做 | 前向纸面仍跑 M5 agent |
+
+### 19.5 B 阶段约束（**待启动**）
+
+1. `max_gross_exposure`：1.0 → **3.0**（已确认）
+2. agent 层 `HedgeEnsemble(max_exposure=3.0)` 与 sim 层 `SimConfig(max_gross=3.0)` **必须同时改**——否则任一边是安全网，另一边是天花板，仿真行为不对称
+3. C 阶段**不并入 B**：保证金/强平是高风险工作，建议单独立项，新建 `SimExchangePerp` 类而非改 `SimExchange`
+4. 新增测试锚点（计划）：
+   - 单标的 `|w_s| ≤ 3.0`
+   - 总仓位 `Σ\|w_s\| ≤ 3.0`
+   - 真实数据上跑 Hedge，断言 `min(w) < -1.0`（证明真在做空，不只在合成数据上）
+   - `max_turnover` 阈值在杠杆下是否要放宽
+
+### 19.6 已知坑
+
+- A 的端到端测试用**合成下跌数据**触发 ShortExpert；真实历史数据上 Hedge 可能更保守（因为交易成本、funding、regime 都比合成数据复杂），`p > 2/K` 这个阈值将来可能需要重新调
+- `runs/live/*.json` **没**加 `.gitignore`，cron 自动追加事件，commit 前手动 `git restore`
+- A 的 commit message 第一次写错（"增加做空专家集合与对称裁剪"，但只含专家），已 `--amend` 修正为准确描述
+- 旧 `_sanitize` 兜底代码（`max(w, 0)`）**没测试覆盖**，A 加了 `test_sanitize_blocks_negative_weights_when_short_disallowed` 补齐
+
+---
 
 ## 15. 合规底线
 
