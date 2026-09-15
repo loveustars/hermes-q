@@ -287,6 +287,87 @@ def test_trim_preserves_daily_marks():
 
 
 # ==========================================================================
+# 6. 行情重试
+# ==========================================================================
+def test_retry_returns_first_success_without_sleeping():
+    from src.live import feed
+    calls, slept = [], []
+    def ok():
+        calls.append(1)
+        return "值"
+    assert feed.retry_call(ok, attempts=3, sleep=slept.append) == "值"
+    assert len(calls) == 1, "第一次就成功不该重试"
+    assert slept == [], "成功时不该 sleep"
+
+
+def test_retry_absorbs_transient_failure():
+    """**核心**：前两次失败、第三次成功 —— 这正是重试要吸收的场景。"""
+    from src.live import feed
+    calls, slept = [], []
+    def flaky():
+        calls.append(1)
+        if len(calls) < 3:
+            raise OSError("SSL: UNEXPECTED_EOF_WHILE_READING")
+        return "第三次成功"
+    assert feed.retry_call(flaky, attempts=3, base_delay=2.0,
+                           sleep=slept.append) == "第三次成功"
+    assert len(calls) == 3
+    assert slept == [2.0, 4.0], f"退避应为 2s/4s，得 {slept}"
+
+
+def test_retry_raises_after_exhausting_attempts():
+    """耗尽后必须**照常抛错** —— 不能吞掉，否则会变成安静地少算一笔。"""
+    from src.live import feed
+    calls, slept = [], []
+    def always_fail():
+        calls.append(1)
+        raise OSError("代理上游不可达")
+    try:
+        feed.retry_call(always_fail, attempts=3, base_delay=1.0,
+                        sleep=slept.append)
+    except OSError as e:
+        assert "不可达" in str(e)
+    else:
+        raise AssertionError("重试耗尽后应抛错，而不是静默返回")
+    assert len(calls) == 3, f"应尝试 3 次，得 {len(calls)}"
+    assert slept == [1.0, 2.0], f"三次尝试只该 sleep 两次，得 {slept}"
+
+
+def test_retry_attempts_one_is_single_shot():
+    from src.live import feed
+    calls, slept = [], []
+    def fail():
+        calls.append(1)
+        raise ValueError("x")
+    try:
+        feed.retry_call(fail, attempts=1, sleep=slept.append)
+    except ValueError:
+        pass
+    assert len(calls) == 1 and slept == []
+
+
+def test_live_quote_uses_retry_and_surfaces_errors():
+    """live_quote 必须把底层失败如实抛出（tick 靠它决定跳过而不是写坏状态）。"""
+    from src.live import feed
+    orig = feed._quote_once                       # noqa: SLF001
+    calls = []
+    def boom(sym):
+        calls.append(sym)
+        raise RuntimeError("Name or service not known")
+    feed._quote_once = boom                       # noqa: SLF001
+    try:
+        feed.live_quote("BTCUSDT", attempts=2, base_delay=0.0,
+                        sleep=lambda _: None)
+    except RuntimeError as e:
+        assert "Name or service not known" in str(e)
+    else:
+        raise AssertionError("应抛出底层错误")
+    finally:
+        feed._quote_once = orig                   # noqa: SLF001
+    assert len(calls) == 2, f"应尝试 2 次，得 {len(calls)}"
+
+
+# ==========================================================================
 def main() -> int:
     tests = [(k, v) for k, v in sorted(globals().items())
              if k.startswith("test_") and callable(v)]

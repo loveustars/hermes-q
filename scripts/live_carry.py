@@ -20,6 +20,7 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.data import sources  # noqa: E402
+from src.live import feed  # noqa: E402
 from src.live.paper import LIVE_DIR, Book, LiveConfig  # noqa: E402
 
 SYMBOLS = ["BTCUSDT", "ETHUSDT"]      # G3 判定为「有边际」的两个
@@ -37,19 +38,8 @@ def _now_utc() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
-def fetch_live(symbol: str) -> dict:
-    """取该时刻的实时行情。失败则抛错——宁可整次 tick 跳过，也不要写半截状态。"""
-    spot = float(sources._get("binance", sources.BINANCE_BASE,   # noqa: SLF001
-                              "/api/v3/ticker/price", {"symbol": symbol})["price"])
-    perp = float(sources._get("binance_futures",                 # noqa: SLF001
-                              sources.BINANCE_FUTURES_BASE,
-                              "/fapi/v1/ticker/price", {"symbol": symbol})["price"])
-    pi = sources.premium_index(symbol)
-    now_ms = int(time.time() * 1000)
-    return {"symbol": symbol, "spot_px": spot, "perp_px": perp,
-            "mark_px": float(pi["markPrice"]),
-            "last_funding_rate": float(pi.get("lastFundingRate") or 0.0),
-            "now_ms": now_ms}
+# 取数与重试都在 src/live/feed.py 里（脚本里的逻辑测不到）
+fetch_live = feed.live_quote
 
 
 def funding_since(symbol: str, since_ms: int, now_ms: int) -> list[dict]:
