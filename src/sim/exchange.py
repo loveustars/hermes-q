@@ -54,6 +54,18 @@ class SimConfig:
     # 启用后，建仓扣 initial_margin，平仓退 margin_cash + 浮动 PnL。
     # 强平由 max_exposure_per_symbol 范围内的逐腿强平判定（SimConfig 仍可有 cfg.margin）。
     margin: "MarginConfig | None" = None
+    # 破产闸门（2026-09-15 修）。净权益 ≤ 此值时**立即停止交易**并截断曲线。
+    #
+    # 为什么必须有：仓位按 `want_n = target_w[s] * eq_n / px[s]` 定，而这条式子
+    # 在 eq_n < 0 时会**翻号**——想要 3x 做多的策略变成巨额做空，且幅度随 |eq_n|
+    # 增大而失控。实测在 3x + 逐腿强平配置下，权益到 −23,467 后环境仍在交易，
+    # 单笔名义额冲到 1.86 亿（本金 1 万），权益从 206 涨到 260 万（12,600 倍）——
+    # 这个"反弹"完全来自破产账户被强制做空的意外，与策略无关。
+    #
+    # 现实里这种账户在权益转负之前就被强平了（强平的意义就在于此），所以
+    # "权益 ≤ 0 还继续下单"没有任何对应物。设为 0.0 表示"资不抵债即出局"。
+    insolvency_floor: float = 0.0
+    stop_when_bankrupt: bool = True
 
     def __post_init__(self):
         if self.gap_policy not in ("execute", "skip"):
@@ -78,6 +90,11 @@ class SimResult:
     n_trades: int
     initial_cash: float = 10_000.0
     insolvent_at: int | None = None
+    # 破产闸门触发的位置（见 SimConfig.insolvency_floor）。
+    # **非 None 时曲线在这一点被截断**：net_equity / index / cost_paid 等都只到
+    # 死亡那一根。于是下游指标（total_ret、sharpe、max_dd）都只覆盖"活着的时段"，
+    # 不会用一条虚构的复活曲线去算夏普。
+    bankrupt_at: int | None = None
     n_gap_bars: int = 0
     n_gap_trades: int = 0
     n_gap_skipped: int = 0
@@ -85,6 +102,9 @@ class SimResult:
     n_funding_events: int = 0
     latency_histogram: dict = field(default_factory=dict)
     symbols: list[str] = field(default_factory=list)
+    # 冲击率被适用域护栏截断的成交笔数（见 CostModel.max_impact_rate）。
+    # >0 表示该策略的规模已超出平方根律的适用范围，**结果不可用于横向比较**。
+    n_impact_capped: int = 0
     liquidated_legs: list[str] = field(default_factory=list)    # C 阶段：被强平的标的列表（按时间顺序）
 
     @property
@@ -98,6 +118,11 @@ class SimResult:
     @property
     def insolvent(self) -> bool:
         return self.insolvent_at is not None
+
+    @property
+    def bankrupt(self) -> bool:
+        """资不抵债、已被破产闸门中止（曲线已截断）。比 `insolvent` 更强。"""
+        return self.bankrupt_at is not None
 
     def final_net(self) -> float:
         return float(self.net_equity[-1])
@@ -176,6 +201,7 @@ class SimExchange:
         n_trades = 0
         n_funding_events = 0
         insolvent_at: int | None = None
+        bankrupt_at: int | None = None
         n_gap_trades = 0
         n_gap_skipped = 0
         latency_hist: dict[int, int] = {}
@@ -222,7 +248,9 @@ class SimExchange:
                             cash_n -= d_n * px[s]
                             old_units = units_n[s]
                             units_n[s] = want_n
-                            # C 阶段：保证金账本同步（C2 只记账，不操作 cash）
+                            # C 阶段：保证金账本同步
+                            # 注意 `[cash_n]` 只是装了 cash_n 副本的列表，改它不影响
+                            # 局部变量 cash_n —— 所以凡是要动现金的路径都必须用**返回值**。
                             if self.margin_book is not None:
                                 if abs(old_units) < 1e-9 and abs(want_n) >= 1e-9:
                                     self.margin_book.open_leg(
@@ -230,6 +258,11 @@ class SimExchange:
                                 elif abs(want_n) < 1e-9 and abs(old_units) >= 1e-9:
                                     self.margin_book.close_leg(
                                         s, old_units, px[s], [cash_n])
+                                elif old_units * want_n < 0:
+                                    # 多空翻转 = 旧腿结束 + 新腿开始。必须重锚，
+                                    # 否则浮动盈亏会拿旧方向的建仓价算（符号反了）。
+                                    self.margin_book.open_leg(
+                                        s, want_n, px[s], [cash_n])
                             bar_cost += c
                             n_trades += 1
 
@@ -242,17 +275,27 @@ class SimExchange:
                             bar_turnover += notional_g
 
             # ---------- 1.5) 逐腿强平判定（C 阶段）----------
-            # 用本根 high 做压力测试，触发时清零该腿 + 退还 margin_cash
+            # 用**不利价**做压力测试（多头 low、空头 high），触发时按不利价强制平仓。
+            #
+            # 必须用 liquidate 的**返回值**加到 cash_n：`[cash_n]` 是浮点副本的列表，
+            # 改它改不到 cash_n。初版正是踩了这个坑——`cash_pool[0] += release` 是
+            # 空操作，而 `units_n[s] = 0.0` 却真的执行了，于是空头的负债凭空消失、
+            # 权益凭空增加 |units| × 价格。这是 D 阶段"权益冲到 2.1 亿"的直接原因。
             if self.margin_book is not None:
                 for s in self.symbols:
                     if s in self.margin_book.liquidated:
                         continue
                     if abs(units_n[s]) < 1e-9:
                         continue
+                    low_px = float(self.frames[s]["low"].iloc[ex])
                     high_px = float(self.frames[s]["high"].iloc[ex])
-                    if self.margin_book.is_liquidatable(s, units_n[s], high_px):
-                        self.margin_book.liquidate(
-                            s, units_n[s], high_px, [cash_n])
+                    adverse_px = self.margin_book.adverse_price(
+                        units_n[s], low_px, high_px)
+                    if self.margin_book.is_liquidatable(
+                            s, units_n[s], adverse_px):
+                        realized = self.margin_book.liquidate(
+                            s, units_n[s], adverse_px, [cash_n])
+                        cash_n += realized          # ← 真正的现金动作
                         units_n[s] = 0.0
                         result_liquidated_legs.append(s)
 
@@ -280,6 +323,12 @@ class SimExchange:
                 funding_paid.append(bar_funding)
                 if insolvent_at is None and net_eq[-1] < 0.01 * cfg.initial_cash:
                     insolvent_at = len(net_eq) - 1
+                # 破产闸门：资不抵债即出局，**必须先于下一根 bar 的建仓**。
+                # 放在盯市之后，好让曲线包含"死掉的那一根"（死前权益是真实记录的）。
+                if (cfg.stop_when_bankrupt and bankrupt_at is None
+                        and net_eq[-1] <= cfg.insolvency_floor):
+                    bankrupt_at = len(net_eq) - 1
+                    break
 
             # ---------- 4) 决策（只能在看到 t 及之前的数据后做）----------
             if ex >= self.T - 1:
@@ -305,6 +354,8 @@ class SimExchange:
             n_trades=n_trades,
             initial_cash=cfg.initial_cash,
             insolvent_at=insolvent_at,
+            bankrupt_at=bankrupt_at,
+            n_impact_capped=self.net_costs.n_impact_capped,
             n_gap_bars=n_gap_bars,
             n_gap_trades=n_gap_trades,
             n_gap_skipped=n_gap_skipped,

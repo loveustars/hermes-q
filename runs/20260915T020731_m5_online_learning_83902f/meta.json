@@ -1,0 +1,30 @@
+{
+  "run_id": "20260915T020731_m5_online_learning_83902f",
+  "name": "m5_online_learning",
+  "config_hash": "0d684e480db00b69",
+  "git_head": "145ff7b",
+  "python": "3.10.12",
+  "host": "nick-Lenovo-ThinkBook-16p-Gen-4",
+  "started_at": "2026-09-15T02:07:31+00:00",
+  "data_manifest": {
+    "data/raw/binance_BTCUSDT_1h.csv": "55b8200d6de0fbc29b0b25a0b47eb2f9bc2e59904ac5b32de912fb575f9df694",
+    "data/raw/binance_ETHUSDT_1h.csv": "af0d3eeb8f8efdb13bd839f1f12e880d92dfef791c32ad33405045e3462fea17",
+    "data/raw/binance_BNBUSDT_1h.csv": "9e50605f75a5fc10ccaa9169c2f1d717e4018affbbb4e5f3759747cd562d5056",
+    "data/raw/binance_BTCUSDT_1d.csv": "7d3995ff0d2dfbe98ba0a3262803e4e09be7565d41bec41abc7629aa0773fe02",
+    "data/raw/binance_ETHUSDT_1d.csv": "b45ba9754c42185a77e558957a5c58498b39dc84d924db4d6992052a0c6cd146",
+    "data/raw/binance_BNBUSDT_1d.csv": "29c0444f39af294d75043faf24dec8e86e1d067ae12a658286109d3e3bee7bcd",
+    "data/raw/binance_TRXUSDT_1d.csv": "418f441dd28a04024dfca4882cb76aa45fcd8aaf344801cb2d3d4d0a80b00517",
+    "data/raw/binance_funding_BTCUSDT.csv": "9769422e4c2741e90bd7cb5d4e7baf5a98f6c48ba5af69e5a483eefdd4549bc3",
+    "data/raw/binance_funding_ETHUSDT.csv": "9754ce4e7a247d210afc4eebec790e82d1ae45a09b2887b486dbf590b1196e12",
+    "data/raw/binance_funding_BNBUSDT.csv": "f1e49f3fe536ee19ccfb2341d8da8331a47fffdb959d9c7747054de5fbbeb04b",
+    "data/raw/binance_funding_TRXUSDT.csv": "fc8fa87a64c84bfcb3c5de128ea6270ecf16232cd9db19814261c28b121879ef",
+    "data/raw/binanceperp_BTCUSDT_1h.csv": "ef36cdbedfe77ff4c3cc606f7dc0eb53c88a03c51a299b8dbdc191e126cfe352",
+    "data/raw/binanceperp_ETHUSDT_1h.csv": "26d1b3a1060289da5b93f53c2664e22ec8f6f66fdaccf9423831ae3854622a69",
+    "data/raw/binanceperp_BNBUSDT_1h.csv": "5a2616a8f3e0093009876da0d4842a5dace446ebe99b0b2e81433bd6bdbb12a6"
+  },
+  "hypothesis": {
+    "question": "在线学习体（每 bar 更新、含成本信号）能否在扣除成本后跑出相对市场暴露的显著 alpha？持续学习会不会随时间退化？",
+    "expected": "大概率无显著 alpha；成本会压制换手；分段表现应大致持平而非发散",
+    "decision_rule": "若净口径 alpha 不显著，则结论为'无边际'，如实记录并转信号源研究；若分段退化为负，说明在线更新在追逐噪声，需下调 η"
+  }
+}

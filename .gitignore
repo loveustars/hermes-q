@@ -8,6 +8,15 @@ data/raw/*.csv
 runs/*/curves/*.csv
 logs_*.txt
 
+# 临时/探索性的曲线 dump（无 config.json + meta.json，不是 Run 注册产物）。
+# 2026-09-15 加入：`runs/a_short_baseline/` 是 80MB 的裸曲线，不应进 git。
+# 正规证据请用 `src/registry/runs.py::Run` 注册（会写 config.json / meta.json），
+# 那种 run 目录**必须**入 git —— 这是本项目"证据可复现"的底线。
+runs/a_*_baseline/
+runs/*/hedge.csv
+runs/*/expert_weights.csv
+runs/*/learning_curve.csv
+
 # 纸面交易的原始逐次日志：无界增长，不入 git。
 # 真正的事件审计轨迹在 runs/live/<SYM>.json 的 events 字段里，且有界（见 paper.Book._trim）。
 runs/live/ticks.jsonl
