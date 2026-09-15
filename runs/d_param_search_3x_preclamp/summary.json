@@ -1,0 +1,51 @@
+{
+  "n_configs": 18,
+  "total_seconds": 473.3,
+  "bh_final": 1584312.77,
+  "best_by_sharpe": {
+    "eta": 0.05,
+    "band": 0.1,
+    "funding": false,
+    "insolvent": true,
+    "sharpe": 2.6253,
+    "total_return": -1.2139,
+    "max_dd": -1.0212,
+    "do_short_pct": 0.0028,
+    "p_short_all": 0.0,
+    "p_long_all": 0.0067,
+    "n_liquidated": 2,
+    "n_trades": 912,
+    "total_cost": 5599.72,
+    "final_net": -2131.7,
+    "seconds": 96.9
+  },
+  "best_by_total_return": {
+    "eta": 0.01,
+    "band": 0.03,
+    "funding": true,
+    "insolvent": true,
+    "sharpe": 0.7432,
+    "total_return": -0.9962,
+    "max_dd": -0.9999,
+    "do_short_pct": 0.0002,
+    "p_short_all": 0.0,
+    "p_long_all": 0.5942,
+    "n_liquidated": 6,
+    "n_trades": 13673,
+    "total_cost": 6777.44,
+    "final_net": 37.45,
+    "seconds": 308.8
+  },
+  "funding_comparison": {
+    "with_funding": {
+      "n": 9,
+      "mean_sharpe": 1.1749222222222222,
+      "mean_total": -1.168411111111111
+    },
+    "no_funding": {
+      "n": 9,
+      "mean_sharpe": 1.1515777777777778,
+      "mean_total": -1.1704666666666668
+    }
+  }
+}

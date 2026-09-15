@@ -1,0 +1,57 @@
+{
+  "n_configs": 18,
+  "n_alive": 2,
+  "n_bankrupt": 16,
+  "total_seconds": 481.6,
+  "bh_final": 1584312.77,
+  "best_by_sharpe": {
+    "eta": 0.01,
+    "band": 0.03,
+    "funding": true,
+    "insolvent": true,
+    "bankrupt": false,
+    "bankrupt_equity_raw": null,
+    "sharpe": 0.7432,
+    "total_return": -0.9962,
+    "max_dd": -0.9999,
+    "do_short_pct": 0.0002,
+    "p_short_all": 0.0,
+    "p_long_all": 0.5942,
+    "n_liquidated": 6,
+    "n_trades": 13673,
+    "total_cost": 6777.44,
+    "final_net": 37.45,
+    "seconds": 314.2
+  },
+  "best_by_total_return": {
+    "eta": 0.01,
+    "band": 0.03,
+    "funding": true,
+    "insolvent": true,
+    "bankrupt": false,
+    "bankrupt_equity_raw": null,
+    "sharpe": 0.7432,
+    "total_return": -0.9962,
+    "max_dd": -0.9999,
+    "do_short_pct": 0.0002,
+    "p_short_all": 0.0,
+    "p_long_all": 0.5942,
+    "n_liquidated": 6,
+    "n_trades": 13673,
+    "total_cost": 6777.44,
+    "final_net": 37.45,
+    "seconds": 314.2
+  },
+  "funding_comparison": {
+    "with_funding": {
+      "n": 1,
+      "mean_sharpe": 0.7432,
+      "mean_total": -0.9962
+    },
+    "no_funding": {
+      "n": 1,
+      "mean_sharpe": 0.7415,
+      "mean_total": -0.9964
+    }
+  }
+}

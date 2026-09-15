@@ -263,3 +263,53 @@ def test_trade_cost_never_exceeds_notional_with_cap():
     for notional in (10.0, 1e3, 1e6, 1e9):
         c = cm.impact(notional, sigma=0.02, period_notional=1e3)
         assert c <= notional, f"notional={notional}: 冲击成本 {c} 超过了名义额"
+
+
+# ==========================================================================
+# 6. 破产闸门的记录语义（2026-09-15 加）
+# ==========================================================================
+def _bankrupt_run():
+    """做空 1x，价格在单根 bar 内冲到 400 —— 损失远超全部权益。"""
+    frames = flat_frames(n=40, spike_at=25, spike_high=400.0)
+    ag = OnceAgent({"BTCUSDT": -1.0})
+    return SimExchange(
+        frames, CostModel(enabled=False), CostModel(enabled=False),
+        SimConfig(initial_cash=10_000.0, warmup=10,
+                  max_gross=1.0, max_exposure_per_symbol=1.0,
+                  margin=MarginConfig(initial_margin_ratio=0.5,
+                                      maintenance_margin_ratio=0.1,
+                                      topup_trigger_ratio=0.5),
+                  allow_short=True, instrument="perp")).run(ag)
+
+
+def test_bankruptcy_records_zero_not_negative_equity():
+    """爆仓时曲线记 **0**，不是负值；原始盯市值另存 bankrupt_equity_raw。
+
+    为什么必须归零：交易所不会让你欠钱（强平的意义就在于此）。若把负数
+    如实留在曲线里，下游会算出 `total_ret < −100%`、`max_dd < −100%`
+    （经济上不可能），而且 **sharpe 会变成无意义的正数** —— 简单收益率的
+    *均值*可以为正，而复利终值已经归零。实测在 3x 网格里出现过
+    "已爆仓的配置 sharpe=2.625 排第一"这种荒谬排名。
+    """
+    res = _bankrupt_run()
+
+    assert res.bankrupt, "单根 bar 亏光本金，破产闸门必须触发"
+    assert res.net_equity[-1] == 0.0, (
+        f"爆仓后权益应归零，实际 {res.net_equity[-1]}；"
+        "负值是盯市口径的产物，不是经济现实")
+    assert res.net_equity.min() >= 0.0, "曲线里不允许出现负权益"
+
+
+def test_bankruptcy_keeps_raw_overshoot_for_diagnosis():
+    """归零不应抹掉诊断信息：'本来跌到多深'要保留。
+
+    本例：做空 100 单位、开仓价 100、在 400 被强平 ⇒ 变现现金流 −40,000，
+    而开仓后现金只有 20,000 ⇒ 原始盯市值 **−20,000**（2 倍本金）。
+    """
+    res = _bankrupt_run()
+
+    assert res.bankrupt_equity_raw is not None, "必须保留原始盯市值"
+    assert res.bankrupt_equity_raw < 0, (
+        f"本例原始盯市值应为负，实际 {res.bankrupt_equity_raw}")
+    assert res.bankrupt_equity_raw == pytest.approx(-20_000.0, rel=1e-6), (
+        "做空 100 单位在 400 强平 ⇒ 现金 20,000 − 40,000 = −20,000")

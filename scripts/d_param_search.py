@@ -72,7 +72,9 @@ def run_one(frames, syms, rates, funding_or_none, eta, band,
     net_eq = res.net_equity
     if len(net_eq) < 2:
         return {"eta": eta, "band": band, "funding": funding_or_none is not None,
-                "insolvent": res.insolvent, "sharpe": 0.0, "total_return": 0.0,
+                "insolvent": res.insolvent, "bankrupt": res.bankrupt,
+                "bankrupt_equity_raw": None,
+                "sharpe": 0.0, "total_return": 0.0,
                 "max_dd": 0.0, "do_short_pct": 0.0, "p_short_all": 0.0,
                 "p_long_all": 0.0, "n_liquidated": 0, "n_trades": res.n_trades,
                 "total_cost": float(res.cost_paid.sum())}
@@ -98,6 +100,11 @@ def run_one(frames, syms, rates, funding_or_none, eta, band,
         "eta": eta, "band": band,
         "funding": funding_or_none is not None,
         "insolvent": res.insolvent,
+        # 已爆仓：曲线截断在归零那一根，末期收益为 −100%。
+        # **这类配置的 sharpe 没有意义**（见 main() 里的排名处理）。
+        "bankrupt": res.bankrupt,
+        "bankrupt_equity_raw": (round(res.bankrupt_equity_raw, 2)
+                                if res.bankrupt_equity_raw is not None else None),
         "sharpe": round(sharpe, 4),
         "total_return": round(total_ret, 4),
         "max_dd": round(max_dd, 4),
@@ -167,22 +174,39 @@ def main() -> None:
                       f"{row['final_net']:>12,.0f} {row['seconds']:>5.0f}")
     total_seconds = time.time() - t0
 
-    # 按 sharpe 排序
-    rows.sort(key=lambda r: -r["sharpe"])
-    best_by_sharpe = rows[0] if rows else None
-    print(f"\n总耗时 {total_seconds:.1f}s   benchmark 净终值 {bh_final:,.0f}\n")
-    print("=== top-10 by sharpe ===")
-    for r in rows[:10]:
+    # ---- 排名：已爆仓的配置**不参与** ----
+    # 爆仓组的曲线被截断在归零那一根、末期收益恰为 −100%，其 sharpe 在数学上
+    # 失去意义：简单收益率的**均值**可以为正，而复利终值已经归零，于是会得出
+    # "已爆仓组 sharpe 最高"这种荒谬排名（实测出现过 sharpe=2.625 的爆仓组）。
+    # 它们单独列出，只报"死时原始权益 / 换手 / 强平次数"。
+    dead = [r for r in rows if r["bankrupt"]]
+    alive = [r for r in rows if not r["bankrupt"]]
+
+    alive.sort(key=lambda r: -r["sharpe"])
+    best_by_sharpe = alive[0] if alive else None
+    print(f"\n总耗时 {total_seconds:.1f}s   benchmark 净终值 {bh_final:,.0f}")
+    print(f"存活 {len(alive)}/{len(rows)} 组，爆仓 {len(dead)} 组\n")
+    print("=== top-10 by sharpe（仅存活组）===")
+    for r in alive[:10]:
         marker = "💰" if r["funding"] else "  "
         print(f"  {marker} η={r['eta']:.3f} band={r['band']:.2f} "
               f"funding={'Y' if r['funding'] else 'N'}  "
               f"sharpe={r['sharpe']:>6.3f}  total={r['total_return']*100:>7.1f}%  "
               f"short%={r['do_short_pct']*100:>4.1f}  p_short={r['p_short_all']:.3f}")
 
-    # 按 total_return 排序
-    rows.sort(key=lambda r: -r["total_return"])
-    print("\n=== top-10 by total_return ===")
-    for r in rows[:10]:
+    if dead:
+        print(f"\n=== 已爆仓（{len(dead)} 组，不参与排名）===")
+        for r in sorted(dead, key=lambda r: r["eta"]):
+            print(f"     η={r['eta']:.3f} band={r['band']:.2f} "
+                  f"funding={'Y' if r['funding'] else 'N'}  "
+                  f"死时原始权益={r['bankrupt_equity_raw']:>12,.0f}  "
+                  f"n_trd={r['n_trades']:>7}  liq={r['n_liquidated']:>4}")
+
+    # 按 total_return 排序（同样只用存活组）
+    alive.sort(key=lambda r: -r["total_return"])
+    best_by_total = alive[0] if alive else None
+    print("\n=== top-10 by total_return（仅存活组）===")
+    for r in alive[:10]:
         marker = "💰" if r["funding"] else "  "
         print(f"  {marker} η={r['eta']:.3f} band={r['band']:.2f} "
               f"funding={'Y' if r['funding'] else 'N'}  "
@@ -190,15 +214,22 @@ def main() -> None:
               f"short%={r['do_short_pct']*100:>4.1f}  p_short={r['p_short_all']:.3f}")
 
     # funding 接入 vs 不接入的对比
-    print("\n=== funding 接入 vs 不接入（按 sharpe 平均）===")
-    with_f = [r for r in rows if r["funding"]]
-    no_f = [r for r in rows if not r["funding"]]
-    print(f"  funding=Y:  mean sharpe {np.mean([r['sharpe'] for r in with_f]):>6.3f}  "
-          f"mean total {np.mean([r['total_return'] for r in with_f])*100:>6.1f}%  "
-          f"mean short% {np.mean([r['do_short_pct'] for r in with_f])*100:>5.1f}%")
-    print(f"  funding=N:  mean sharpe {np.mean([r['sharpe'] for r in no_f]):>6.3f}  "
-          f"mean total {np.mean([r['total_return'] for r in no_f])*100:>6.1f}%  "
-          f"mean short% {np.mean([r['do_short_pct'] for r in no_f])*100:>5.1f}%")
+    print("\n=== funding 接入 vs 不接入（按 sharpe 平均，仅存活组）===")
+    with_f = [r for r in alive if r["funding"]]
+    no_f = [r for r in alive if not r["funding"]]
+    if not alive:
+        print("  存活 0 组 —— 全部爆仓，本对比无意义（已跳过）")
+    else:
+        print(f"  仅存活组参与：爆仓组的 sharpe 在数学上无意义"
+              f"（简单收益率均值可正、复利终值已归零），纳入会把均值污染成假信号。")
+        print(f"  funding=Y:  mean sharpe {np.mean([r['sharpe'] for r in with_f]):>6.3f}  "
+              f"mean total {np.mean([r['total_return'] for r in with_f])*100:>6.1f}%  "
+              f"mean short% {np.mean([r['do_short_pct'] for r in with_f])*100:>5.1f}%"
+              if with_f else "  funding=Y:  存活 0 组")
+        print(f"  funding=N:  mean sharpe {np.mean([r['sharpe'] for r in no_f]):>6.3f}  "
+              f"mean total {np.mean([r['total_return'] for r in no_f])*100:>6.1f}%  "
+              f"mean short% {np.mean([r['do_short_pct'] for r in no_f])*100:>5.1f}%"
+              if no_f else "  funding=N:  存活 0 组")
 
     # 落盘
     out_dir = os.path.join(store.project_root(), "runs", OUT_NAME)
@@ -207,12 +238,16 @@ def main() -> None:
     with open(os.path.join(out_dir, "summary.json"), "w") as f:
         json.dump({
             "n_configs": n_total,
+            "n_alive": len(alive),
+            "n_bankrupt": len(dead),
             "total_seconds": round(total_seconds, 1),
             "bh_final": round(bh_final, 2),
-            # 注意：必须在**按 sharpe 排序之后、按 total_return 重排之前**取。
-            # 初版写成 `rows[0] if not rows else None`（条件写反），导致该字段恒为 null。
+            # 注意：这两个字段来自**仅存活组**的排名（爆仓组的 sharpe 无意义，
+            # 见 main() 里的说明）。best_by_sharpe 必须在按 sharpe 排序之后、
+            # 按 total_return 重排之前取 —— 初版写成 `rows[0] if not rows else None`
+            # （条件写反）导致该字段恒为 null。
             "best_by_sharpe": best_by_sharpe,
-            "best_by_total_return": rows[0] if rows else None,
+            "best_by_total_return": best_by_total,
             "funding_comparison": {
                 "with_funding": {
                     "n": len(with_f),

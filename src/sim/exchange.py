@@ -95,6 +95,9 @@ class SimResult:
     # 死亡那一根。于是下游指标（total_ret、sharpe、max_dd）都只覆盖"活着的时段"，
     # 不会用一条虚构的复活曲线去算夏普。
     bankrupt_at: int | None = None
+    # 闸门触发时的原始盯市值 —— 可能 < 0（单根 bar 亏掉的不止全部权益）。
+    # 曲线里记的是归零后的 0.0；这个字段只为排查保留"本来跌到多深"。
+    bankrupt_equity_raw: float | None = None
     n_gap_bars: int = 0
     n_gap_trades: int = 0
     n_gap_skipped: int = 0
@@ -202,6 +205,7 @@ class SimExchange:
         n_funding_events = 0
         insolvent_at: int | None = None
         bankrupt_at: int | None = None
+        bankrupt_equity_raw: float | None = None   # 闸门触发时的原始盯市值（可能为负）
         n_gap_trades = 0
         n_gap_skipped = 0
         latency_hist: dict[int, int] = {}
@@ -328,6 +332,16 @@ class SimExchange:
                 if (cfg.stop_when_bankrupt and bankrupt_at is None
                         and net_eq[-1] <= cfg.insolvency_floor):
                     bankrupt_at = len(net_eq) - 1
+                    # **强平语义：交易所不会让你欠钱 —— 权益归零，不是负值。**
+                    # 单根 bar 内的损失可以超过全部权益（3x + 高相关标的同步下跌时
+                    # 常见）。若把负数如实留在曲线里，下游会算出
+                    #   total_ret < −100%、max_dd < −100%（经济上不可能），
+                    # 而且 sharpe 会变成**无意义的正数**（简单收益率的均值可以为
+                    # 正，而复利终值已经归零），进而把已爆仓的配置排到排行榜第一。
+                    # 原始盯市值另存 bankrupt_equity_raw，供排查用。
+                    bankrupt_equity_raw = float(net_eq[-1])
+                    net_eq[-1] = max(0.0, net_eq[-1])
+                    gross_eq[-1] = max(0.0, gross_eq[-1])
                     break
 
             # ---------- 4) 决策（只能在看到 t 及之前的数据后做）----------
@@ -355,6 +369,7 @@ class SimExchange:
             initial_cash=cfg.initial_cash,
             insolvent_at=insolvent_at,
             bankrupt_at=bankrupt_at,
+            bankrupt_equity_raw=bankrupt_equity_raw,
             n_impact_capped=self.net_costs.n_impact_capped,
             n_gap_bars=n_gap_bars,
             n_gap_trades=n_gap_trades,
