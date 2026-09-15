@@ -925,12 +925,91 @@ python3 -m pytest tests/ -q
 ```bash
 cd /home/nick/workspace/quant
 
-# 单元测试（pytest，必须用这个跑法，见 §14.7 发现 B）
-python3 -m pytest tests/ -q
+# 单元测试 —— 必须用 pytest 跑法（见 §14.7 发现 B：两个文件没有 main()，
+# 用 `python3 tests/x.py` 会静默跳过且 exit 0）
+python3 -m pytest tests/ -q                      # 期望 156 passed
 
-# 复现修复前的病态（把 stop_when_bankrupt 关掉、然后插桩看强平时的权益跳变）
-# 最小复现：同一 agent，只开关保证金
-python3 scripts/c_margin_baseline.py        # C 阶段基线，已走修好的路径
+# 复现"修复前 vs 修复后"的对照（初版实现内联保留在脚本里，永不失传）
+python3 scripts/fix_margin_verify.py             # 默认前 25,000 根，约 3 分钟
+python3 scripts/fix_margin_verify.py --bars 10000  # 更快
 
-# 隔离实验脚本（本文档 §14.1 的数字来源）见 runs/ 下带 margin 的 run 目录
+# 资金守恒不变量（补上 C 阶段缺失的覆盖层）
+python3 -m pytest tests/test_sim_conservation.py -q
+
+# D 阶段重跑（约 21.5 分钟；1x 与 3x 用环境变量区分，不复制脚本）
+python3 scripts/d_param_search.py                          # 1x → runs/d_param_search
+D_LEVERAGE=3.0 D_OUT=d_param_search_3x python3 scripts/d_param_search.py
 ```
+
+对照证据：`runs/20260915T035051_fix_margin_verify_d0497d/metrics.json`
+（含 `continuity_ok` 与 36 项 `grid.*`）。
+作废的旧 D 结果：`runs/d_param_search_INVALIDATED_margin_bug/`（含 README 说明为何不可引用）。
+
+---
+
+## 十五、D 阶段重跑（修复后，2026-09-15）
+
+**触发**：§14 修掉保证金记账缺陷后，D 阶段全部数字作废，必须重跑。
+
+**命令**：`python3 scripts/d_param_search.py`（`LEVERAGE = 1.0`，即 D2 的配置）
+**窗口**：77,503 根（2017-11-06 ~ 2026-09-14），3 标的，18 组（η 3 × band 3 × funding 2）
+**耗时**：1,290.3s（21.5 分钟，每组约 72s —— 脚本文档里写的"3-5 分钟"是错的）
+**产物**：`runs/d_param_search/{all_configs.csv,summary.json}`
+
+### 15.1 结果
+
+| 项 | 数值 |
+|---|---|
+| 终值区间 | **53,679 ~ 200,595**（本金 10,000） |
+| sharpe 区间 | 0.627 ~ **0.838** |
+| 最大回撤区间 | **−75.5% ~ −92.0%** |
+| 基准 buy_hold 净终值 | **1,584,313** |
+| **跑赢基准的组数** | **0 / 18** |
+
+**最优组**：η=0.20、band=0.20、funding=Y —— sharpe 0.838、总收益 +1,907.5%、终值 200,595。
+
+### 15.2 四条判读
+
+**① 全部 18 组跑不过买入持有，且差距很大**（最好的 20.1 万 vs 基准 158.4 万，
+差 7.9 倍；最差差 29.5 倍）。这与 M5 早先的判定（在线学习体"无边际"）**一致**，
+而且现在是建立在**可信的记账**之上的。
+
+**② bug 的影响与做空占比严格对应** —— 这是对 §14 根因诊断最有力的独立验证：
+
+| 做空 bar 占比 | 组数 | 旧/新 终值倍数（中位） |
+|---|---|---|
+| 0%（几乎不做空） | 6 | **1.0x** |
+| 3.9%（偶尔做空） | 6 | **25.0x** |
+| 33.8%（经常做空） | 6 | **281.6x** |
+
+**越常做空，旧数字被夸得越狠。** 机制正是 §14.2/§14.3 描述的：
+缺陷 2 让空头一开仓就被强平、缺陷 1 让每次强平都造钱。
+反过来说，**不做空的配置新旧几乎一样**（1.0x）——如果 bug 是别的原因，不该有这种对应关系。
+
+**③ 参数搜索实际只有 1 个自由度。** sharpe 与 total_return 的 **Spearman = 1.0000**
+（完全同序），所以本节表格里"按 sharpe 排"和"按总收益排"是同一张表。
+18 组配置看起来很宽，实际只在一个轴上变化。
+
+**④ funding 接入仍然近乎无效**：mean sharpe 0.723(Y) vs 0.705(N)、
+mean total 955.5% vs 803.6%。与 A' 阶段"1h 尺度上资金费远小于价格波动"的发现一致。
+
+**⑤ 学习体依然是双峰**：低 η(0.01) 全压 `long_all`（p_long 0.70~0.74，做空 0%）；
+高 η(0.20) 全压 `short_all`（p_short 1.000，做空 33.8%，强平 160~216 次）。
+**没有中间态**——这不是"学到了配置"，而是"最近赢家通吃"。
+
+### 15.3 被本次重跑推翻/搁置的结论
+
+- **D1 的"3x 下 12 组全部破产，参数搜索救不了 sim 失真"不可信**：
+  那是 bug 之下的结论，而它正是把整个 D 阶段推向 1x 的依据。
+  3x 重跑：`runs/d_param_search_3x/`（`D_LEVERAGE=3.0 D_OUT=d_param_search_3x`）。
+- **§12.10 的全部数字作废**，已归档为 `runs/d_param_search_INVALIDATED_margin_bug/`。
+
+### 15.4 顺带修掉的两个报告层 bug
+
+`scripts/d_param_search.py` 的两处**只影响落盘、不影响计算**的问题：
+
+1. `"best_by_sharpe": rows[0] if not rows else None` —— **条件写反**，
+   非空时反而给 `None`，所以该字段**恒为 null**（旧产物里也是 null，不是新引入的）。
+   已改为在**按 sharpe 排序之后、按 total_return 重排之前**取，并新增
+   `best_by_total_return` 字段。
+2. 死代码 `LEVERAGE = 3.0` 紧跟着被 `LEVERAGE = 1.0` 覆盖（已删）。

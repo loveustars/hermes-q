@@ -1,11 +1,11 @@
-"""D 阶段：参数重标定 —— 60 组 (η × band × funding) 真实数据搜索。
+"""D 阶段：参数重标定 —— 18 组 (η × band × funding) 真实数据搜索。
 
 目的：
   - C 阶段已发现 Hedge 在 1h 时间尺度追逐价格信号，funding carry 被滤掉
   - B' baseline 用 η=0.05, band=0.05 几乎无效，需要重新选超参
   - 本脚本**不**跑评估协议（DSR/bootstrap），只看：sharpe / 总收益 / 最大回撤 /
     做空 bar 占比 / 终态 p_short_all
-  - 6 × 5 × 2 = 60 组（η × band × funding on/off），真实数据 77k bar × 3 标的
+  - 3 × 3 × 2 = 18 组（η × band × funding on/off），真实数据 77k bar × 3 标的
   - 找出 top-10 配置，看 funding 接入是否在超参搜索下有边际
 
 不做：
@@ -13,7 +13,12 @@
   - HoldoutGuard（C/B' baseline 都没用 holdout，D 也不引入）
   - Baseline 对照（m5_online.py 已有，C/B' 已对比 buy_hold）
 
-预计耗时：~3-5 分钟（每组 ~3-5s，60 组）
+**杠杆**：用环境变量 `D_LEVERAGE`（默认 1.0）、输出目录用 `D_OUT`
+（默认 `d_param_search`），因为 1x 与 3x 都要跑而 3x 的结论在
+2026-09-15 的记账修复后必须重新验证。见 WORK_LOG §14 / §15。
+
+耗时（2026-09-15 实测，i9-13900H）：**每组约 72 秒，18 组约 21.5 分钟**
+（此前本文件写"~3-5 分钟 / 每组 3-5s"是**错的**；实测每组 72s）。
 """
 from __future__ import annotations
 
@@ -38,12 +43,12 @@ from src.sim.funding import FundingTable  # noqa: E402
 from src.sim.margin import MarginConfig  # noqa: E402
 
 BARS_PER_YEAR = 24 * 365
-LEVERAGE = 3.0
 
-# D 阶段：D1 阶段已跑 12 组（η=0.01/0.05/0.20 × band=0.03/0.10/0.20 × funding=N=9 + funding=Y 前 3 组）
-# 关键发现：3x 杠杆下 12 组全部破产，参数搜索救不了 sim 失真
-# D2 阶段：减杠杆到 1.0x（无 margin、无强平），看参数搜索在低杠杆下能否找到 alpha
-LEVERAGE = 1.0    # D2 阶段：1x 杠杆（与 A 阶段 baseline 一致）
+# 运行期开关（2026-09-15 加）：让"重跑 D"能跑不同杠杆而不必复制脚本。
+#   D_LEVERAGE=3.0 D_OUT=d_param_search_3x python3 scripts/d_param_search.py
+# 默认值与初版一致（1.0 / d_param_search），所以旧调用方式行为不变。
+LEVERAGE = float(os.environ.get("D_LEVERAGE", "1.0"))
+OUT_NAME = os.environ.get("D_OUT", "d_param_search")
 ETA_GRID = [0.01, 0.05, 0.20]
 BAND_GRID = [0.03, 0.10, 0.20]
 FUNDING_FLAGS = [False, True]    # 2 选 1
@@ -164,6 +169,7 @@ def main() -> None:
 
     # 按 sharpe 排序
     rows.sort(key=lambda r: -r["sharpe"])
+    best_by_sharpe = rows[0] if rows else None
     print(f"\n总耗时 {total_seconds:.1f}s   benchmark 净终值 {bh_final:,.0f}\n")
     print("=== top-10 by sharpe ===")
     for r in rows[:10]:
@@ -195,7 +201,7 @@ def main() -> None:
           f"mean short% {np.mean([r['do_short_pct'] for r in no_f])*100:>5.1f}%")
 
     # 落盘
-    out_dir = os.path.join(store.project_root(), "runs", "d_param_search")
+    out_dir = os.path.join(store.project_root(), "runs", OUT_NAME)
     os.makedirs(out_dir, exist_ok=True)
     pd.DataFrame(rows).to_csv(os.path.join(out_dir, "all_configs.csv"), index=False)
     with open(os.path.join(out_dir, "summary.json"), "w") as f:
@@ -203,7 +209,10 @@ def main() -> None:
             "n_configs": n_total,
             "total_seconds": round(total_seconds, 1),
             "bh_final": round(bh_final, 2),
-            "best_by_sharpe": rows[0] if not rows else None,
+            # 注意：必须在**按 sharpe 排序之后、按 total_return 重排之前**取。
+            # 初版写成 `rows[0] if not rows else None`（条件写反），导致该字段恒为 null。
+            "best_by_sharpe": best_by_sharpe,
+            "best_by_total_return": rows[0] if rows else None,
             "funding_comparison": {
                 "with_funding": {
                     "n": len(with_f),

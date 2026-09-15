@@ -1,18 +1,52 @@
 {
   "n_configs": 18,
-  "total_seconds": 1294.5,
+  "total_seconds": 1290.3,
   "bh_final": 1584312.77,
-  "best_by_sharpe": null,
+  "best_by_sharpe": {
+    "eta": 0.2,
+    "band": 0.2,
+    "funding": true,
+    "insolvent": false,
+    "sharpe": 0.8382,
+    "total_return": 19.0753,
+    "max_dd": -0.7554,
+    "do_short_pct": 0.3379,
+    "p_short_all": 1.0,
+    "p_long_all": 0.0,
+    "n_liquidated": 130,
+    "n_trades": 5327,
+    "total_cost": 91364.63,
+    "final_net": 200594.56,
+    "seconds": 1290.3
+  },
   "funding_comparison": {
     "with_funding": {
       "n": 9,
-      "mean_sharpe": 1.0873111111111111,
-      "mean_total": NaN
+      "mean_sharpe": 0.7225444444444444,
+      "mean_total": 9.554866666666667
     },
     "no_funding": {
       "n": 9,
-      "mean_sharpe": 1.0829777777777778,
-      "mean_total": NaN
+      "mean_sharpe": 0.7046111111111111,
+      "mean_total": 8.035966666666667
     }
-  }
+  },
+  "best_by_total_return": {
+    "eta": 0.2,
+    "band": 0.2,
+    "funding": true,
+    "insolvent": false,
+    "sharpe": 0.8382,
+    "total_return": 19.0753,
+    "max_dd": -0.7554,
+    "do_short_pct": 0.3379,
+    "p_short_all": 1.0,
+    "p_long_all": 0.0,
+    "n_liquidated": 130,
+    "n_trades": 5327,
+    "total_cost": 91364.63,
+    "final_net": 200594.56,
+    "seconds": 1290.3
+  },
+  "_repaired": "2026-09-15：`best_by_sharpe` 原为 `rows[0] if not rows else None`（条件写反），恒为 null。此处按**本次运行自己的 all_configs.csv** 重新计算填回，非重新训练。修复已进 scripts/d_param_search.py。"
 }
