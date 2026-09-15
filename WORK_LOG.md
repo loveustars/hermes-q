@@ -4,7 +4,7 @@
 **位置**：`/home/nick/workspace/quant`
 **最后更新**：2026-09-15
 **当前阶段**：M0–M11 完成。前向纸面交易运行中；**新启动"训练目标做空能力扩展"路线图
-（A→B→C→D 四阶段），A 已完成、B 待启动**。
+（A→A'→B 三阶段，A、A'、B 已完成；C、D 规划）**。
 
 ---
 
@@ -497,14 +497,15 @@ G2 淘汰门之后，重新审视训练目标本身：**当前 `mixed = clip(mix
 清零，训练目标只能在 {0, 多} 之间选**，从架构上排除了做空信号。
 
 本路线图目标：让训练目标**能使用杠杆做多做空**，且仿真结果在实盘可复现。
-分四阶段（**A 已完成**，**B 待启动**，C、D 是规划）：
+分四阶段（**A、A'、B 已完成**，C、D 规划）：
 
-| 阶段 | 内容 | 风险 |
-|---|---|---|
-| **A** 放开做空 | clip(0) → 对称 clip；加做空专家；配置 allow_short | 低：sim 层早已支持 |
-| **B** 加杠杆 | max_gross 1.0 → 3.0；单标的上限 | 中：杠杆会放大冲击成本 |
-| **C** 逐标的保证金 + 强平 | 把 carry.py 的 margin_cash/reserve 移植到主 sim | 高：sim 失真会导致仿真结果比实盘乐观一个数量级 |
-| **D** 参数重标定 | max_turnover、band、η 等 | 中：贯穿全程 |
+| 阶段 | 内容 | 风险 | 状态 |
+|---|---|---|---|
+| **A** 放开做空 | clip(0) → 对称 clip；加做空专家；配置 allow_short | 低 | ✅ 完成 |
+| **A'** funding carry 信号 | 把 funding 接进 Hedge payoffs，让 ShortExpert 看到 carry 收益 | 低 | ✅ 完成（但**真实数据几乎无变化**）|
+| **B** 加杠杆 | max_gross 1.0 → 3.0；agent/sim 配齐 | 中 | ✅ 完成（**但 Hedge 长期 gross 仍 = 1.0**）|
+| **C** 逐腿保证金 + 强平 | 把 `carry.py` 的 margin_cash/reserve 移植到主 sim | **高** | 规划 |
+| **D** 参数重标定 | `max_turnover`、`band`、`η` 配合新范围 | 中 | 规划 |
 
 ### 12.2 A 阶段变更摘要（**已完成**）
 
@@ -552,6 +553,59 @@ G2 淘汰门之后，重新审视训练目标本身：**当前 `mixed = clip(mix
 - **A 没改 base.json 的 `max_gross_exposure`**，所以默认仍是 1.0。要让 A 的"放开做空"真的发挥作用，必须接着做 B 改 3.0
 - 旧测试 `test_hedge_ensemble_can_emit_negative_mixed_weights` 用的是**下跌** 600 根合成数据。若改用真实历史数据回归，需重新调阈值（`p > 2/K` 是合成的，真实场景下 Hedge 可能更保守）
 - `runs/live/*.json` 没加 `.gitignore`（cron 会自动追加事件，下次 commit 前手动 `git restore`）
+
+### 12.6 A' 阶段：funding carry 信号（**已完成但效果有限**）
+
+**触发**：A 阶段真实数据 baseline 显示 Hedge **完全没学到做空**——下跌段（-41%/-19%）也 0% 做空，只在上涨段 11.1% / 8.6% 短暂做空（短期反转套利）。
+
+**修复**：把 funding carry 接进 `_update_experts` 的 payoffs，让 short 持仓的专家能从 8h 资金费里收到 carry（BTC/ETH 年化 +5~8%）。
+
+**实现**：
+- `HedgeEnsemble(funding=...)` 新增可选 `FundingTable` 参数
+- `decide(view)` 查上一根 bar 时刻的 funding rate，写进 fr_arr
+- payoffs[k] += `target @ fr_arr`（短 carry 对 short 持仓是 +payoff）
+
+**测试新增 2 条**（`test_short_expert_activated_by_positive_funding_carry` / `test_funding_none_keeps_pure_price_signal`），全 110 条通过。
+
+**真实数据发现**（A' vs A 几乎无变化）：
+
+| 指标 | A（无 funding）| A'（有 funding）|
+|---|---|---|
+| 做空 bar 占比 | 3.9% | 4.0% |
+| 终态 p_short_all | 0 | 0 |
+| 段 3/5 下跌做空 | 0% | 0% |
+
+**根本原因**：1h 价格波动（σ ≈ 0.4%）>> 8h funding 收益（1bp），Hedge 在 1h 时间尺度上把 funding 当噪声过滤。**这是 D 阶段（参数重标定）的目标**。
+
+### 12.7 B 阶段：3x 杠杆（**已完成但 no-op**）
+
+**改动**：
+- `HedgeEnsemble(max_exposure=3.0)` + `SimConfig(max_gross=3.0)` 配齐
+- 测试 4 条（单标/总仓位/3x 生效/超限截断）→ 114/114 通过
+- 新增 `scripts/b_leverage_baseline.py`
+
+**真实数据发现**（**B 和 A' 完全一致**）：
+
+| 指标 | A'（1x）| B（3x）|
+|---|---|---|
+| 净终值 | 49,778 | **49,778** |
+| max(Σ\|w\|) | 1.00 | **1.00** |
+| 段 3（-41% 跌）| 0% 做空 | 0% 做空 |
+| net_eq 最小 | 2,590 | 2,590 |
+| 终态 p_long_all | 0.9945 | 0.9945 |
+| 破产触发 | 否 | **否（C 阶段没做 → sim 不会逐腿爆仓）** |
+
+**核心发现**：
+- **B 阶段是 no-op**——`max(Σ|w|)=1.0` 而非 3.0，杠杆上限**完全没用满**
+- 根因：`LongExpert` / `InverseVolExpert` 等 14 个专家的"满仓值"= `1/n`，**写死**在专家代码里
+- 要让 B 阶段真生效，必须改专家"满仓值"（如 LongExpert 改 `3.0/n`）或让 HedgeEnsemble 把 `max_exposure` 注入专家 proposal
+- 净终值 / 破产：**未破产**（C 阶段没做），但 `net_eq 最低 2,590`（**跌去 74%**）—— 这与 sim 失真共存
+
+### 12.8 进入 C 之前必须解决的 B 阶段遗留问题
+
+1. **专家"满仓值"与 max_exposure 解耦**：要么改专家返回 `target * max_exposure`，要么显式给 HedgeEnsemble 一个 `gross_target` 参数
+2. **C 阶段（逐腿保证金/强平）必须先于"实盘用"**：当前 B 阶段 alpha 完全是 sim 估值，BTC 跌 33% 净资产归零这个事实在 sim 里**不会**真触发
+3. **D 阶段（参数重标定）必须做**：A' 已证明 funding 信号在 1h 时间尺度上被噪声过滤，需要 D 阶段重新选 `η` / `band` 才能让 funding 可见
 
 ---
 
